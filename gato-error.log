@@ -1,0 +1,15 @@
+00001 import random
+00002 
+00003 
+00004 def imprimir_tablero(tablero):
+00005 _var1&& ==  10
+        Error 201. Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.[Linea 5]
+00006 var2_abc <= _var1
+00007 var2_abc != 10.123
+*************
+1 Token ==
+1 Token <=
+0 Token <
+1 Token !=
+0 Token >
+0 Token >=
