@@ -13,7 +13,9 @@ import static compilador.Compilador.contenidoArchivo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -23,7 +25,7 @@ import java.util.StringTokenizer;
 public class Lexer {
 
     private static List<String> programaEnPythonOriginal; //Código que se analiza en forma de lista
-    private static List<Token> listaDeTokens; //Almacena los tokens que se identifican
+    private static List<List<Token>> listaDeTokens; //Almacena cada linea de codigo convertida a Token
     private static List<String> programaEnPythonRevisado; //Almacena los tokens que se identifican
     private static auxiliares.Error erroresEnProgamaEnPythonOriginal;
     private static HashMap<String, Integer> histograma = new HashMap<String, Integer>(); //Cuenta los operadores de comparación
@@ -101,17 +103,16 @@ public class Lexer {
                 arregloDeTokens[j++] = token;
             }
 
-            for( int indice = 0; indice < arregloDeTokens.length; ++indice){
+            for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
                 String tokenActual = arregloDeTokens[indice];
                 String tokenSiguiente = " ";
-                
-                if(indice == arregloDeTokens.length - 1){
-                     tokenSiguiente = " ";
+
+                if (indice == arregloDeTokens.length - 1) {
+                    tokenSiguiente = " ";
                 } else {
-                     tokenSiguiente = arregloDeTokens[indice + 1];
+                    tokenSiguiente = arregloDeTokens[indice + 1];
                 }
-                
-                
+
                 switch (tokenActual) {
                     //Ignora los espacios en blanco
                     case " ":
@@ -131,18 +132,18 @@ public class Lexer {
                         agregarNuevoToken(TipoDeToken.DIVISION, numeroLineaActual);
                         break;
 
-                     //Analiza los operadores aritméticos       
+                    //Analiza los operadores aritméticos       
                     case "=":
                         if (tokenSiguiente.equals("=")) {
-                            agregarNuevoToken(TipoDeToken.IGUAL_QUE,  numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.IGUAL_QUE, numeroLineaActual);
                             incrementarCantidadOperadoresComparacion("==");
                         } else {
-                            agregarNuevoToken(TipoDeToken.ASIGNACION,  numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.ASIGNACION, numeroLineaActual);
                         }
                         break;
                     case "!":
                         if (tokenSiguiente.equals("=")) {
-                            agregarNuevoToken(TipoDeToken.DIFERENTE_QUE,  numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.DIFERENTE_QUE, numeroLineaActual);
                             incrementarCantidadOperadoresComparacion("!=");
                         } else {
                             //No contemplado en Python
@@ -150,7 +151,7 @@ public class Lexer {
                         break;
                     case ">":
                         if (tokenSiguiente.equals("=")) {
-                            agregarNuevoToken(TipoDeToken.MAYOR_O_IGUAL_QUE,  numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.MAYOR_O_IGUAL_QUE, numeroLineaActual);
                             incrementarCantidadOperadoresComparacion(">=");
                         } else {
                             agregarNuevoToken(TipoDeToken.MAYOR_QUE, numeroLineaActual);
@@ -159,7 +160,7 @@ public class Lexer {
                         break;
                     case "<":
                         if (tokenSiguiente.equals("=")) {
-                            agregarNuevoToken(TipoDeToken.MENOR_O_IGUAL_QUE,numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.MENOR_O_IGUAL_QUE, numeroLineaActual);
                             incrementarCantidadOperadoresComparacion("<=");
                         } else {
                             agregarNuevoToken(TipoDeToken.MENOR_QUE, numeroLineaActual);
@@ -208,30 +209,33 @@ public class Lexer {
             }
             ++numeroLineaActual;
         }
-        
 
         System.out.println("Lista de Tokens tiene tamanio " + listaDeTokens.size());
         for (Token token : listaDeTokens) {
             System.out.println(token.toString());
         }
-        
+
+        validarPosicionDeImport();
+
         System.out.println("Generacion del histograma");
         generarHistogramaOperadoresComparacion();
-        
+
         System.out.println("Generacion del archivo de analisis");
         generarArchivoDeSalida();
 
     }
 
     //FUNCIONES AUXILIARES
-    
-    public static void generarArchivoDeSalida(){
+    public static void generarArchivoDeSalida() {
         Archivo archivo = new Archivo();
         archivo.escribirArchivo(programaEnPythonRevisado, archivoDeSalida);
-        
+
     }
+
     public static void agregarNuevoToken(TipoDeToken tipoDeToken, String lexema, String literal, int numeroLinea) {
         Token nuevoToken = new Token(tipoDeToken, lexema, literal, numeroLinea);
+        List<Token> tokens = new ArrayList();
+        tokens.add(nuevoToken);
         listaDeTokens.add(nuevoToken);
     }
 
@@ -359,4 +363,59 @@ public class Lexer {
             System.out.println(histograma.get(operador) + " Token " + operador);
         }
     }
+
+    /*
+    public  void validarPosicionDeImport()  {
+        Set<Integer> lineasProcesadas = new HashSet<>();
+        boolean encontradoOtroToken = false;
+
+        for (Token token : listaDeTokens) {
+            int numeroLinea = token.getNumeroLinea();
+
+            // Solo procesamos el primer token de cada línea
+            if (!lineasProcesadas.contains(numeroLinea)) {
+                lineasProcesadas.add(numeroLinea);
+
+                if (token.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA && token.getLexema().equals("import")) {
+                    if (encontradoOtroToken) {
+                        //throw new Exception("Error: 'import' encontrado en una posición incorrecta en la línea " + numeroLinea);
+                       insertarMensajeDeErrorEnProgramaEnPythonRevisado(300, numeroLinea);
+                    }
+                } else {
+                    encontradoOtroToken = true;
+                }
+            }
+        }
+    }
+     */
+    public void validarPosicionDeImport() {
+
+        Set<Integer> lineasProcesadas = new HashSet<>();
+        boolean encontradoOtroToken = false;
+
+        for (Token token : listaDeTokens) {
+            int numeroLinea = token.getNumeroLinea();
+
+            // Solo procesamos el primer token de cada línea
+            //if (!lineasProcesadas.contains(numeroLinea)) {
+            //    lineasProcesadas.add(numeroLinea);
+
+                if ( token.getLexema().equals("import")) {
+                    if (encontradoOtroToken) {
+                        //throw new Exception("Error: 'import' encontrado en una posición incorrecta en la línea " + numeroLinea);
+                       insertarMensajeDeErrorEnProgramaEnPythonRevisado(300, numeroLinea);
+                    }
+                } else {
+                    encontradoOtroToken = true;
+                }
+            
+        }
+    }
+
+    public void insertarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
+        programaEnPythonRevisado.add(numeroDeLinea + 1, String.format("%14s", "Error ") + numeroDeError
+                + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError)
+                + String.format("[%s%d]", "Linea ", numeroDeLinea));
+    }
+
 }

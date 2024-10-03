@@ -60,6 +60,7 @@ public class Compilador {
 
                         Lexer lexer = new Lexer(contenidoArchivo);
                         lexer.analizadorLexico(contenidoArchivo);
+                       
 
 
                         /*
