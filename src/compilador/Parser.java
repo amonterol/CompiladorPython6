@@ -33,10 +33,12 @@ public class Parser {
     private List<MiError> erroresEncontrados;
     private List<String> archivoFinal;
     private TiposDeError tipos = new TiposDeError();
+    private int cantidadDeComentarios;
 
-    Parser(List<List<Token>> tokens, List<LineaDeContenido> programa, int numeroDeComentarios) {
+    Parser(List<List<Token>> tokens, List<LineaDeContenido> programa, int cantidadDeComentarios) {
         this.listaDeTokens = tokens;
         this.listaContenidoFinal = programa;
+        this.cantidadDeComentarios = cantidadDeComentarios;
     }
 
     public List<String> analisisSintactico() throws IOException {
@@ -124,18 +126,7 @@ public class Parser {
 
     }
 
-    /*
-    public void insertarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
-        programaEnPythonRevisado.add(numeroDeLinea, String.format("%14s", "Error ") + numeroDeError
-                + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError));
-    }
 
-    public void registrarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
-        programaEnPythonRevisado.add(String.format("%14s", "Error ") + numeroDeError
-                + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError)
-                + String.format("[%s%d]", "Linea ", numeroDeLinea));
-    }
-     */
     public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {
         List<String> programaEnPythonRevisado = new ArrayList<>();
        
@@ -165,7 +156,7 @@ public class Parser {
         for (String operador : operadores) {
             programaEnPythonRevisado.add(histograma.get(operador) + " Token " + operador);
         }
-         programaEnPythonRevisado.add(numeroDeComentarios);
+         programaEnPythonRevisado.add(this.cantidadDeComentarios + " lineas de comentario");
         
 
         return programaEnPythonRevisado;

@@ -1,8 +1,9 @@
 import random
 import random
 
+#Primer comentario
 def imprimir_tablero(tablero):
-	_var1&& ==  var3&&
+	_var1&& ==  var3&&#SegundoComentario
 	var2_abc <= _var1
 	var2_abc != 10.123	
 import random

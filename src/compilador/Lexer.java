@@ -261,6 +261,11 @@ public class Lexer {
         System.out.println();
     }
 
+    public int getCantidadComentarios() {
+        return cantidadComentarios;
+    }
+    
+
     public static void imprimirListasDeContenidoFinal(List<LineaDeContenido> contenido) {
         for (LineaDeContenido linea : contenido) {
             System.out.println(linea);
