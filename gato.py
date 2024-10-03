@@ -2,7 +2,7 @@ import random
 import random
 
 def imprimir_tablero(tablero):
-	_var1&& ==  10
+	_var1&& ==  var3&&
 	var2_abc <= _var1
 	var2_abc != 10.123	
 import random

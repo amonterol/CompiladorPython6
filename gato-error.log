@@ -1,21 +1,22 @@
 00001 import random
 00002 import random
 00003 
-00005 def imprimir_tablero(tablero):
-00006 _var1&& ==  10
+00004 def imprimir_tablero(tablero):
+00005 _var1&& ==  var3&&
         Error 201. Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.
-00007 var2_abc <= _var1
-00008 var2_abc != 10.123
-00009 import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta
-00010 var3_abc@@ != 1000.123
-        Error 300. La posición de la palabra reservada "import" es incorrecta
         Error 201. Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.
-00011 import random
-00012 def imprimir_tablero3(tablero):
-00013 _var1&& ==  10
+00006 var2_abc <= _var1
+00007 var2_abc != 10.123
+00008 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00009 var3_abc@@ != 1000.123
         Error 201. Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.
-*************
+00010 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00011 def imprimir_tablero3(tablero):
+00012 _var1&& ==  10
+        Error 201. Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.
+=================================================
 2 Token ==
 1 Token <=
 0 Token <

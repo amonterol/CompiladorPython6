@@ -4,24 +4,25 @@
  */
 package compilador;
 
+import auxiliares.LineaDeContenido;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import utilitarios.Archivo;
-import utilitarios.Error;
+import auxiliares.Archivo;
+import auxiliares.TiposDeError;
 
 /**
  *
  * @author A Montero
  */
-
 public class Compilador {
 
     public static final Error listaDeErrores = new Error();
     public static String archivoDeEntrada;
     public static String archivoDeSalida;
     public static List<String> contenidoArchivo = new ArrayList();
+    public static TiposDeError tiposError = new TiposDeError();
 
     public static void main(String[] args) {
 
@@ -41,7 +42,6 @@ public class Compilador {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        
 
                         System.out.println("""
                                        
@@ -50,26 +50,23 @@ public class Compilador {
 
                         imprimirListas(contenidoArchivo); //BORRAR
 
-                        archivo.escribirArchivo(contenidoArchivo, archivoDeSalida);
+                       
+                        
+
+                        Lexer lexer = new Lexer(contenidoArchivo);
+                        lexer.analizadorLexico();
+
+                        Parser parser = new Parser(lexer.getListaDeTokens(), lexer.getListaContenidoFinal());
+                        List<String>  programaRevisado = parser.analisisSintactico();
+
                         System.out.println("""
                                         
                                        3 CLASE COMIPILADOR BORRAR: ESTE ES EL CONTENIDO DEL ARCHIVO log
                                        
                                        """);
+                        archivo.escribirArchivo( programaRevisado, archivoDeSalida);
                         archivo.imprimirArchivo(archivoDeSalida); //BORRAR
-
-                        Lexer lexer = new Lexer(contenidoArchivo);
-                        lexer.analizadorLexico(contenidoArchivo);
-                       
-
-
-                        /*
-                   
-                    Parser parser = new Parser(lexer.getTokens());
-                    parser.parse();
-                    ErrorChecker errorChecker = new ErrorChecker(parser.getASTNodes(), parser.getSymbolTable());
-                    errorChecker.checkErrors();
-                         */
+                 
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(null, "Error al leer el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -87,16 +84,22 @@ public class Compilador {
 
     } // fin metodo main
 
+    public static void imprimirListasDeContenidoFinal(List<LineaDeContenido> contenido) {
+        for (LineaDeContenido linea : contenido) {
+            System.out.println(linea);
+        }
+    }
+
     //Verifica que exista un solo archivo a analizar 
     public static boolean validarArchivoParaAnalizar(String[] args) {
 
         if (args.length == 0) {
-            JOptionPane.showMessageDialog(null, listaDeErrores.obtenerDescripcionDeError(100), "Error en archivo", JOptionPane.WARNING_MESSAGE);
-            System.out.println(" 4 CLASE COMIPILADOR BORRAR " + listaDeErrores.obtenerDescripcionDeError(100));
+            JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(100), "Error en archivo", JOptionPane.WARNING_MESSAGE);
+            //System.out.println(" 4 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(100));
             return false;
         } else if (args.length > 1) {
-            JOptionPane.showMessageDialog(null, listaDeErrores.obtenerDescripcionDeError(101), "Error en archivo", JOptionPane.WARNING_MESSAGE);
-            System.out.println("5 CLASE COMIPILADOR BORRAR " + listaDeErrores.obtenerDescripcionDeError(101));
+            JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(101), "Error en archivo", JOptionPane.WARNING_MESSAGE);
+            System.out.println("5 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(101));
             return false;
         } else {
             System.out.println("6 CLASE COMIPILADOR BORRAR: Este es el archivo para analizar: " + args[0]);
@@ -112,8 +115,8 @@ public class Compilador {
         if (archivo.toLowerCase().endsWith(".py")) {
             return true;
         } else {
-            JOptionPane.showMessageDialog(null, listaDeErrores.obtenerDescripcionDeError(102), "Código Fuente", JOptionPane.WARNING_MESSAGE);
-            System.out.println("8 CLASE COMIPILADOR BORRAR " + listaDeErrores.obtenerDescripcionDeError(102));
+            JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(102), "Código Fuente", JOptionPane.WARNING_MESSAGE);
+            System.out.println("8 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(102));
             return false;
         }
     }
@@ -121,7 +124,7 @@ public class Compilador {
     public static boolean validarContenidoArchivoParaAnalizar(String archivo) {
 
         if (archivo.isEmpty() || archivo.isBlank()) {
-            JOptionPane.showMessageDialog(null, listaDeErrores.obtenerDescripcionDeError(103), "Error en archivo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(103), "Error en archivo", JOptionPane.WARNING_MESSAGE);
             System.out.println(" 10 CLASE COMPILADOR BORRAR Archivo NO CONTIENE INFORMACION");
             return true;
         } else {
@@ -129,6 +132,13 @@ public class Compilador {
         }
 
     }
+    
+      public static void generarArchivoDeSalida(List<String> programaEnPythonRevisado) {
+        auxiliares.Archivo archivo = new auxiliares.Archivo();
+        archivo.escribirArchivo(programaEnPythonRevisado, archivoDeSalida);
+
+    }
+    
 
     //Recorre una lista de string y la imprime BORRAR
     public static void imprimirListas(List<String> contenidoArchivo) {
