@@ -26,6 +26,7 @@ public class Lexer {
 
     private static List<String> programaEnPythonOriginal; //Código que se analiza en forma de lista
     private static List<List<Token>> listaDeTokens; //Almacena cada linea de codigo convertida a Token
+    private static List<Token> tokens; //Almacena una linea de codigo convertida en Token
     private static List<String> programaEnPythonRevisado; //Almacena los tokens que se identifican
     private static auxiliares.Error erroresEnProgamaEnPythonOriginal;
     private static HashMap<String, Integer> histograma = new HashMap<String, Integer>(); //Cuenta los operadores de comparación
@@ -61,7 +62,7 @@ public class Lexer {
         String comentario = "";
         String numero = ""; //Almacena transitoriamente un cadena constituido por digitos
 
-        listaDeTokens = new ArrayList<>();
+        listaDeTokens = new ArrayList<List<Token>>();
         inicializarHistogramaOperadoresComparacion();
 
         //Itera sobre cada línea del archivo con el código fuente en Python
@@ -69,13 +70,14 @@ public class Lexer {
         for (int lineaActual = 0; lineaActual < programaEnPythonOriginal.size(); lineaActual++) {
 
             String contenidoDeLaLineaActual = programaEnPythonOriginal.get(lineaActual).trim();
-
-            System.out.println("63 La linea que estamos leyendo: " + lineaActual + " " + contenidoDeLaLineaActual);
+             //Agrega la linea que actualmente se analiza al archivo de salida 
+            registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
+            System.out.println("74 La linea que estamos leyendo: " + lineaActual + " " + contenidoDeLaLineaActual);
 
             //Verifica si la linea esta en blanco
             if (contenidoDeLaLineaActual.isBlank() || contenidoDeLaLineaActual.isEmpty()) {
                 //Agrega la linea que actualmente se analiza al archivo de salida 
-                registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
+                //registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
                 ++numeroLineaActual;
                 //continue;
             }
@@ -83,13 +85,10 @@ public class Lexer {
             //Verifica si la linea es un comentario o si hay comentarios al final de una linea de código
             if (existeComentario(contenidoDeLaLineaActual)) {
                 //Agrega la linea que actualmente se analiza al archivo de salida 
-                registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
+                //registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
                 cantidadComentarios++;
                 contenidoDeLaLineaActual = contenidoDeLaLineaActual.split("#")[0].trim(); // Elimina la parte del comentario en la línea
             }
-
-            //Agrega la linea que actualmente se analiza al archivo de salida 
-            registrarLineaAnalizadaEnProgramaPythonRevisado(contenidoDeLaLineaActual, numeroLineaActual);
 
             StringTokenizer tokenizer = new StringTokenizer(contenidoDeLaLineaActual, " ()[]=<>*/+-:", true);
 
@@ -102,8 +101,9 @@ public class Lexer {
                 String token = tokenizer.nextToken();
                 arregloDeTokens[j++] = token;
             }
-
+            tokens = new ArrayList<Token>();
             for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
+                
                 String tokenActual = arregloDeTokens[indice];
                 String tokenSiguiente = " ";
 
@@ -208,14 +208,31 @@ public class Lexer {
 
             }
             ++numeroLineaActual;
+            listaDeTokens.add(tokens);
         }
-
-        System.out.println("Lista de Tokens tiene tamanio " + listaDeTokens.size());
-        for (Token token : listaDeTokens) {
+        /*
+        System.out.println("Tokens tiene tamanio " + tokens.size());
+        for (Token token : tokens) {
             System.out.println(token.toString());
         }
+         */
+        System.out.println("Lista de Tokens tiene tamanio " + listaDeTokens.size());
+        for (List tkn : listaDeTokens) {
+            for (Object token : tkn) {
+                System.out.println(token.toString());
+            }
 
-        validarPosicionDeImport();
+        }
+        /* BORRAR
+        if (listaDeTokens.get(0).get(0).getLexema().equals("import")) {
+            System.out.println();
+            System.out.println("228 FUNCIONA " + listaDeTokens.get(0).get(0).getLexema());
+            System.out.println();
+        }
+         */
+
+        Parser parser = new Parser(listaDeTokens, programaEnPythonRevisado);
+        parser.analisisSintactico();
 
         System.out.println("Generacion del histograma");
         generarHistogramaOperadoresComparacion();
@@ -234,14 +251,12 @@ public class Lexer {
 
     public static void agregarNuevoToken(TipoDeToken tipoDeToken, String lexema, String literal, int numeroLinea) {
         Token nuevoToken = new Token(tipoDeToken, lexema, literal, numeroLinea);
-        List<Token> tokens = new ArrayList();
         tokens.add(nuevoToken);
-        listaDeTokens.add(nuevoToken);
     }
 
     public static void agregarNuevoToken(TipoDeToken tipoDeToken, int numeroLinea) {
         Token nuevoToken = new Token(tipoDeToken, numeroLinea);
-        listaDeTokens.add(nuevoToken);
+        tokens.add(nuevoToken);
     }
 
     //Verifica si la linea de codigo que se esta leyendo contiene un comentario
@@ -335,7 +350,7 @@ public class Lexer {
     public static void registrarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
         programaEnPythonRevisado.add(String.format("%14s", "Error ") + numeroDeError
                 + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError)
-                + String.format("[%s%d]", "Linea ", numeroDeLinea));
+        );
     }
 
     public static void inicializarHistogramaOperadoresComparacion() {
@@ -362,60 +377,6 @@ public class Lexer {
         for (String operador : operadores) {
             System.out.println(histograma.get(operador) + " Token " + operador);
         }
-    }
-
-    /*
-    public  void validarPosicionDeImport()  {
-        Set<Integer> lineasProcesadas = new HashSet<>();
-        boolean encontradoOtroToken = false;
-
-        for (Token token : listaDeTokens) {
-            int numeroLinea = token.getNumeroLinea();
-
-            // Solo procesamos el primer token de cada línea
-            if (!lineasProcesadas.contains(numeroLinea)) {
-                lineasProcesadas.add(numeroLinea);
-
-                if (token.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA && token.getLexema().equals("import")) {
-                    if (encontradoOtroToken) {
-                        //throw new Exception("Error: 'import' encontrado en una posición incorrecta en la línea " + numeroLinea);
-                       insertarMensajeDeErrorEnProgramaEnPythonRevisado(300, numeroLinea);
-                    }
-                } else {
-                    encontradoOtroToken = true;
-                }
-            }
-        }
-    }
-     */
-    public void validarPosicionDeImport() {
-
-        Set<Integer> lineasProcesadas = new HashSet<>();
-        boolean encontradoOtroToken = false;
-
-        for (Token token : listaDeTokens) {
-            int numeroLinea = token.getNumeroLinea();
-
-            // Solo procesamos el primer token de cada línea
-            //if (!lineasProcesadas.contains(numeroLinea)) {
-            //    lineasProcesadas.add(numeroLinea);
-
-                if ( token.getLexema().equals("import")) {
-                    if (encontradoOtroToken) {
-                        //throw new Exception("Error: 'import' encontrado en una posición incorrecta en la línea " + numeroLinea);
-                       insertarMensajeDeErrorEnProgramaEnPythonRevisado(300, numeroLinea);
-                    }
-                } else {
-                    encontradoOtroToken = true;
-                }
-            
-        }
-    }
-
-    public void insertarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
-        programaEnPythonRevisado.add(numeroDeLinea + 1, String.format("%14s", "Error ") + numeroDeError
-                + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError)
-                + String.format("[%s%d]", "Linea ", numeroDeLinea));
     }
 
 }

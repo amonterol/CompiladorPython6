@@ -18,109 +18,89 @@ import java.util.Set;
  */
 public class Parser {
 
-    private List<Token> listaDeTokens; //Almacena los tokens que se identifican
+    private List<List<Token>> listaDeTokens; //Almacena los tokens que se identifican
     private List<String> programaEnPythonRevisado; //Almacena los tokens que se identifican
 
     Parser() {
 
     }
 
-    Parser(List<Token> tokens, List<String> programa) {
-        this.listaDeTokens = tokens;
+    Parser(List<List<Token>> lista, List<String> programa) {
+        this.listaDeTokens = lista;
         this.programaEnPythonRevisado = programa;
     }
 
     public List<String> analisisSintactico() throws IOException {
         boolean existeInstruccionAntesDeImport = false;
-        int numeroLinea = 0;
+        
         Set<Integer> lineasConImport = new HashSet<>();
-        
-        
-        if (!listaDeTokens.isEmpty()) {
-            for (Token tokenActual : listaDeTokens) {
-                switch (tokenActual.getTipoDeToken().toString()) {
-                    case "PALABRA_RESERVADA":
-                        
-                        OUTER:
-                        switch(tokenActual.getLexema()){
-                            case "import":
-                                int primeraLineaConTokenDiferenteDeImport =  obtenerPrimeraLineaConTokenDiferenteDeImport();
-                                if(tokenActual.getNumeroLinea() > primeraLineaConTokenDiferenteDeImport){
-                                    
-                                }else {
-                                    
-                                }
-                                break;
-                            case "input":
-                                
-                                break;    
-                            default:
-                                existeInstruccionAntesDeImport = true;   
-                        }
-                    case "ASIGNACION":
-                        break;
-                    default:
-                        existeInstruccionAntesDeImport = false;
-                }
-            }
-        } else {
 
+        for (List<Token> tokens : listaDeTokens) {
+            if (!tokens.isEmpty()) {
+                //for (Token tokenActual : tokens)
+
+                for (int i = 0; i < tokens.size(); i++) {
+                    Token tokenActual = tokens.get(i);
+
+                    switch (tokenActual.getTipoDeToken().toString()) {
+                        case "PALABRA_RESERVADA":
+
+                            OUTER:
+                            switch (tokenActual.getLexema()) {
+                                case "import":
+                                    if (tokenActual.getNumeroLinea() != 1) {
+                                        if (!obtenerTokenAnterior(tokenActual.getNumeroLinea() - 1).equals("import")) {
+                                            insertarMensajeDeErrorEnProgramaEnPythonRevisado(300, (tokenActual.getNumeroLinea()));
+                                            System.out.println();
+                                            System.out.println(" 55 Error se inserta en linea  " + (tokenActual.getNumeroLinea()));
+                                            System.out.println();
+                                        } else {
+                                            //Verificamos que el siguiente token en la linea sea un identificador valido
+                                        }
+                                    }
+                                    break;
+                                case "input":
+
+                                    break;
+                                default:
+                                    existeInstruccionAntesDeImport = true;
+                            }
+                        case "ASIGNACION":
+                            break;
+                        default:
+                            existeInstruccionAntesDeImport = false;
+                    }
+
+                }
+
+            }
         }
+        System.out.println();
+        imprimirListas(programaEnPythonRevisado);
+        System.out.println();
         return null;
     }
 
-    public boolean validarPosicionDeImport() {
-       int primeraLineaConTokenDiferenteDeImport =  obtenerPrimeraLineaConTokenDiferenteDeImport();
-       Set<Integer> lineasConInstruccionImport = obtenerLineasConImport();
-       Integer strArray[] = lineasConInstruccionImport.toArray(new Integer[lineasConInstruccionImport.size()]);
-       
-       return primeraLineaConTokenDiferenteDeImport > strArray[0]; 
-      
+    public String obtenerTokenAnterior(int linea) {
+        return listaDeTokens.get(linea).get(0).getLexema();
+
     }
 
     public void insertarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
-        programaEnPythonRevisado.add(numeroDeLinea + 1, String.format("%14s", "Error ") + numeroDeError
+        programaEnPythonRevisado.add(numeroDeLinea, String.format("%14s", "Error ") + numeroDeError
+                + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError));
+    }
+
+    public void registrarMensajeDeErrorEnProgramaEnPythonRevisado(int numeroDeError, int numeroDeLinea) {
+        programaEnPythonRevisado.add(String.format("%14s", "Error ") + numeroDeError
                 + ". " + auxiliares.Error.obtenerDescripcionDeError(numeroDeError)
                 + String.format("[%s%d]", "Linea ", numeroDeLinea));
     }
 
-      public  Set<Integer> obtenerLineasConImport() {
-        Set<Integer> lineasConImport =  new LinkedHashSet();
-        Set<Integer> lineasProcesadas = new LinkedHashSet();
-
-        for (Token token : this.listaDeTokens) {
-            int numeroLinea = token.getNumeroLinea();
-
-            // Solo procesamos el primer token de cada línea
-            if (!lineasProcesadas.contains(numeroLinea)) {
-                lineasProcesadas.add(numeroLinea);
-
-                if (token.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA && token.getLexema().equals("import")) {
-                    lineasConImport.add(numeroLinea);
-                }
-            }
+    //Recorre una lista de string y la imprime BORRAR
+    public static void imprimirListas(List<String> contenidoArchivo) {
+        for (String linea : contenidoArchivo) {
+            System.out.println(linea);
         }
-        System.out.println(lineasConImport);
-        return lineasConImport;
-    }
-      
-      public int obtenerPrimeraLineaConTokenDiferenteDeImport() {
-        Set<Integer> lineasProcesadas = new HashSet<>();
-
-        for (Token token : listaDeTokens) {
-            int numeroLinea = token.getNumeroLinea();
-
-            // Solo procesamos el primer token de cada línea
-            if (!lineasProcesadas.contains(numeroLinea)) {
-                lineasProcesadas.add(numeroLinea);
-
-                if (!(token.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA && token.getLexema().equals("import"))) {
-                    return numeroLinea;
-                }
-            }
-        }
-
-        // Si todos los primeros tokens son "import", devolvemos -1 o cualquier valor que indique que no se encontró
-        return -1;
     }
 }
