@@ -2,10 +2,8 @@
 00002 import random
 00003 
 00004 #Primer comentario
-00005 = input("Ingrese su nombre: ")
-        Error 400. Falta una variable valida, a la cual asignar el valor devuelto por la funcion input.
-        Error 500. Falta el operador de asignación "=".
-        Error 501. Falta el operador de asignación "=".
+00005 Nombre = c input"Ingrese su nombre: ")
+        Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
 00006 
 00007 def imprimir_tablero(tablero):
 00008 _var1&& ==  var3&&#SegundoComentario

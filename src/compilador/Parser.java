@@ -10,11 +10,13 @@ import auxiliares.TiposDeError;
 import auxiliares.Token;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  *
@@ -69,22 +71,10 @@ public class Parser {
                                             if (!tknAnterior.equals("import")) {
 
                                                 int numeroError = 300;
-                                                MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(300));
-
-                                                for (LineaDeContenido linea : listaContenidoFinal) {
-                                                    if (linea.getNumeroDeLinea() == numeroLinea) {
-                                                        if (linea.getErroresEncontrados() == null) {
-                                                            List<MiError> errores = new ArrayList<>();
-                                                            errores.add(e);
-                                                            linea.setErroresEncontrados(errores);
-                                                        } else {
-                                                            linea.getErroresEncontrados().add(e);
-                                                        }
-
-                                                    }
-                                                }
+                                                incluirErrorEncontrado(numeroLinea, numeroError);
 
                                                 //USANDO HASHMAP PARA ERRORES ENCONTRADOS
+                                                MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
                                                 if (erroresEncontradosMap.containsKey((numeroLinea + 1))) {
                                                     if (erroresEncontradosMap.get((numeroLinea + 1)) != null) {
                                                         List<MiError> errores3 = erroresEncontradosMap.get((numeroLinea + 1));
@@ -107,7 +97,21 @@ public class Parser {
                                     break;
                                 case "input":
                                     numeroLinea = tokenActual.getNumeroLinea();
-                                    validarInput(tokensEnLaLinea, numeroLinea);
+                                    int indiceTokenInput = tokensEnLaLinea.indexOf(tokenActual);
+
+                                    //Valida los tokens antes de input
+                                    System.out.println("111 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    validarOperadoresAntesDeInput(tokensEnLaLinea, numeroLinea, indiceTokenInput);
+
+                                    //Valida que los parentesis esten balanceados
+                                    boolean parentesisBalanceados = verificarParentesisBalanceados(tokensEnLaLinea, numeroLinea);
+                                    if (parentesisBalanceados) {
+                                        System.out.println("108 Parentesis balanceados:" + parentesisBalanceados);
+                                    } else {
+                                        System.out.println("108 Parentesis NO balanceados:" + parentesisBalanceados);
+
+                                    }
+                                    //Valida
                                     break;
                                 default:
                                     existeInstruccionAntesDeImport = true;
@@ -178,93 +182,270 @@ public class Parser {
 
     }
 
+    public void incluirErrorEncontrado(int numeroDeLinea, int numeroError) {
+        MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
+        for (LineaDeContenido linea : listaContenidoFinal) {
+            if (linea.getNumeroDeLinea() == numeroDeLinea) {
+                if (linea.getErroresEncontrados() == null) {
+                    List<MiError> errores = new ArrayList<>();
+                    errores.add(e);
+                    linea.setErroresEncontrados(errores);
+                } else {
+                    linea.getErroresEncontrados().add(e);
+                }
+            }
+        }
+    }
+
     //Valida-> identificador, =, input, (, "string", )
-    public void validarInput(List<Token> lineaDeTokens, int numeroDeLinea) {
+    public void validarOperadoresAntesDeInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenInput) {
         int numeroError = 0;
-
-        Token token_posicion_0 = lineaDeTokens.get(0);
-        if (token_posicion_0 != null) {
-            if (!token_posicion_0.getTipoDeToken().toString().equals("IDENTIFICADOR")) {
+        String token_en_posicion_0 = "";
+        switch (indiceTokenInput) {
+            case 0:
                 numeroError = 400;
-                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(400));
-                for (LineaDeContenido linea : listaContenidoFinal) {
-                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
-                        if (linea.getErroresEncontrados() == null) {
-                            List<MiError> errores = new ArrayList<>();
-                            errores.add(e);
-                            linea.setErroresEncontrados(errores);
-                        } else {
-                            linea.getErroresEncontrados().add(e);
-                        }
-
-                    }
-                }
-            }
-        }
-
-        Token token_posicion_1 = lineaDeTokens.get(0);
-        if (token_posicion_0 != null) {
-            if (!token_posicion_0.getTipoDeToken().toString().equals("ASIGNACION")) {
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
                 numeroError = 401;
-                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(400));
-                for (LineaDeContenido linea : listaContenidoFinal) {
-                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
-                        if (linea.getErroresEncontrados() == null) {
-                            List<MiError> errores = new ArrayList<>();
-                            errores.add(e);
-                            linea.setErroresEncontrados(errores);
-                        } else {
-                            linea.getErroresEncontrados().add(e);
-                        }
-
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                break;
+            case 1:
+                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
+                if (token_en_posicion_0.equals("IDENTIFICADOR")) { //Falta =
+                    numeroError = 401;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                } else if (token_en_posicion_0.equals("ASIGNACION")) {//Falta ID
+                    numeroError = 400;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                } else if (!(token_en_posicion_0.equals("IDENTIFICADOR") && token_en_posicion_0.equals("ASIGNACION"))) {
+                    switch (token_en_posicion_0) {
+                        case "DESCONOCIDO":
+                            numeroError = 402;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "PALABRA_RESERVADA":
+                            numeroError = 404;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "NUMERO_DECIMAL":
+                        case "NUMERO_ENTERO":
+                            numeroError = 405;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        default:
+                            numeroError = 400;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
                     }
                 }
-            }
-        }
-
-        Token token_posicion_3 = lineaDeTokens.get(1);
-        if (token_posicion_3 != null) {
-            if (!token_posicion_3.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
-                numeroError = 500;
-                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(401));
-                for (LineaDeContenido linea : listaContenidoFinal) {
-                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
-                        if (linea.getErroresEncontrados() == null) {
-                            List<MiError> errores = new ArrayList<>();
-                            errores.add(e);
-                            linea.setErroresEncontrados(errores);
-                        } else {
-                            linea.getErroresEncontrados().add(e);
-                        }
-
+                break;
+            case 2:
+                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
+                String token_en_posicion_1 = lineaDeTokens.get(1).getTipoDeToken().toString();
+                if (!(token_en_posicion_0.equals("IDENTIFICADOR") && token_en_posicion_1.equals("ASIGNACION"))) {
+                    numeroError = 406;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                } else if (!(token_en_posicion_0.equals("IDENTIFICADOR")) && token_en_posicion_1.equals("ASIGNACION")) {
+                    switch (token_en_posicion_0) {
+                        case "DESCONOCIDO":
+                            numeroError = 402;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "PALABRA_RESERVADA":
+                            numeroError = 404;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "NUMERO_DECIMAL":
+                        case "NUMERO_ENTERO":
+                            numeroError = 405;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        default:
+                            numeroError = 400;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                    }
+                } else if (token_en_posicion_0.equals("IDENTIFICADOR") && !(token_en_posicion_1.equals("ASIGNACION"))) {
+                    switch (token_en_posicion_0) {
+                        case "DESCONOCIDO":
+                            numeroError = 402;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "PALABRA_RESERVADA":
+                            numeroError = 404;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        case "NUMERO_DECIMAL":
+                        case "NUMERO_ENTERO":
+                            numeroError = 405;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
+                        default:
+                            numeroError = 400;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            numeroError = 401;
+                            incluirErrorEncontrado(numeroDeLinea, numeroError);
+                            break;
                     }
                 }
-            }
-        }
-
-        int ultimoIndiceDeLineaDeTokens = (lineaDeTokens.size() - 1);
-        Token token_posicion_final = lineaDeTokens.get(1);
-        if (token_posicion_final != null) {
-            if (!token_posicion_final.getTipoDeToken().toString().equals("PARENTESIS_DERECHO")) {
-                numeroError = 501;
-                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(401));
-                for (LineaDeContenido linea : listaContenidoFinal) {
-                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
-                        if (linea.getErroresEncontrados() == null) {
-                            List<MiError> errores = new ArrayList<>();
-                            errores.add(e);
-                            linea.setErroresEncontrados(errores);
-                        } else {
-                            linea.getErroresEncontrados().add(e);
-                        }
-
-                    }
-                }
-            }
+                break;
+            default:
+                numeroError = 406;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                break;
         }
 
     }
 
+    //Verifica que los parentesis este balanceados 
+    public boolean verificarParentesisBalanceados(List<Token> lineaDeTokens, int numeroDeLinea) {
+        Stack<String> pila = new Stack<>();
+
+        for (Token token : lineaDeTokens) {
+            switch (token.getTipoDeToken().toString()) {
+                case "PARENTESIS_IZQUIERDO":
+                    pila.push("(");
+                    break;
+
+                case "PARENTESIS_DERECHO": {
+                    if (pila.isEmpty()) {
+                        return false;
+                    }
+                    String ultimoParentesis = pila.pop();
+                    if (!coinciden(ultimoParentesis, ")")) {
+                        return false;
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+
+        return pila.isEmpty();
+    }
+
+    public boolean verificarCorchetesBalanceados(List<Token> lineaDeTokens, int numeroDeLinea) {
+        Stack<String> pila = new Stack<>();
+
+        for (Token token : lineaDeTokens) {
+            switch (token.getTipoDeToken().toString()) {
+
+                case "CORCHETE_IZQUIERDO":
+                    pila.push("[");
+                    break;
+
+                case "CORCHETE_DERECHO": {
+                    if (pila.isEmpty()) {
+                        return false;
+                    }
+                    String ultimoParentesis = pila.pop();
+                    if (!coinciden(ultimoParentesis, "]")) {
+                        return false;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        return pila.isEmpty();
+    }
+
+    private static boolean coinciden(String apertura, String cierre) {
+        return (apertura.equals("(") && cierre.equals(")"))
+                || (apertura.equals("[") && cierre.equals("]"));
+    }
+
+    private void parentesis(List<Token> lineaDeTokens, int numeroDeLinea) {
+        Set<String> parentesis = new HashSet<>(Arrays.asList("(", ")"));
+
+        int numeroError = 0;
+        int ultimoIndiceLineaDeTokens = (lineaDeTokens.size() - 1);
+        int posicion_parentesis_izquierdo = 0;
+        int posicion_parentesis_derecho = 0;
+
+        if (!lineaDeTokens.get(3).getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
+            numeroError = 506;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        if (!lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString().equals("PARENTESIS_DERECHO")) {
+            numeroError = 507;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+
+    }
+
+    /*
+    public boolean verificarExistenciaDeAmbosParentesis(List<Token> lineaDeTokens, int numeroDeLinea) {
+        Set<String> parentesis = new HashSet<>(Arrays.asList("(", ")"));
+
+        int ultimoIndiceLineaDeTokens = (lineaDeTokens.size() - 1);
+        String posicion_parentesis_izquierdo = lineaDeTokens.get(3).getTipoDeToken().toString();
+        String posicion_parentesis_derecho = lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString();
+
+        for (Token token : lineaDeTokens) {
+            if (token.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
+
+            }
+        }
+        if (lineaDeTokens.containsAll(parentesis)) {
+            System.out.println("La lista contiene ambos elementos del set.");
+            return true;
+        } else {
+            System.out.println("La lista no contiene ambos elementos del set.");
+            return false;
+        }
+    }
+     */
+ /*
+    public static String encontrarParentesis(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenInput) {
+
+        Set<String> parentesis = new HashSet<>(Arrays.asList("(", ")"));
+        String encontrado = null;
+        int count = 0;
+
+        for (String elemento : parentesis) {
+            if (lineaDeTokens.contains(elemento)     {
+                encontrado = elemento;
+                count++;
+            }
+        }
+        String parentesisEncontrado = count == 1 ? encontrado : null;
+
+        if (parentesisEncontrado != null) {
+            System.out.println("La lista contiene solo uno de los elementos del set: " + parentesisEncontrado);
+            return parentesisEncontrado;
+        } else {
+            System.out.println("La lista no contiene exactamente uno de los elementos del set.");
+            return "";
+        }
+
+    }
+     */
     public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {
         List<String> programaEnPythonRevisado = new ArrayList<>();
 

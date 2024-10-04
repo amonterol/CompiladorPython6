@@ -2,7 +2,7 @@ import random
 import random
 
 #Primer comentario
-= input("Ingrese su nombre: ")
+Nombre = c input"Ingrese su nombre: ")
 
 def imprimir_tablero(tablero):
 	_var1&& ==  var3&&#SegundoComentario
