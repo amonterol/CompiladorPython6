@@ -105,20 +105,17 @@ public class Parser {
 
                                     //Valida que los parentesis esten balanceados
                                     boolean parentesisBalanceados = verificarParentesisBalanceados(tokensEnLaLinea, numeroLinea);
-                                    if (parentesisBalanceados) {
-                                        System.out.println("108 Parentesis balanceados:" + parentesisBalanceados);
-                                    } else {
-                                        System.out.println("108 Parentesis NO balanceados:" + parentesisBalanceados);
-
-                                    }
+                                    if (!parentesisBalanceados) {
+                                        System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceados);
+                                        validarUsoDeParentesis(tokensEnLaLinea, numeroLinea);
+                                    } 
                                     //Valida
                                     break;
                                 default:
                                     existeInstruccionAntesDeImport = true;
                             }
                         case "ASIGNACION":
-                            int indiceOperadorAsignacion = i;
-                            //validarOperadorDeAsignacion(tokensEnLaLinea, tokenActual.getNumeroLinea(), indiceOperadorAsignacio);
+                            //Validar uso del operador de asignacion
                             break;
                         default:
                             existeInstruccionAntesDeImport = false;
@@ -380,13 +377,12 @@ public class Parser {
                 || (apertura.equals("[") && cierre.equals("]"));
     }
 
-    private void parentesis(List<Token> lineaDeTokens, int numeroDeLinea) {
+    private void validarUsoDeParentesis(List<Token> lineaDeTokens, int numeroDeLinea) {
         Set<String> parentesis = new HashSet<>(Arrays.asList("(", ")"));
 
         int numeroError = 0;
         int ultimoIndiceLineaDeTokens = (lineaDeTokens.size() - 1);
-        int posicion_parentesis_izquierdo = 0;
-        int posicion_parentesis_derecho = 0;
+       
 
         if (!lineaDeTokens.get(3).getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
             numeroError = 506;
@@ -394,6 +390,14 @@ public class Parser {
         }
         if (!lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString().equals("PARENTESIS_DERECHO")) {
             numeroError = 507;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        if (!lineaDeTokens.get(3).getTipoDeToken().toString().equals("CORCHETE_IZQUIERDO")) {
+            numeroError = 508;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        if (!lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString().equals("CORCHETE_DERECHO")) {
+            numeroError = 509;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
 

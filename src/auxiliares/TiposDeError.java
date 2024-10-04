@@ -42,7 +42,6 @@ public class TiposDeError {
         errores.put(404, "Una palabra reservada no se puede usar como variable valida.");
         errores.put(405, "Un valor numérico no es una variable valida.");
         errores.put(406, "Sintaxix incorrecto de funcion \"input\"-> variable = input(\"string\")");
-           
 
         //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
@@ -53,6 +52,8 @@ public class TiposDeError {
         errores.put(505, "Falta el corchete izquierdo: \"[\" y corchete derecho: \"]\".");
         errores.put(506, "Falta \"(\". Seguido a la funcion input de aparecer un paretesis izquierdo.");
         errores.put(507, "Falta \")\". La funcion input termina con un parentesis derecho.");
+        errores.put(508, "Falta \"(\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
+        errores.put(509, "Falta \")\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
     }
 
     public String obtenerDescripcionDelError(int key) {
