@@ -31,14 +31,23 @@ public class TiposDeError {
         errores.put(201, "Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.");
         errores.put(203, "Identificador no válido porque es una palabra reservada de Python.");
 
-        // Relacionados con palabras reservadas
+        // Relacionados con palabra reservada-> import
         errores.put(300, "La posición de la palabra reservada \"import\" es incorrecta.");
-    
-       
-    
+
+        //Relacionados con palabra reserva-> input
+        errores.put(400, "Falta una variable valida, a la cual asignar el valor devuelto por la funcion input.");
+        errores.put(401, "Falta el operador de asignación \"=\".");
+
+        //Relacionados con operadores de agrupacion-> {, }, [, ]
+        errores.put(500, "Falta el parénteris izquierdo: \"{\".");
+        errores.put(501, "Falta el parénteris derecho: \"}\".");
+        errores.put(502, "Falta el corchete izquierdo: \"[\".");
+        errores.put(503, "Falta el corchete derecho: \"]\".");
+        errores.put(504, "Falta el parénteris izquierdo: \"{\" y el parénteris derecho: \"}\".");
+        errores.put(505, "Falta el corchete izquierdo: \"[\" y corchete derecho: \"]\".");
     }
 
-    public  String obtenerDescripcionDelError(int key) {
+    public String obtenerDescripcionDelError(int key) {
         return errores.get(key);
     }
 

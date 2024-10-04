@@ -54,6 +54,7 @@ public class Parser {
             if (!tokensEnLaLinea.isEmpty()) {
 
                 for (int i = 0; i < tokensEnLaLinea.size(); i++) {
+                    int numeroLinea = 0;
                     Token tokenActual = tokensEnLaLinea.get(i);
                     switch (tokenActual.getTipoDeToken().toString()) {
                         case "PALABRA_RESERVADA":
@@ -61,49 +62,52 @@ public class Parser {
                             OUTER:
                             switch (tokenActual.getLexema()) {
                                 case "import":
-                                    int numeroLinea = tokenActual.getNumeroLinea();
+                                    numeroLinea = tokenActual.getNumeroLinea();
                                     if (numeroLinea > 0) {
                                         String tknAnterior = obtenerTokenAnterior((numeroLinea - 1), 0);
-                                        if (!tknAnterior.equals("import")) {
+                                        if (tknAnterior.length() > 0) {
+                                            if (!tknAnterior.equals("import")) {
 
-                                            int numeroError = 300;
-                                            MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(300));
+                                                int numeroError = 300;
+                                                MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(300));
 
-                                            for (LineaDeContenido linea : listaContenidoFinal) {
-                                                if (linea.getNumeroDeLinea() == numeroLinea) {
-                                                    if (linea.getErroresEncontrados() == null) {
-                                                        List<MiError> errores = new ArrayList<>();
-                                                        errores.add(e);
-                                                        linea.setErroresEncontrados(errores);
-                                                    } else {
-                                                        linea.getErroresEncontrados().add(e);
+                                                for (LineaDeContenido linea : listaContenidoFinal) {
+                                                    if (linea.getNumeroDeLinea() == numeroLinea) {
+                                                        if (linea.getErroresEncontrados() == null) {
+                                                            List<MiError> errores = new ArrayList<>();
+                                                            errores.add(e);
+                                                            linea.setErroresEncontrados(errores);
+                                                        } else {
+                                                            linea.getErroresEncontrados().add(e);
+                                                        }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            //USANDO HASHMAP PARA ERRORES ENCONTRADOS
-                                            if (erroresEncontradosMap.containsKey((numeroLinea + 1))) {
-                                                if (erroresEncontradosMap.get((numeroLinea + 1)) != null) {
-                                                    List<MiError> errores3 = erroresEncontradosMap.get((numeroLinea + 1));
-                                                    errores3.add(new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError)));
+                                                //USANDO HASHMAP PARA ERRORES ENCONTRADOS
+                                                if (erroresEncontradosMap.containsKey((numeroLinea + 1))) {
+                                                    if (erroresEncontradosMap.get((numeroLinea + 1)) != null) {
+                                                        List<MiError> errores3 = erroresEncontradosMap.get((numeroLinea + 1));
+                                                        errores3.add(e);
+                                                    }
+                                                } else {
+                                                    List<MiError> errores3 = new ArrayList<>();
+                                                    errores3.add(e);
+                                                    erroresEncontradosMap.put((numeroLinea + 1), errores3);
                                                 }
+
                                             } else {
-                                                List<MiError> errores3 = new ArrayList<>();
-                                                errores3.add(new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError)));
-                                                erroresEncontradosMap.put((numeroLinea + 1), errores3);
+                                                //Verificamos que el siguiente token en la linea sea un identificador valido
+                                                System.out.println(" 78 ESTAMOS EN EL ANALISIS SINTACTICO " + "TOKEN ANTERIOR ES import");
                                             }
-
-                                        } else {
-                                            //Verificamos que el siguiente token en la linea sea un identificador valido
-                                            System.out.println(" 78 ESTAMOS EN EL ANALISIS SINTACTICO " + "TOKEN ANTERIOR ES import");
                                         }
+
                                     }
 
                                     break;
                                 case "input":
-                                    int numeroDeLinea = tokenActual.getNumeroLinea();
-                                    //validarInput();
+                                    numeroLinea = tokenActual.getNumeroLinea();
+                                    validarInput(tokensEnLaLinea, numeroLinea);
                                     break;
                                 default:
                                     existeInstruccionAntesDeImport = true;
@@ -154,29 +158,35 @@ public class Parser {
         System.out.println();
         System.out.println("166 obtenerTokenAnterior-> " + listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() + " numero de linea " + numeroDeLinea);
         System.out.println();
-        return listaDeTokens.get(numeroDeLinea).get(posicion).getLexema();
-
-    }
-
-    public String obtenerTokenSiguiente(int numeroDeLinea, int posicion) {
         if (listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() != null) {
             return listaDeTokens.get(numeroDeLinea).get(posicion).getLexema();
         } else {
-            return " ";
+            return "";
+        }
+    }
+
+    public String obtenerTokenSiguiente(int numeroDeLinea, int posicion) {
+        System.out.println();
+        System.out.println();
+        System.out.println("170 obtenerTokenSiguiente-> " + listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() + " numero de linea " + numeroDeLinea);
+        System.out.println();
+        if (listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() != null) {
+            return listaDeTokens.get(numeroDeLinea).get(posicion).getLexema();
+        } else {
+            return "";
         }
 
     }
 
-    //Valida-> identificador = identificador | numero | input
-    public void validarInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDelOperador) {
-        Token tokenAnterior = new Token();
-        Token tokenSiguiente = new Token();
+    //Valida-> identificador, =, input, (, "string", )
+    public void validarInput(List<Token> lineaDeTokens, int numeroDeLinea) {
+        int numeroError = 0;
 
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDelOperador > 0) {
-                tokenAnterior = lineaDeTokens.get((indiceDelOperador - 1));
-            } else {
-                MiError e = new MiError(numeroDeLinea, 300, tipos.obtenerDescripcionDelError(300));
+        Token token_posicion_0 = lineaDeTokens.get(0);
+        if (token_posicion_0 != null) {
+            if (!token_posicion_0.getTipoDeToken().toString().equals("IDENTIFICADOR")) {
+                numeroError = 400;
+                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(400));
                 for (LineaDeContenido linea : listaContenidoFinal) {
                     if (linea.getNumeroDeLinea() == numeroDeLinea) {
                         if (linea.getErroresEncontrados() == null) {
@@ -190,31 +200,69 @@ public class Parser {
                     }
                 }
             }
-            if (indiceDelOperador < lineaDeTokens.size()) {
-                tokenAnterior = lineaDeTokens.get((indiceDelOperador + 1));
-            } else {
-
-            }
-
-        } else {
-
         }
 
-        /*
-         MiError e = new MiError(tokenActual.getNumeroLinea(), 300, tipos.obtenerDescripcionDelError(300));
-         for (LineaDeContenido linea : listaContenidoFinal) {
-                                                if (linea.getNumeroDeLinea() == tokenActual.getNumeroLinea()) {
-                                                    if (linea.getErroresEncontrados() == null) {
-                                                        List<MiError> errores = new ArrayList<>();
-                                                        errores.add(e);
-                                                        linea.setErroresEncontrados(errores);
-                                                    } else {
-                                                        linea.getErroresEncontrados().add(e);
-                                                    }
+        Token token_posicion_1 = lineaDeTokens.get(0);
+        if (token_posicion_0 != null) {
+            if (!token_posicion_0.getTipoDeToken().toString().equals("ASIGNACION")) {
+                numeroError = 401;
+                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(400));
+                for (LineaDeContenido linea : listaContenidoFinal) {
+                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
+                        if (linea.getErroresEncontrados() == null) {
+                            List<MiError> errores = new ArrayList<>();
+                            errores.add(e);
+                            linea.setErroresEncontrados(errores);
+                        } else {
+                            linea.getErroresEncontrados().add(e);
+                        }
 
-                                                }
-                                            }
-         */
+                    }
+                }
+            }
+        }
+
+        Token token_posicion_3 = lineaDeTokens.get(1);
+        if (token_posicion_3 != null) {
+            if (!token_posicion_3.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
+                numeroError = 500;
+                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(401));
+                for (LineaDeContenido linea : listaContenidoFinal) {
+                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
+                        if (linea.getErroresEncontrados() == null) {
+                            List<MiError> errores = new ArrayList<>();
+                            errores.add(e);
+                            linea.setErroresEncontrados(errores);
+                        } else {
+                            linea.getErroresEncontrados().add(e);
+                        }
+
+                    }
+                }
+            }
+        }
+
+        int ultimoIndiceDeLineaDeTokens = (lineaDeTokens.size() - 1);
+        Token token_posicion_final = lineaDeTokens.get(1);
+        if (token_posicion_final != null) {
+            if (!token_posicion_final.getTipoDeToken().toString().equals("PARENTESIS_DERECHO")) {
+                numeroError = 501;
+                MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(401));
+                for (LineaDeContenido linea : listaContenidoFinal) {
+                    if (linea.getNumeroDeLinea() == numeroDeLinea) {
+                        if (linea.getErroresEncontrados() == null) {
+                            List<MiError> errores = new ArrayList<>();
+                            errores.add(e);
+                            linea.setErroresEncontrados(errores);
+                        } else {
+                            linea.getErroresEncontrados().add(e);
+                        }
+
+                    }
+                }
+            }
+        }
+
     }
 
     public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {
