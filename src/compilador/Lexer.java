@@ -12,13 +12,13 @@ import auxiliares.TipoDeToken;
 import auxiliares.Token;
 import auxiliares.MiError;
 import auxiliares.TiposDeError;
-import static compilador.Compilador.archivoDeSalida;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.List;
+import java.util.Map;
 
 import java.util.StringTokenizer;
 
@@ -35,9 +35,8 @@ public class Lexer {
     //Lo cambiamos>
     private static List<String> programaEnPythonRevisado; //Almacena los tokens que se identifican
 
-    private static HashMap<String, Integer> histograma = new HashMap<String, Integer>(); //Almacena la cuenta de los operadores de comparación
-
     //Manejo de errores en cada linea
+    private static Map<Integer, List<MiError>> erroresEncontradosMap = new HashMap<>();//Almacena los errores encontrados, cada llave es un linea de codigo
     private List<LineaDeContenido> listaContenidoFinal = new ArrayList<>();
     private LineaDeContenido nuevoContenido;
     private List<MiError> erroresEncontrados;
@@ -61,7 +60,6 @@ public class Lexer {
 
         // System.out.println("\n3 LEXER > INICIO LINEA DE CODIGO CONVERTIDA A CARACTERES  " + lineaDeCodigoActual);
         listaDeTokens = new ArrayList<>(); //Almacena cada linea del codigo como una lista de Token
-        inicializarHistogramaOperadoresComparacion(); //Almacena el histograma que permite contar los operadores de comparacion
 
         //Itera sobre cada línea del archivo con el código fuente en Python que fue convertido en un List<String>
         for (int lineaActual = 0; lineaActual < programaEnPythonOriginal.size(); lineaActual++) {
@@ -69,7 +67,7 @@ public class Lexer {
             erroresEncontrados = new ArrayList<>();//Almacena los errores encontrados en la linea que se lee
 
             String lineaDeCodigoActual = programaEnPythonOriginal.get(lineaActual).trim(); //Lee cada linea de codigo
-            nuevoContenido = new LineaDeContenido(lineaActual,lineaDeCodigoActual.trim());
+            nuevoContenido = new LineaDeContenido(lineaActual, lineaDeCodigoActual.trim());
             listaContenidoFinal.add(nuevoContenido);
 
             //Agrega la linea que actualmente se analiza al archivo de salida 
@@ -92,7 +90,7 @@ public class Lexer {
             }
 
             //Separa cada linea de codigo en Tokens
-            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual, " ()[]=<>*/+-:", true);
+            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual, " ()[]=<>*/+-:\"", true);
 
             System.out.println("94 Tokenizer to  La linea que estamos leyendo: " + lineaActual + " " + lineaDeCodigoActual);
             System.out.println();
@@ -146,7 +144,7 @@ public class Lexer {
                     case "=":
                         if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.IGUAL_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion("==");
+
                         } else {
                             agregarNuevoToken(TipoDeToken.ASIGNACION, numeroLineaActual);
                         }
@@ -154,7 +152,7 @@ public class Lexer {
                     case "!":
                         if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.DIFERENTE_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion("!=");
+
                         } else {
                             //No contemplado en Python
                         }
@@ -162,25 +160,20 @@ public class Lexer {
                     case ">":
                         if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.MAYOR_O_IGUAL_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion(">=");
+
                         } else {
                             agregarNuevoToken(TipoDeToken.MAYOR_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion(">");
+
                         }
                         break;
                     case "<":
                         if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.MENOR_O_IGUAL_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion("<=");
+
                         } else {
                             agregarNuevoToken(TipoDeToken.MENOR_QUE, numeroLineaActual);
-                            incrementarCantidadOperadoresComparacion("<");
-                        }
-                        break;
 
-                    //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
-                    case ":":
-                        agregarNuevoToken(TipoDeToken.DOS_PUNTOS, numeroLineaActual);
+                        }
                         break;
 
                     //Identifica los operadores de agrupación
@@ -196,6 +189,17 @@ public class Lexer {
                     case "]":
                         agregarNuevoToken(TipoDeToken.CORCHETE_DERECHO, numeroLineaActual);
                         break;
+
+                    //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
+                    case ":":
+                        agregarNuevoToken(TipoDeToken.DOS_PUNTOS, numeroLineaActual);
+                        break;
+
+                    //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
+                    case "\"":
+                        agregarNuevoToken(TipoDeToken.COMILLAS, numeroLineaActual);
+                        break;
+
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 
@@ -217,7 +221,7 @@ public class Lexer {
                 }
 
             }
-            
+
             listaDeTokens.add(tokens);
         } //Fin for que recorre linea por linea el programa en Python
         /*
@@ -240,8 +244,20 @@ public class Lexer {
             System.out.println();
         }
          */
+        System.out.println();
+        System.out.println("253");
+        System.out.println("LEXER: Contenido del mapa de errores encontrados " + erroresEncontrados.size());
+        for (Map.Entry<Integer, List<MiError>> entry : erroresEncontradosMap.entrySet()) {
+            Integer key = entry.getKey();
+            List<MiError> errorList = entry.getValue();
+            System.out.println("Linea: " + key);
+            for (MiError error : errorList) {
+                System.out.println(error.getKey() + "  " + error.getDescripcion());
+            }
+        }
+        System.out.println();
 
- /*
+        /*
         Parser parser = new Parser(listaDeTokens, programaEnPythonRevisado);
         parser.analisisSintactico();
 
@@ -254,17 +270,16 @@ public class Lexer {
         System.out.println("254");
         System.out.println("LISTA CONTENIDO FINAL LEXER");
         //imprimirListas(listaContenidoFinal);
-        if(listaContenidoFinal != null){
+        if (listaContenidoFinal != null) {
             imprimirListasDeContenidoFinal(listaContenidoFinal);
         }
-        
+
         System.out.println();
     }
 
     public int getCantidadComentarios() {
         return cantidadComentarios;
     }
-    
 
     public static void imprimirListasDeContenidoFinal(List<LineaDeContenido> contenido) {
         for (LineaDeContenido linea : contenido) {
@@ -280,6 +295,10 @@ public class Lexer {
         return listaContenidoFinal;
     }
 
+    public Map<Integer, List<MiError>> getErroresEncontradosMap() {
+        return erroresEncontradosMap;
+    }
+
     //FUNCIONES AUXILIARES
     public static String[] convertirStringTokenizerEnArregloDeStrings(StringTokenizer tokenizer) {
         String[] arreglo = new String[tokenizer.countTokens()];
@@ -291,7 +310,6 @@ public class Lexer {
         return arreglo;
     }
 
- 
     public static void agregarNuevoToken(TipoDeToken tipoDeToken, String lexema, String literal, int numeroLinea) {
         Token nuevoToken = new Token(tipoDeToken, lexema, literal, numeroLinea);
         tokens.add(nuevoToken);
@@ -312,7 +330,7 @@ public class Lexer {
     }
 
     //Valida si el token corresponde a un identificador valido
-    public boolean verificarPrimerCaracterDeUnIdentificador(String string, int linea) {
+    public boolean verificarPrimerCaracterDeUnIdentificador(String string, int numeroLinea) {
 
         if (string == null || string.isEmpty()) {
             return false;
@@ -325,10 +343,15 @@ public class Lexer {
             //System.out.println("300 verificarPrimeraCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(200));
             int numeroError = 200;
             TiposDeError tipos = new TiposDeError();
-            MiError e = new MiError(linea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
+            MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
             this.erroresEncontrados.add(e);
 
             nuevoContenido.setErroresEncontrados(erroresEncontrados);
+
+            //USANDO HASHMAP PARA ERRORES ENCONTRADOS
+            List<MiError> errores1 = new ArrayList<>();
+            errores1.add(new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError)));
+            erroresEncontradosMap.put((numeroLinea + 1), errores1);
 
             return false;
         }
@@ -337,7 +360,7 @@ public class Lexer {
 
     //Verifica que el identificador sea una secuencia de letras y
     //numeros sin caracteres especiales a partir del segundo caracter
-    public boolean verificarSecuenciaDeCaracteresDeUnIdentificador(String string, int linea) {
+    public boolean verificarSecuenciaDeCaracteresDeUnIdentificador(String string, int numeroLinea) {
 
         // Verificar los caracteres restantes
         if (string == null || string.isEmpty()) {
@@ -353,10 +376,15 @@ public class Lexer {
             //System.out.println("324 metodo verificarSecuenciaDeCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(201));
             int numeroError = 201;
             TiposDeError tipos = new TiposDeError();
-            MiError e = new MiError(linea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
+            MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
             this.erroresEncontrados.add(e);
 
             nuevoContenido.setErroresEncontrados(erroresEncontrados);
+
+            //USANDO HASHMAP PARA ERRORES ENCONTRADOS
+            List<MiError> errores2 = new ArrayList<>();
+            errores2.add(new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError)));
+            erroresEncontradosMap.put((numeroLinea + 1), errores2);
 
             return false;
         }
@@ -388,33 +416,6 @@ public class Lexer {
             return true; // El token es un número decimal
         } catch (NumberFormatException e) {
             return false; // El token no es un número decimal
-        }
-    }
-
-   
-    public static void inicializarHistogramaOperadoresComparacion() {
-        histograma.put("<", 0);
-        histograma.put("<=", 0);
-        histograma.put(">", 0);
-        histograma.put(">=", 0);
-        histograma.put("==", 0);
-        histograma.put("!=", 0);
-    }
-
-    public static void incrementarCantidadOperadoresComparacion(String operador) {
-        histograma.put(operador, histograma.get(operador) + 1);
-    }
-
-    public static void generarHistogramaOperadoresComparacion() {
-        ArrayList<String> operadores = new ArrayList<String>(histograma.keySet());
-        programaEnPythonRevisado.add("*************");
-        for (String operador : operadores) {
-            programaEnPythonRevisado.add(histograma.get(operador) + " Token " + operador);
-        }
-        //BORRAR
-        System.out.println("**************************");
-        for (String operador : operadores) {
-            System.out.println(histograma.get(operador) + " Token " + operador);
         }
     }
 

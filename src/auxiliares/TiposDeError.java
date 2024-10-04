@@ -33,6 +33,9 @@ public class TiposDeError {
 
         // Relacionados con palabras reservadas
         errores.put(300, "La posición de la palabra reservada \"import\" es incorrecta.");
+    
+       
+    
     }
 
     public  String obtenerDescripcionDelError(int key) {

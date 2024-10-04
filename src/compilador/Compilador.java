@@ -56,7 +56,7 @@ public class Compilador {
                         Lexer lexer = new Lexer(contenidoArchivo);
                         lexer.analizadorLexico();
 
-                        Parser parser = new Parser(lexer.getListaDeTokens(), lexer.getListaContenidoFinal(), lexer.getCantidadComentarios());
+                        Parser parser = new Parser(lexer.getListaDeTokens(), lexer.getListaContenidoFinal(), lexer.getCantidadComentarios(), lexer.getErroresEncontradosMap());
                         List<String>  programaRevisado = parser.analisisSintactico();
 
                         System.out.println("""
