@@ -61,6 +61,7 @@ public final class PalabraReservada {
         this.palabrasReservadas.add("not");
         this.palabrasReservadas.add("del");
         this.palabrasReservadas.add("except");
+        this.palabrasReservadas.add("all");
 
         return palabrasReservadas;
     }

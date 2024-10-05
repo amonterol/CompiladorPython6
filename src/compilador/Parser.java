@@ -123,8 +123,8 @@ public class Parser {
                                 default:
                                     break;
                             }
-                        case "ASIGNACION":
-                            //Validar uso del operador de asignacion
+                        case "all":
+                            //Validar uso de la funcion all
                             break;
                         default:
                             existeInstruccionAntesDeImport = false;
