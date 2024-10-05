@@ -1,0 +1,11 @@
+00001 nombre = input"Ingrese su nombre: ")
+        Error 506. Falta "(". Seguido a la funcion input de aparecer un paretesis izquierdo.
+        Error 510. Los parentesis redondos no están balanceados.
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

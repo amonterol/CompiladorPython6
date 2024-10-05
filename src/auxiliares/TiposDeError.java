@@ -43,19 +43,19 @@ public class TiposDeError {
         errores.put(405, "Un valor numérico no es una variable valida.");
         errores.put(406, "Sintaxix incorrecto de funcion \"input\"-> variable = input(\"string\")");
 
-        //Relacionados con operadores de agrupacion-> (, ), [, ]
+       //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
         errores.put(501, "Falta el parénteris derecho: \")\".");
         errores.put(502, "Falta el corchete izquierdo: \"[\".");
         errores.put(503, "Falta el corchete derecho: \"]\".");
         errores.put(504, "Falta el parénteris izquierdo: \"{\" y el parénteris derecho: \"}\".");
         errores.put(505, "Falta el corchete izquierdo: \"[\" y corchete derecho: \"]\".");
-        errores.put(506, "Falta \"(\". Seguido a la funcion input de aparecer un paretesis izquierdo.");
-        errores.put(507, "Falta \")\". La funcion input termina con un parentesis derecho.");
-        errores.put(508, "Falta \"(\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
-        errores.put(509, "Falta \")\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
-        errores.put(510, "Los parentesis redondos no están balanceados.");
-        errores.put(511, "Faltan los parentesis redondos.");
+        errores.put(506, "Falta \"(\". Sintaxis incorrecta de input.");
+        errores.put(507, "Falta \")\". Sintaxis incorrecta de input.");
+        errores.put(508, "Falta \"(\". Sintaxis incorrecta de input");
+        errores.put(509, "Falta \")\". Sintaxis incorrecta de input.");
+        errores.put(510, "Sintaxis incorrecta de input, los parentesis redondos no están balanceados.");
+        errores.put(511, "Sintaxis incorrecta de input,faltan los parentesis redondos.");
         
     }
 

@@ -1,0 +1,19 @@
+00001            print(f" {tablero[i][j]} ", end="")
+00002 print("|", end="")
+00003         print()  # Salto de línea después de cada fila
+00004 print("-----------")  # Línea horizontal entre filas
+00005 
+00006             print("Error: La edad debe ser un número entero.")
+00007         print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
+00008 print("Error: Por favor ingrese dos números separados por espacio.")
+00009  print("Error: Coordenadas fuera de rango. Debe ser entre 0 y 2.")
+00010  print("Casilla ocupada. Intente de nuevo.")
+00011 print(resultado)
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+2 lineas de comentario

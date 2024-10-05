@@ -1,18 +1,12 @@
-00001 def verificar_ganador(tablero, jugador):
-00002     """ Función para verificar si hay un ganador """
-00003     # Verificar filas, columnas y diagonales
-00004     for i in range(3):
-00005         if (all(tablero[i][j] == jugador for j in range(3)) or       # Filas
-00006             all(tablero[j][i] == jugador for j in range(3)) or       # Columnas
-00007             all(tablero[i][i] == jugador for i in range(3)) or       # Diagonal principal
-00008             all(tablero[i][2 - i] == jugador for i in range(3))):   # Diagonal secundaria
-00009             return True
-00010     return False
+00001 
+00002 input("Error: La edad debe ser un número entero.")
+        Error 400. Falta incluir una variable valida.
+        Error 401. Falta incluir el operador de asignación: "=".
 =================================================
-4 Token ==
+0 Token ==
 0 Token <=
 0 Token <
 0 Token !=
 0 Token >
 0 Token >=
-5 lineas de comentario
+0 lineas de comentario

@@ -40,6 +40,7 @@ public enum TipoDeToken {
         
         COMA,
         
+        PUNTO,
         DOS_PUNTOS, //DECLARACION_DE_TIPO,
         
         PARENTESIS_IZQUIERDO,
@@ -61,6 +62,7 @@ public enum TipoDeToken {
         
         TEXTO_ENTRE_COMILLAS,
         
+        SALTO_DE_LINEA,        
         
         DESCONOCIDO,;
 

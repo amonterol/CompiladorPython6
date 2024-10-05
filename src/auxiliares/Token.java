@@ -25,6 +25,11 @@ public class Token {
         this.numeroLinea = linea;
     }
 
+    public Token(TipoDeToken tipo, String lexema, int linea) {
+        this.tipoDeToken = tipo;
+         this.lexema = lexema;
+        this.numeroLinea = linea;
+    }
     public Token(TipoDeToken tipo, int linea) {
         this.tipoDeToken = tipo;
         this.numeroLinea = linea;
@@ -64,7 +69,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" + " tipoDeToken=" + tipoDeToken + ", lexema=" + lexema + ", literal=" + literal + ", numeroLinea=" + numeroLinea + '}';
+        return "Token{" + " tipoDeToken = " + tipoDeToken + ", lexema = " + lexema + ", literal = " + literal + ", numeroLinea = " + numeroLinea + '}';
     }
 
 }
