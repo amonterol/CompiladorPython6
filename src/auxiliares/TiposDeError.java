@@ -28,7 +28,7 @@ public class TiposDeError {
 
         // Relacionados con verificación de identificadores válidos
         errores.put(200, "Identificador no comienza con una letra o guión bajo.");
-        errores.put(201, "Identificador no válido porque contiene caracteres especiales diferentes de guión bajo.");
+        errores.put(201, "Identificador contiene caracteres especiales diferentes de guión bajo.");
         errores.put(203, "Identificador no válido porque es una palabra reservada de Python.");
 
         // Relacionados con palabra reservada-> import
@@ -54,6 +54,9 @@ public class TiposDeError {
         errores.put(507, "Falta \")\". La funcion input termina con un parentesis derecho.");
         errores.put(508, "Falta \"(\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
         errores.put(509, "Falta \")\". El argumento de la funcion input debe esta limitado por parentesis rendondos.");
+        errores.put(510, "Los parentesis redondos no están balanceados.");
+        errores.put(511, "Faltan los parentesis redondos.");
+        
     }
 
     public String obtenerDescripcionDelError(int key) {

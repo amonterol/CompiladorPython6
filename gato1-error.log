@@ -1,0 +1,20 @@
+00001 import random
+00002 
+00003 def imprimir_tablero(tablero):
+00004 """ Función para imprimir el tablero actual """
+00005 for i in range(3):
+00006 for j in range(3):
+00007 print(f" {tablero[i][j]} ", end="")
+00008 if j < 2:
+00009 print("|", end="")
+00010 print()  # Salto de línea después de cada fila
+00011 if i < 2:
+00012 print("-----------")  # Línea horizontal entre filas
+=================================================
+0 Token ==
+0 Token <=
+2 Token <
+0 Token !=
+0 Token >
+0 Token >=
+2 lineas de comentario

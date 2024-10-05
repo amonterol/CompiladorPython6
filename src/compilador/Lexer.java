@@ -81,8 +81,13 @@ public class Lexer {
                 continue;
             }
 
+            //Verifica si la linea con comentarios """ 
+            if (existeComentarioVariasLineas(lineaDeCodigoActual)) {
+                continue;
+            }
+
             //Verifica si la linea es un comentario o si hay comentarios al final de una linea de código
-            if (existeComentario(lineaDeCodigoActual)) {
+            if (existeComentarioDeUnaLinea(lineaDeCodigoActual)) {
                 cantidadComentarios++;
                 //Si hay un comentario despues de codigo,elimina la parte del comentario en la línea
                 //para poder tokenizarlo
@@ -90,7 +95,7 @@ public class Lexer {
             }
 
             //Separa cada linea de codigo en Tokens
-            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual, " ()[]=<>*/+-:\"", true);
+            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual, " ()[]{}=<>*/+-:\",.", true);
 
             System.out.println("94 Tokenizer to  La linea que estamos leyendo: " + lineaActual + " " + lineaDeCodigoActual);
             System.out.println();
@@ -189,17 +194,27 @@ public class Lexer {
                     case "]":
                         agregarNuevoToken(TipoDeToken.CORCHETE_DERECHO, numeroLineaActual);
                         break;
+                    case "{":
+                        agregarNuevoToken(TipoDeToken.LLAVE_IZQUIERDA, numeroLineaActual);
+                        break;
+                    case "}":
+                        agregarNuevoToken(TipoDeToken.LLAVE_DERECHA, numeroLineaActual);
+                        break;
 
                     //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
                     case ":":
                         agregarNuevoToken(TipoDeToken.DOS_PUNTOS, numeroLineaActual);
                         break;
 
+                    case ",":
+                        agregarNuevoToken(TipoDeToken.COMA, numeroLineaActual);
+                        break;
                     //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
                     case "\"":
                         agregarNuevoToken(TipoDeToken.COMILLAS, numeroLineaActual);
                         break;
-
+                    case "|":
+                        break;
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 
@@ -321,11 +336,19 @@ public class Lexer {
     }
 
     //Verifica si la linea de codigo que se esta leyendo contiene un comentario
-    public boolean existeComentario(String lineaActual) {
+    public boolean existeComentarioDeUnaLinea(String lineaActual) {
         Character caracterDeComentario = '#';
 
-        System.out.println(" Existe el caracter de comentarios " + lineaActual.contains(String.valueOf(caracterDeComentario)));
+        System.out.println(" 332 Existe el caracter de comentarios " + lineaActual.contains(String.valueOf(caracterDeComentario)));
         return lineaActual.contains(String.valueOf(caracterDeComentario));
+
+    }
+
+    public boolean existeComentarioVariasLineas(String lineaActual) {
+        String tresComillas = "\"\"\"";
+
+        System.out.println(" 342 Existe el caracter de comentarios multilineas " + lineaActual.contains(tresComillas));
+        return lineaActual.contains(tresComillas);
 
     }
 

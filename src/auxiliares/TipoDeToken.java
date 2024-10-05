@@ -38,12 +38,16 @@ public enum TipoDeToken {
         
         COMILLAS,
         
+        COMA,
+        
         DOS_PUNTOS, //DECLARACION_DE_TIPO,
         
         PARENTESIS_IZQUIERDO,
         PARENTESIS_DERECHO,
         CORCHETE_IZQUIERDO,
         CORCHETE_DERECHO,
+        LLAVE_IZQUIERDA,
+        LLAVE_DERECHA,
 
         AND,
         OR,
@@ -56,6 +60,7 @@ public enum TipoDeToken {
         IS_NOT,
         
         TEXTO_ENTRE_COMILLAS,
+        
         
         DESCONOCIDO,;
 
