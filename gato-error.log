@@ -43,8 +43,6 @@
 00042             break  # Si la conversión es exitosa, salir del bucle
 00043         except ValueError:
 00044             print("Error: La edad debe ser un número entero.")
-        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00045     
 00046     jugador_usuario = nombre
 00047     jugador_cpu = "CPU"
@@ -59,33 +57,23 @@
 00056 
 00057         imprimir_tablero(tablero)
 00058         print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00059 
 00060         if jugador_actual == "X":  # Turno del usuario
 00061             try:
 00062                 fila, columna = map(int, input("Ingrese fila y columna (ej. '0 0'): ").split())
         Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
         Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
+        Error 510. Los parentesis redondos no están balanceados.
 00063             except ValueError:
 00064                 print("Error: Por favor ingrese dos números separados por espacio.")
-        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00065                 continue
 00066 
 00067             if not (0 <= fila < 3 and 0 <= columna < 3):
 00068                 print("Error: Coordenadas fuera de rango. Debe ser entre 0 y 2.")
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00069                 continue
 00070 
 00071             if tablero[fila][columna] != " ":
 00072                 print("Casilla ocupada. Intente de nuevo.")
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00073                 continue
 00074 
 00075             tablero[fila][columna] = jugador_actual
@@ -94,14 +82,11 @@
 00078 
 00079         if verificar_ganador(tablero, jugador_actual):
 00080             resultado = f"\n¡El jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual}) ha ganado!"
-        Error 200. Identificador no comienza con una letra o guión bajo.
-        Error 200. Identificador no comienza con una letra o guión bajo.
         Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
 00081             break
 00082 
 00083         if all(tablero[i][j] != " " for i in range(3) for j in range(3)):
 00084             resultado = "\n¡Empate!"
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00085             break
 00086 
 00087         jugador_actual = "O" if jugador_actual == "X" else "X"
@@ -111,7 +96,7 @@
 00091     print(resultado)
 00092 juego_gato()
 =================================================
-9 Token ==
+7 Token ==
 2 Token <=
 4 Token <
 2 Token !=

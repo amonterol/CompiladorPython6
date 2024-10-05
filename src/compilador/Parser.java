@@ -10,9 +10,9 @@ import auxiliares.TiposDeError;
 import auxiliares.Token;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -93,9 +93,17 @@ public class Parser {
                                     int indiceTokenInput = tokensEnLaLinea.indexOf(tokenActual);
 
                                     //Valida los tokens antes de input
-                                    System.out.println("111 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    System.out.println();
+                                    System.out.println("97 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    System.out.println();
                                     validarOperadoresAntesDeInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
 
+                                    System.out.println();
+                                    System.out.println("101 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    System.out.println();
+
+                                    
+                                    
                                     //Valida que los parentesis esten balanceados
                                     if (verificarExistenciaParentesis(tokensEnLaLinea)) {
                                         validarCorrectoUsoDeParentesis(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
@@ -110,7 +118,7 @@ public class Parser {
                                         incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
                                     }
 
-                                    //Valida
+                                    
                                     break;
                                 default:
                                     break;
@@ -153,6 +161,39 @@ public class Parser {
         System.out.println();
 
         return programaRevisado;
+    }
+
+   public static String[] extraerTextoEntreComillas(List<Token> lineaDeTokens) {
+        StringBuilder textoEntreComillas = new StringBuilder();
+        boolean dentroDeComillas = false;
+        int contadorTokens = 0;
+
+        for (Token token : lineaDeTokens) {
+            if (token.getTipoDeToken().equals("COMILLAS")) {
+                if (dentroDeComillas) {
+                    // Salir del bucle cuando se encuentra la segunda comilla
+                    dentroDeComillas = false;
+                } else {
+                    // Encontrar la primera comilla
+                    dentroDeComillas = true;
+                }
+            } else if (dentroDeComillas) {
+                if (token.getLexema().equals(")")) {
+                    // Salir del bucle si se encuentra un paréntesis de cierre
+                    break;
+                }
+                // Agregar lexema al texto entre comillas
+                textoEntreComillas.append(token.getLexema());
+                textoEntreComillas.append(" ");
+                contadorTokens++;
+            }
+        }
+
+        String[] resultado = new String[2];
+        resultado[0] = textoEntreComillas.toString();
+        resultado[1] = String.valueOf(contadorTokens + 1);
+
+        return resultado;
     }
 
     public String obtenerTokenAnterior(int numeroDeLinea, int posicion) {

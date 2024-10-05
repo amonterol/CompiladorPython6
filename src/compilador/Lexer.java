@@ -209,14 +209,28 @@ public class Lexer {
                     case ",":
                         agregarNuevoToken(TipoDeToken.COMA, numeroLineaActual);
                         break;
-                     
+
                     case "\"":
                         agregarNuevoToken(TipoDeToken.COMILLAS, numeroLineaActual);
+                        StringBuilder textoEntreComillas = new StringBuilder();
+                        textoEntreComillas.append(tokenActual); // Añade la comilla inicial
+                        ++indice;
+                        while (indice < arregloDeTokens.length) {
+                            tokenActual = arregloDeTokens[indice];
+                            textoEntreComillas.append(tokenActual);
+                            if (tokenActual.equals("\"") || tokenActual.equals(")")) {
+                                break;
+                            }
+                            ++indice;
+                        }
+                        System.out.println("Texto entre comillas: " + textoEntreComillas.toString());
+                        agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
                         break;
-                        
+
+
                     case "|":
                         break;
-                        
+
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 
@@ -292,6 +306,39 @@ public class Lexer {
         }
 
         System.out.println();
+    }
+
+    public static String[] extraerTextoEntreComillas(List<Token> lineaDeTokens) {
+        StringBuilder textoEntreComillas = new StringBuilder();
+        boolean dentroDeComillas = false;
+        int contadorTokens = 0;
+
+        for (Token token : lineaDeTokens) {
+            if (token.getTipoDeToken().toString().equals("COMILLAS")) {
+                if (dentroDeComillas) {
+                    // Salir del bucle cuando se encuentra la segunda comilla
+                    dentroDeComillas = false;
+                } else {
+                    // Encontrar la primera comilla
+                    dentroDeComillas = true;
+                }
+            } else if (dentroDeComillas) {
+                if (token.getLexema().equals(")")) {
+                    // Salir del bucle si se encuentra un paréntesis de cierre
+                    break;
+                }
+                // Agregar lexema al texto entre comillas
+                textoEntreComillas.append(token.getLexema());
+                textoEntreComillas.append(" ");
+                contadorTokens++;
+            }
+        }
+
+        String[] resultado = new String[2];
+        resultado[0] = textoEntreComillas.toString();
+        resultado[1] = String.valueOf(contadorTokens + 1);
+
+        return resultado;
     }
 
     public int getCantidadComentarios() {

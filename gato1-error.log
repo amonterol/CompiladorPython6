@@ -1,31 +1,12 @@
-00001 import random
-00002 
-00003 def imprimir_tablero(tablero):
-00004     """ Función para imprimir el tablero actual """
-00005     for i in range(3):
-00006         for j in range(3):
-00007             print(f" {tablero[i][j]} ", end="")
-00008             if j < 2:
-00009                 print("|", end="")
-00010         print()  # Salto de línea después de cada fila
-00011         if i < 2:
-00012             print("-----------")  # Línea horizontal entre filas
-00013 
-00014 def verificar_ganador(tablero, jugador):
-00015     """ Función para verificar si hay un ganador """
-00016     # Verificar filas, columnas y diagonales
-00017     for i in range(3):
-00018         if (all(tablero[i][j] == jugador for j in range(3)) or       # Filas
-00019             all(tablero[j][i] == jugador for j in range(3)) or       # Columnas
-00020             all(tablero[i][i] == jugador for i in range(3)) or       # Diagonal principal
-00021             all(tablero[i][2 - i] == jugador for i in range(3))):   # Diagonal secundaria
-00022             return True
-00023     return False
+00001    # Solicitar nombre y edad del jugador
+00002    nombre%% = input("Ingrese su nombre: ")
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
 =================================================
-4 Token ==
+0 Token ==
 0 Token <=
-2 Token <
+0 Token <
 0 Token !=
 0 Token >
 0 Token >=
-7 lineas de comentario
+1 lineas de comentario
