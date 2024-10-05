@@ -66,8 +66,8 @@ public class Lexer {
             numeroLineaActual = lineaActual;
             erroresEncontrados = new ArrayList<>();//Almacena los errores encontrados en la linea que se lee
 
-            String lineaDeCodigoActual = programaEnPythonOriginal.get(lineaActual).trim(); //Lee cada linea de codigo
-            nuevoContenido = new LineaDeContenido(lineaActual, lineaDeCodigoActual.trim());
+            String lineaDeCodigoActual = programaEnPythonOriginal.get(lineaActual); //Lee cada linea de codigo
+            nuevoContenido = new LineaDeContenido(lineaActual, lineaDeCodigoActual);
             listaContenidoFinal.add(nuevoContenido);
 
             //Agrega la linea que actualmente se analiza al archivo de salida 
@@ -209,12 +209,14 @@ public class Lexer {
                     case ",":
                         agregarNuevoToken(TipoDeToken.COMA, numeroLineaActual);
                         break;
-                    //Identifica los operadores dos puntos ->  de sublista, subcadena o subarreglos y tipo de retorno de una función    
+                     
                     case "\"":
                         agregarNuevoToken(TipoDeToken.COMILLAS, numeroLineaActual);
                         break;
+                        
                     case "|":
                         break;
+                        
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 
