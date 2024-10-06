@@ -1,9 +1,5 @@
 
-+nombre = apellido123
--nombre = apellido123
-*nombre = apellido123
-/nombre = apellido123
 
-
+nombre123 = _apellido
 
 

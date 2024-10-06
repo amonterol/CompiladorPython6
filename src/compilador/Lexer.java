@@ -243,15 +243,14 @@ public class Lexer {
                                 }
 
                             }
-                            
+
                             if (!textoEntreComillas.isEmpty()) {
                                 agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
                                 System.out.println(" 249 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                             } else {
                                 --indice;
-                                 System.out.println(" 250 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
+                                System.out.println(" 250 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                             }
-                           
 
                         }
                         //--indice;
@@ -469,13 +468,18 @@ public class Lexer {
                         } else if (verificarPrimerCaracterDeUnIdentificador(tokenActual.trim(), numeroLineaActual)
                                 && verificarSecuenciaDeCaracteresDeUnIdentificador(tokenActual.trim(), numeroLineaActual)) {
                             System.out.println(" 194 Este es el TOKEN  BORRAR:   " + tokenActual.trim() + " en linea " + numeroLineaActual + "\n");
-                            agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
 
-                            /*
-                                                       
-                            incluirNuevaVariableEnTablaDeSimbolos(Token token)''
+                            //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                            Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                            tokens.add(nuevoToken);
+
+                            //Solo probando construir una tabla de simbolos
+                            incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
                             
-                             */
+                            System.out.println("479 TABLA DE SIGNOS ");
+                            imprimirTablaDeSimbolos();
+                          
+                     
                         } else {
                             agregarNuevoToken(TipoDeToken.DESCONOCIDO, tokenActual.trim(), null, this.numeroLineaActual);
                         }
@@ -643,7 +647,7 @@ public class Lexer {
         }
 
         if (string.matches("^[a-zA-Z_].*")) {
-            System.out.println("315 verificarPrimeraCaracter Borrar " + "inicia con letra o _ " + string );
+            System.out.println("315 verificarPrimeraCaracter Borrar " + "inicia con letra o _ " + string);
             return true;
         } else {
             //System.out.println("300 verificarPrimeraCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(200));
@@ -729,13 +733,13 @@ public class Lexer {
         return str.matches("[a-zA-Z0-9_]*$");
     }
 
-    public void incluirNuevaVariableEnTablaDeSimbolos(Token identificador, Token valor) {
-        String nombre = identificador.getLexema();
+    public void incluirNuevaVariableEnTablaDeSimbolos(Token token) {
+        String nombre = token.getLexema();
         String tipo;
-        String literal = valor.getLiteral();
+        String literal = token.getLiteral();
 
         // Asigna el tipo de simbolo basado en el tipo de token
-        tipo = switch (valor.getTipoDeToken()) {
+        tipo = switch (token.getTipoDeToken()) {
             case NUMERO_ENTERO ->
                 "int";
             case NUMERO_DECIMAL ->
@@ -744,10 +748,14 @@ public class Lexer {
                 "String";
         };
 
-        int numeroLinea = identificador.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
+        int numeroLinea = token.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
 
         Simbolo simbolo = new Simbolo(tipo, literal, numeroLinea);
         tablaDeSimbolos.agregarSimbolo(nombre, simbolo);
 
+    }
+
+    public void imprimirTablaDeSimbolos() {
+        System.out.println(tablaDeSimbolos.toString());
     }
 }

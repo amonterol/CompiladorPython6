@@ -1,12 +1,8 @@
 00001 
-00002 +nombre = apellido123
-00003 -nombre = apellido123
-00004 *nombre = apellido123
-00005 /nombre = apellido123
-00006 
-00007 
-00008 
-00009 
+00002 
+00003 nombre123 = _apellido
+00004 
+00005 
 =================================================
 0 Token ==
 0 Token <=
