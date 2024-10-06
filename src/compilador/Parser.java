@@ -389,30 +389,46 @@ public class Parser {
         Stack<String> pila = new Stack<>();
 
         for (Token token : lineaDeTokens) {
+            System.out.println();
+            System.out.println(" 392 Leyendo token " + token.getTipoDeToken());
             switch (token.getTipoDeToken().toString()) {
                 case "PARENTESIS_IZQUIERDO":
                     pila.push("(");
+                    System.out.println(" 395 Se incluyo un nuevo  " + token.getTipoDeToken().toString());
+                    System.out.println();
+                    System.out.println(" 399 Contenido de la pila: " + pila);
                     break;
 
-                case "PARENTESIS_DERECHO": {
+                case "PARENTESIS_DERECHO":
+                    System.out.println(" 403 Contenido de la pila: " + pila);
                     if (pila.isEmpty()) {
+                        System.out.println("403 Error: pila vacía al encontrar un paréntesis derecho.  " + pila.isEmpty() );
                         return false;
                     }
+                    System.out.println(" 403 Contenido de la pila: " + pila);
+                    System.out.println("406Error: pila vacía al encontrar un paréntesis derecho." + pila.isEmpty() );
                     String ultimoParentesis = pila.pop();
-                    if (!coinciden(ultimoParentesis, ")")) {
+                    System.out.println(" 406 Se retiro un   " + ultimoParentesis);
+                    if (!"(".equals(ultimoParentesis)) {
+                        System.out.println(" 406 Se retiro un   " + ultimoParentesis + " coinciden " + !"(".equals(ultimoParentesis));
                         return false;
                     }
+             
                     break;
-                }
 
                 default:
+                    System.out.println("419 En default : " + token.getTipoDeToken());
                     break;
             }
+            // Imprimir el contenido de la pila en cada iteración
+            System.out.println(" 413 Contenido de la pila: " + pila);
         }
-
-        return pila.isEmpty();
+        System.out.println(" 420 Contenido de la pila.isEmpty(): " + pila.isEmpty());
+        boolean resultado = pila.isEmpty();
+        System.out.println("Resultado final: " + resultado);
+        return resultado;
     }
-
+    
     public boolean verificarCorchetesBalanceados(List<Token> lineaDeTokens, int numeroDeLinea) {
         Stack<String> pila = new Stack<>();
 
@@ -428,7 +444,7 @@ public class Parser {
                         return false;
                     }
                     String ultimoParentesis = pila.pop();
-                    if (!coinciden(ultimoParentesis, "]")) {
+                    if (!existeParentesisEmparejados(ultimoParentesis, "]")) {
                         return false;
                     }
                     break;
@@ -441,9 +457,9 @@ public class Parser {
         return pila.isEmpty();
     }
 
-    private boolean coinciden(String apertura, String cierre) {
-        return (apertura.equals("(") && cierre.equals(")"))
-                || (apertura.equals("[") && cierre.equals("]"));
+    private boolean existeParentesisEmparejados(String ultimoParentesis, String actual) {
+        System.out.println("451 existeParentesisEmparejados => llegan " + ultimoParentesis + "  " + actual);
+        return "(".equals(ultimoParentesis) && ")".equals(actual);
     }
 
     private void validarParentesisEnInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDeInput) {

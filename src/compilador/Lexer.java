@@ -232,7 +232,7 @@ public class Lexer {
                             ++indice;
                             while (indice + 1 < arregloDeTokens.length) {
                                 tokenActual = arregloDeTokens[indice];
-                                if (tokenActual.equals("\"") || tokenActual.equals(")")) {
+                                if (tokenActual.equals("\"") || (tokenActual.equals(")") && indice == (arregloDeTokens.length - 1))) {
                                     --indice;
                                     System.out.println(" 237 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
                                     break;
@@ -243,11 +243,19 @@ public class Lexer {
                                 }
 
                             }
-                            --indice;
-                            System.out.println("246Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
-                            agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
+                            
+                            if (!textoEntreComillas.isEmpty()) {
+                                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
+                                System.out.println(" 249 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
+                            } else {
+                                --indice;
+                                 System.out.println(" 250 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
+                            }
+                           
 
                         }
+                        //--indice;
+
                         break;
 
                     case "|":
@@ -343,6 +351,33 @@ public class Lexer {
 
                                 }
                             }
+                            /*
+                            for (String str : arregloDeTokens) {
+                                if (str.contains("print")) {
+                                    int startPrint = str.indexOf("print");
+                                    int startParen = str.indexOf('(');
+                                    int endParen = str.lastIndexOf(')');
+                                    int startQuote = str.indexOf('"', startParen);
+                                    int endQuote = str.lastIndexOf('"', endParen);
+
+                                    if (startParen != -1 && endParen != -1 && startQuote != -1 && endQuote != -1) {
+                                        String content = str.substring(startQuote + 1, endQuote);
+                                        String[] tokens = content.split("\\s+");
+                                        List<String> tokenList = new ArrayList<>();
+                                        for (String token : tokens) {
+                                            tokenList.add(token);
+                                        }
+                                        System.out.println("362 Tokens: " + tokenList);
+                                        System.out.println("363 Number of tokens: " + tokenList.size());
+                                    } else {
+                                        System.out.println("365 Paréntesis o comillas faltantes en: " + str);
+                                    }
+                                } else {
+                                    System.out.println("368 La cadena no contiene 'print': " + str);
+                                }
+                            }
+                             */
+ /*
 
                             //Caso de funcion print con texto entre comillas
                             if (tokenActual.trim().equals("print")) {
@@ -388,7 +423,9 @@ public class Lexer {
                                             System.out.println();
                                             System.out.println(" 309 Se incluyo un token " + "\"" + " indice pasa a " + indice);
                                             System.out.println();
-                                        } else {
+                                        } else if (  arregloDeTokens.length - (indice + 1) > 1 ){
+                                        
+                                        }else {
                                             System.out.println(" 316 No hay comillas iniciales  el token es: " + tokenActual + " indice pasa a " + indice);
                                             texoEntreComillasEnPrint.append(tokenActual);
                                         }
@@ -424,7 +461,7 @@ public class Lexer {
 
                             System.out.println();
                             System.out.println(" 345 Salimos de palabra reservada " + tokenActual + " indice pasa a " + indice);
-
+                             */
                         } else if (esNumeroEntero(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
                         } else if (esNumeroDecimal(tokenActual.trim())) {
@@ -439,8 +476,6 @@ public class Lexer {
                             incluirNuevaVariableEnTablaDeSimbolos(Token token)''
                             
                              */
-                            
-                            
                         } else {
                             agregarNuevoToken(TipoDeToken.DESCONOCIDO, tokenActual.trim(), null, this.numeroLineaActual);
                         }
@@ -468,7 +503,7 @@ public class Lexer {
 
         }
         System.out.println("Tokens en linea  " + count);
-      
+
         System.out.println();
         System.out.println("253");
         System.out.println("LEXER: Contenido del mapa de errores encontrados " + erroresEncontrados.size());
@@ -697,13 +732,16 @@ public class Lexer {
     public void incluirNuevaVariableEnTablaDeSimbolos(Token identificador, Token valor) {
         String nombre = identificador.getLexema();
         String tipo;
-        String literal = valor.getLiteral(); 
-        
+        String literal = valor.getLiteral();
+
         // Asigna el tipo de simbolo basado en el tipo de token
         tipo = switch (valor.getTipoDeToken()) {
-            case NUMERO_ENTERO -> "int";
-            case NUMERO_DECIMAL -> "float";
-            default -> "String";
+            case NUMERO_ENTERO ->
+                "int";
+            case NUMERO_DECIMAL ->
+                "float";
+            default ->
+                "String";
         };
 
         int numeroLinea = identificador.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
