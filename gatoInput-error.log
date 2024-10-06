@@ -1,16 +1,12 @@
 00001 
-00002 print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
-00003 print(nombre)
-00004 print(-nombre)
-00005 print(nombre%^&^)
-        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
-00006 -nombre = apellido222&&&
-        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
-00007 _nombre = -apellido222
+00002 +nombre = apellido123
+00003 -nombre = apellido123
+00004 *nombre = apellido123
+00005 /nombre = apellido123
+00006 
+00007 
 00008 
 00009 
-00010 
-00011 
 =================================================
 0 Token ==
 0 Token <=

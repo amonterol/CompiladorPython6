@@ -643,7 +643,7 @@ public class Lexer {
         }
 
         if (string.matches("^[a-zA-Z_].*")) {
-            System.out.println("315 verificarPrimeraCaracter Borrar " + "inicia con letra o _");
+            System.out.println("315 verificarPrimeraCaracter Borrar " + "inicia con letra o _ " + string );
             return true;
         } else {
             //System.out.println("300 verificarPrimeraCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(200));
