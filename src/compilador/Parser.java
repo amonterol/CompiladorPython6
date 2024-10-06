@@ -106,9 +106,9 @@ public class Parser {
                                     //Valida que los parentesis esten balanceados
                                     if (verificarExistenciaParentesis(tokensEnLaLinea)) {
                                         validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
-                                        boolean parentesisBalanceados = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
-                                        if (!parentesisBalanceados) {
-                                            System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceados);
+                                        boolean parentesisBalanceadosEnInput = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
+                                        if (!parentesisBalanceadosEnInput) {
+                                            System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnInput);
                                             int numeroError = 510;
                                             incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
                                         }
@@ -125,10 +125,47 @@ public class Parser {
 
                                     //Valida la existencia de ambas comillas
                                     System.out.println();
-                                    System.out.println("127 No hay comillas => validarComillasEnInput ");
+                                    System.out.println("128 No hay comillas => validarComillasEnInput ");
                                     System.out.println();
                                     validarComillasEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
 
+                                    break;
+                                case "print":
+                                    numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    int indiceTokenPrint = tokensEnLaLinea.indexOf(tokenActual);
+                                    Token tokenSiguienteDePrint = new Token();
+
+                                    if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
+                                        tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                    }
+                                    if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
+                                        if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
+                                            tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                        }
+                                    }
+                                    if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                                        if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
+                                            tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                        }
+                                    }
+
+                                    if (verificarExistenciaParentesis(tokensEnLaLinea)) {
+                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenPrint);
+                                        boolean parentesisBalanceadosEnPrint = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
+                                        if (!parentesisBalanceadosEnPrint) {
+                                            System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnPrint);
+                                            int numeroError = 510;
+                                            incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
+                                        }
+                                        System.out.println();
+                                        System.out.println("115 verificarExistenciaParentesis ");
+                                        System.out.println();
+                                    } else {
+                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenPrint);
+                                        System.out.println();
+                                        System.out.println("141 No hay parentesis => validarParentesisEnInput ");
+                                        System.out.println();
+                                    }
                                     break;
                                 default:
                                     break;
@@ -426,20 +463,20 @@ public class Parser {
             if (indiceDeInput + 1 == lineaDeTokens.size()) {
                 tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput)).getTipoDeToken().toString();
 
-                    numeroError = 511;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+                numeroError = 511;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
 
-                }
+            }
 
         }
-        
+
         if (!lineaDeTokens.isEmpty()) {
             if (indiceDeInput + 1 < lineaDeTokens.size()) {
                 tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
 
                 if (!(tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
-                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) ) {
+                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA"))) {
                     System.out.println();
                     System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
 
@@ -451,7 +488,7 @@ public class Parser {
 
             }
         }
-         //Valida si el ultimo token de la linea es "
+        //Valida si el ultimo token de la linea es "
         if (!lineaDeTokens.isEmpty()) {
             if (lineaDeTokens.size() > indiceDeInput - 2) {
                 ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
@@ -465,13 +502,13 @@ public class Parser {
                 }
             }
         }
-        
+
         //Valida [ o {
         if (!lineaDeTokens.isEmpty()) {
             if (indiceDeInput + 1 < lineaDeTokens.size()) {
                 tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
 
-                if (tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO") ) {
+                if (tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")) {
                     System.out.println();
                     System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
 
@@ -479,9 +516,9 @@ public class Parser {
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
                     System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
 
-                } 
-                
-                if(tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")){
+                }
+
+                if (tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) {
                     System.out.println();
                     System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
 
@@ -496,7 +533,7 @@ public class Parser {
         if (!lineaDeTokens.isEmpty()) {
             if (lineaDeTokens.size() > indiceDeInput - 2) {
                 ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
-                if ( ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")) {
+                if (ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")) {
                     System.out.println();
                     System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
 
@@ -581,7 +618,7 @@ public class Parser {
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
 
                 } else {
-                     System.out.println();
+                    System.out.println();
                     System.out.println("566 no hay parentesis ni comillas iniciales " + tokenSiguienteDeInput);
                 }
 
@@ -592,8 +629,8 @@ public class Parser {
             if (lineaDeTokens.size() > indiceDeInput - 2) {
                 ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
                 if (!(ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
-                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA") || ultimoTokenDeLineaDeInput.equals("COMILLAS")) 
-                        && !(lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema().equals("input")) ) {
+                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA") || ultimoTokenDeLineaDeInput.equals("COMILLAS"))
+                        && !(lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema().equals("input"))) {
                     System.out.println();
                     System.out.println("582 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
 
@@ -602,7 +639,7 @@ public class Parser {
                 }
             }
         }
-         //Valida TextoEntreComillas no hay comillas al final del texto
+        //Valida TextoEntreComillas no hay comillas al final del texto
         if (!lineaDeTokens.isEmpty()) {
             if (lineaDeTokens.size() > indiceDeInput - 1) {
                 ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema();
@@ -616,11 +653,11 @@ public class Parser {
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
                     numeroError = 520;
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
-                   
+
                 }
             }
         }
-    
+
     }
 
     public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {

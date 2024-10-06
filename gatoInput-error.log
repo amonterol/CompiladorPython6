@@ -1,12 +1,13 @@
 00001 
-00002 
-00003 nombre = input
-        Error 511. Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo "(".
+00002  print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
+        Error 510. Sintaxis incorrecta de input, los parentesis redondos no están balanceados.
+00003 print[nombre)
+        Error 513. Sintaxis incorrecta de input,se esperaba "(" en lugar de "[".
+        Error 510. Sintaxis incorrecta de input, los parentesis redondos no están balanceados.
+00004 print(nombre$%%^
         Error 512. Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo ")".
-        Error 518. Sintaxis incorrecta de input, faltan comillas de inicio
-        Error 519. Sintaxis incorrecta de input, faltan comillas de cierre
-        Error 520. Sintaxis incorrecta de input, faltan texto entre comillas
-00004 
+        Error 510. Sintaxis incorrecta de input, los parentesis redondos no están balanceados.
+00005 
 =================================================
 0 Token ==
 0 Token <=
