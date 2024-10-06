@@ -1,6 +1,12 @@
-00001 nombre = input"Ingrese su nombre: ")
-        Error 506. Falta "(". Seguido a la funcion input de aparecer un paretesis izquierdo.
-        Error 510. Los parentesis redondos no están balanceados.
+00001 
+00002 
+00003 nombre = input
+        Error 511. Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo "(".
+        Error 512. Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo ")".
+        Error 518. Sintaxis incorrecta de input, faltan comillas de inicio
+        Error 519. Sintaxis incorrecta de input, faltan comillas de cierre
+        Error 520. Sintaxis incorrecta de input, faltan texto entre comillas
+00004 
 =================================================
 0 Token ==
 0 Token <=

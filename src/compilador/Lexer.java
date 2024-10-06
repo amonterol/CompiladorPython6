@@ -116,6 +116,10 @@ public class Lexer {
             tokens = new ArrayList<Token>();
             //Itera sobre la linea de codigo ya convertida en arreglo de Strings
             for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
+                System.out.println("119 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
+
+                boolean existeFuncionInput = false;
+                boolean existeComillasIniciales = false;
 
                 String tokenActual = arregloDeTokens[indice];
                 String tokenSiguiente = " ";
@@ -133,16 +137,16 @@ public class Lexer {
 
                     //Analiza los operadores aritméticos    
                     case "+":
-                        agregarNuevoToken(TipoDeToken.SUMA,"+", numeroLineaActual);
+                        agregarNuevoToken(TipoDeToken.SUMA, "+", numeroLineaActual);
                         break;
                     case "-":
                         agregarNuevoToken(TipoDeToken.RESTA, "-", numeroLineaActual);
                         break;
                     case "*":
-                        agregarNuevoToken(TipoDeToken.MULTIPLICACION,"*", numeroLineaActual);
+                        agregarNuevoToken(TipoDeToken.MULTIPLICACION, "*", numeroLineaActual);
                         break;
                     case "/":
-                        agregarNuevoToken(TipoDeToken.DIVISION,"/", numeroLineaActual);
+                        agregarNuevoToken(TipoDeToken.DIVISION, "/", numeroLineaActual);
                         break;
 
                     //Analiza los operadores aritméticos       
@@ -151,7 +155,7 @@ public class Lexer {
                             agregarNuevoToken(TipoDeToken.IGUAL_QUE, "==", numeroLineaActual);
 
                         } else {
-                            agregarNuevoToken(TipoDeToken.ASIGNACION,"=", numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.ASIGNACION, "=", numeroLineaActual);
                         }
                         break;
                     case "!":
@@ -173,7 +177,7 @@ public class Lexer {
                         break;
                     case "<":
                         if (tokenSiguiente.equals("=")) {
-                            agregarNuevoToken(TipoDeToken.MENOR_O_IGUAL_QUE,"<=", numeroLineaActual);
+                            agregarNuevoToken(TipoDeToken.MENOR_O_IGUAL_QUE, "<=", numeroLineaActual);
 
                         } else {
                             agregarNuevoToken(TipoDeToken.MENOR_QUE, "<", numeroLineaActual);
@@ -189,14 +193,14 @@ public class Lexer {
                         agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", numeroLineaActual);
                         break;
                     case "[":
-                        agregarNuevoToken(TipoDeToken.CORCHETE_IZQUIERDO,"[", numeroLineaActual);
-                                
+                        agregarNuevoToken(TipoDeToken.CORCHETE_IZQUIERDO, "[", numeroLineaActual);
+
                         break;
                     case "]":
                         agregarNuevoToken(TipoDeToken.CORCHETE_DERECHO, "]", numeroLineaActual);
                         break;
                     case "{":
-                        agregarNuevoToken(TipoDeToken.LLAVE_IZQUIERDA,"{}", numeroLineaActual);
+                        agregarNuevoToken(TipoDeToken.LLAVE_IZQUIERDA, "{", numeroLineaActual);
                         break;
                     case "}":
                         agregarNuevoToken(TipoDeToken.LLAVE_DERECHA, "}", numeroLineaActual);
@@ -217,25 +221,33 @@ public class Lexer {
 
                     case "\"":
                         agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, numeroLineaActual);
-
+                        System.out.println(" 220 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
                         StringBuilder textoEntreComillas = new StringBuilder();
 
-                        if (indice < arregloDeTokens.length) {
-                            System.out.println(" 269 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length));
-                            if (esAlfaNumerico(arregloDeTokens[indice + 1]) || (arregloDeTokens[indice + 1].equals("\\"))) {
+                        if (indice + 1 < arregloDeTokens.length) {
+                            System.out.println(" 224 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
+                            int j = 0;
+                            for (String str : arregloDeTokens) {
+                                System.out.println(" 227 token en  " + j + " es " + str);
+                                j++;
+                            }
+                            if (esAlfaNumerico(arregloDeTokens[indice + 1])) {
                                 ++indice;
-                                while (indice < arregloDeTokens.length) {
+                                while (indice + 1 < arregloDeTokens.length) {
                                     tokenActual = arregloDeTokens[indice];
                                     if (tokenActual.equals("\"") || tokenActual.equals(")")) {
                                         --indice;
+                                        System.out.println(" 237 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
                                         break;
                                     } else {
                                         textoEntreComillas.append(tokenActual);
                                         ++indice;
+                                        System.out.println(" 242 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " " + indice + " <" + arregloDeTokens.length);
                                     }
 
                                 }
-                                System.out.println("Texto entre comillas: " + textoEntreComillas.toString());
+                                --indice;
+                                System.out.println("246Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                                 agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
 
                             }
@@ -260,34 +272,84 @@ public class Lexer {
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 
-                        StringBuilder textoEntreComillasEnPrint = new StringBuilder();
                         if (palabraReservada.esPalabraReservada(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, tokenActual.trim(), null, this.numeroLineaActual);
-                            if (tokenActual.trim().equals("print") || tokenActual.trim().equals("input")) {
-                                System.out.println("267 el token es print: " + tokenActual.trim());
-                                if (indice < arregloDeTokens.length) {
-                                    System.out.println(" 269 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length));
-                                    if (esAlfaNumerico(arregloDeTokens[indice + 1])) {
-                                        ++indice;
-                                        System.out.println(" 276 arregloDeTokens[indice + 1].equals(\"(\"): " + arregloDeTokens[indice + 1].equals("("));
-                                        while (indice < arregloDeTokens.length) {
-                                            tokenActual = arregloDeTokens[indice];
-                                            if (tokenActual.equals("\"") || tokenActual.equals(")")) {
-                                                --indice;
-                                                break;
-                                            } else {
-                                                textoEntreComillasEnPrint.append(tokenActual);
-                                                ++indice;
-                                            }
+                            existeFuncionInput = true;
 
+                            if (tokenActual.trim().equals("input")) {
+                                StringBuilder textoEntreComillasEnPrint = new StringBuilder();
+                                System.out.println();
+                                System.out.println("267 el token es print: " + tokenActual.trim());
+                                
+                                if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
+                                    System.out.println(" 269 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length));
+                                    String tokenSiguienteDeInput = arregloDeTokens[++indice]; //Obtiene el token siguiente a input
+                                    switch (tokenSiguienteDeInput) {
+                                        case "(":
+                                            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", numeroLineaActual);
+                                            break;
+                                        case "{":
+                                            agregarNuevoToken(TipoDeToken.LLAVE_IZQUIERDA, "{", numeroLineaActual);
+                                            break;
+                                        case "[":
+                                            agregarNuevoToken(TipoDeToken.CORCHETE_IZQUIERDO, "[", numeroLineaActual);
+                                            break;
+                                        case "\"":
+                                            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", numeroLineaActual);
+                                            break;    
+                                        case " ":
+                                            System.out.println("298 Se incluyo un token espaso en blanco" + tokenSiguienteDeInput + " indice pasa a " + indice);
+                                            break;
+                                        default:
+                                            System.out.println(" 299 En default: " + tokenSiguienteDeInput + " indice igual "+ indice);
+                                            break;
+                                    }
+                                    
+                                    System.out.println();
+                                    System.out.println(" 300 Se incluyo un token " + tokenSiguienteDeInput + " indice es " + indice);
+                                  
+                                    if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
+                                        tokenSiguienteDeInput = arregloDeTokens[++indice]; //Obtiene el token de (, { o [
+                                        tokenActual = tokenSiguienteDeInput;
+                                        if (tokenActual.equals("\"")) {
+                                            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, numeroLineaActual);
+                                            System.out.println();
+                                            System.out.println(" 309 Se incluyo un token " + "\"" + " indice pasa a " + indice);
+                                            System.out.println();
+                                        } else {
+                                            System.out.println(" 316 No hay comillas iniciales  el token es: " +  tokenActual + " indice pasa a " + indice);
+                                             textoEntreComillasEnPrint.append(tokenActual);
                                         }
-                                        System.out.println(" 274 Texto entre comillas print: " + textoEntreComillasEnPrint.toString());
-                                        agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillasEnPrint.toString(), null, numeroLineaActual);
+                                        
+                                        if (indice + 1 < arregloDeTokens.length) {
+                                            System.out.println(" 276 arregloDeTokens[indice + 1].equals(\"(\"): " + arregloDeTokens[indice + 1].equals("("));
+                                           // ++indice;
+                                            System.out.println(" 316 Antes del while  indice pasa a " + indice);
+                                            while (indice + 1 < arregloDeTokens.length) {
+                                                
+                                                tokenActual = arregloDeTokens[++indice];
+                                                if (tokenActual.equals("\"") || tokenActual.equals(")") || tokenActual.equals("}") || tokenActual.equals("]") ){
+                                                    --indice;
+                                                    break;
+                                                } else {
+                                                    textoEntreComillasEnPrint.append(tokenActual);
+                                                   // ++indice;
+                                                    System.out.println();
+                                                    System.out.println(" 326 de agrego al stringbuilder " + tokenActual + " indice pasa a " + indice);
+                                                }
+
+                                            }
+                                            System.out.println();
+                                            System.out.println(" 331 Texto entre comillas print: " + textoEntreComillasEnPrint.toString() + " indice es " + indice);
+                                            agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillasEnPrint.toString(), null, numeroLineaActual);
+                                        }
+
                                     }
 
                                 }
-
                             }
+                            System.out.println();
+                             System.out.println(" 345 Salimos de palabra reservada " + tokenActual + " indice pasa a " + indice);
 
                         } else if (esNumeroEntero(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
@@ -314,13 +376,17 @@ public class Lexer {
             System.out.println(token.toString());
         }
          */
+        System.out.println();
         System.out.println("Lista de Tokens tiene tamanio " + listaDeTokens.size());
+        int count = 0;
         for (List tkn : listaDeTokens) {
             for (Object token : tkn) {
                 System.out.println(token.toString());
+                ++count;
             }
 
         }
+        System.out.println("Tokens en linea  " + count );
         /* BORRAR
         if (listaDeTokens.get(0).get(0).getLexema().equals("import")) {
             System.out.println();

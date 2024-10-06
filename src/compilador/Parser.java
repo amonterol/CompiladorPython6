@@ -12,11 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -102,23 +103,32 @@ public class Parser {
                                     System.out.println("101 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
                                     System.out.println();
 
-                                    
-                                    
                                     //Valida que los parentesis esten balanceados
                                     if (verificarExistenciaParentesis(tokensEnLaLinea)) {
-                                        validarCorrectoUsoDeParentesis(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
                                         boolean parentesisBalanceados = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
                                         if (!parentesisBalanceados) {
                                             System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceados);
                                             int numeroError = 510;
                                             incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
                                         }
+                                        System.out.println();
+                                        System.out.println("115 verificarExistenciaParentesis ");
+                                        System.out.println();
+
                                     } else {
-                                        int numeroError = 511;
-                                        incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
+                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+                                        System.out.println();
+                                        System.out.println("121 No hay parentesis => validarParentesisEnInput ");
+                                        System.out.println();
                                     }
 
-                                    
+                                    //Valida la existencia de ambas comillas
+                                    System.out.println();
+                                    System.out.println("127 No hay comillas => validarComillasEnInput ");
+                                    System.out.println();
+                                    validarComillasEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+
                                     break;
                                 default:
                                     break;
@@ -161,63 +171,6 @@ public class Parser {
         System.out.println();
 
         return programaRevisado;
-    }
-
-   public static String[] extraerTextoEntreComillas(List<Token> lineaDeTokens) {
-        StringBuilder textoEntreComillas = new StringBuilder();
-        boolean dentroDeComillas = false;
-        int contadorTokens = 0;
-
-        for (Token token : lineaDeTokens) {
-            if (token.getTipoDeToken().equals("COMILLAS")) {
-                if (dentroDeComillas) {
-                    // Salir del bucle cuando se encuentra la segunda comilla
-                    dentroDeComillas = false;
-                } else {
-                    // Encontrar la primera comilla
-                    dentroDeComillas = true;
-                }
-            } else if (dentroDeComillas) {
-                if (token.getLexema().equals(")")) {
-                    // Salir del bucle si se encuentra un paréntesis de cierre
-                    break;
-                }
-                // Agregar lexema al texto entre comillas
-                textoEntreComillas.append(token.getLexema());
-                textoEntreComillas.append(" ");
-                contadorTokens++;
-            }
-        }
-
-        String[] resultado = new String[2];
-        resultado[0] = textoEntreComillas.toString();
-        resultado[1] = String.valueOf(contadorTokens + 1);
-
-        return resultado;
-    }
-
-    public String obtenerTokenAnterior(int numeroDeLinea, int posicion) {
-        System.out.println();
-        System.out.println("166 obtenerTokenAnterior-> " + listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() + " numero de linea " + numeroDeLinea + " posicion " + posicion);
-        System.out.println();
-        if (listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() != null) {
-            return listaDeTokens.get(numeroDeLinea).get(posicion).getLexema();
-        } else {
-            return "";
-        }
-    }
-
-    public String obtenerTokenSiguiente(int numeroDeLinea, int posicion) {
-        System.out.println();
-        System.out.println();
-        System.out.println("170 obtenerTokenSiguiente-> " + listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() + " numero de linea " + numeroDeLinea);
-        System.out.println();
-        if (listaDeTokens.get(numeroDeLinea).get(posicion).getLexema() != null) {
-            return listaDeTokens.get(numeroDeLinea).get(posicion).getLexema();
-        } else {
-            return "";
-        }
-
     }
 
     public int obtenerLineaPrimerTokenDiferenteDeImport() {
@@ -451,36 +404,223 @@ public class Parser {
         return pila.isEmpty();
     }
 
-    private static boolean coinciden(String apertura, String cierre) {
+    private boolean coinciden(String apertura, String cierre) {
         return (apertura.equals("(") && cierre.equals(")"))
                 || (apertura.equals("[") && cierre.equals("]"));
     }
 
-    private void validarCorrectoUsoDeParentesis(List<Token> lineaDeTokens, int numeroDeLinea, int indice) {
+    private void validarParentesisEnInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDeInput) {
+        System.out.println();
+        System.out.println("469 No hay parentesis => validarParentesisEnInput " + " el indice de input es " + indiceDeInput);
+        System.out.println();
 
-        int numeroError = 0;
-        int indiceInput = indice;
-        int ultimoIndiceLineaDeTokens = (lineaDeTokens.size() - 1);
+        int numeroError;
 
-        if (lineaDeTokens.size() > indiceInput) {
-            if (!lineaDeTokens.get((indice + 1)).getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
-                numeroError = 506;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+        String tokenSiguienteDeInput = "";
+        String tokenSiguienteSiguienteDeInput = "";
+        String ultimoTokenDeLineaDeInput = "";
+        String penultimoTokenDeLineaDeInput = "";
+
+        //Valida si el token input es el ultimo de la linea de tokens
+        if (!lineaDeTokens.isEmpty()) {
+            if (indiceDeInput + 1 == lineaDeTokens.size()) {
+                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput)).getTipoDeToken().toString();
+
+                    numeroError = 511;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+
+                }
+
+        }
+        
+        if (!lineaDeTokens.isEmpty()) {
+            if (indiceDeInput + 1 < lineaDeTokens.size()) {
+                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
+
+                if (!(tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
+                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) ) {
+                    System.out.println();
+                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
+
+                    numeroError = 511;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+
+                }
+
             }
-            if (!lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString().equals("PARENTESIS_DERECHO")) {
-                numeroError = 507;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+         //Valida si el ultimo token de la linea es "
+        if (!lineaDeTokens.isEmpty()) {
+            if (lineaDeTokens.size() > indiceDeInput - 2) {
+                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
+                if (!(ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
+                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA"))) {
+                    System.out.println();
+                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
+
+                    numeroError = 512;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
             }
-            if (lineaDeTokens.get((indice + 1)).getTipoDeToken().toString().equals("CORCHETE_IZQUIERDO")) {
-                numeroError = 508;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        
+        //Valida [ o {
+        if (!lineaDeTokens.isEmpty()) {
+            if (indiceDeInput + 1 < lineaDeTokens.size()) {
+                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
+
+                if (tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO") ) {
+                    System.out.println();
+                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
+
+                    numeroError = 513;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+
+                } 
+                
+                if(tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")){
+                    System.out.println();
+                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
+
+                    numeroError = 514;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+                }
+
             }
-            if (lineaDeTokens.get(ultimoIndiceLineaDeTokens).getTipoDeToken().toString().equals("CORCHETE_DERECHO")) {
-                numeroError = 509;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida ] o }
+        if (!lineaDeTokens.isEmpty()) {
+            if (lineaDeTokens.size() > indiceDeInput - 2) {
+                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
+                if ( ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")) {
+                    System.out.println();
+                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
+
+                    numeroError = 515;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                } else if (ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA")) {
+                    System.out.println();
+                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
+
+                    numeroError = 516;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
             }
         }
 
+    }
+
+    private void validarComillasEnInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDeInput) {
+        System.out.println();
+        System.out.println("511 No hay comillas => validarComillasEnInput ");
+        System.out.println();
+
+        int numeroError;
+
+        System.out.println();
+        System.out.println("466 No hay comillas => validarComillasEnInput indice de input es "
+                + indiceDeInput + " indice siguiente a input " + (indiceDeInput + 1)
+                + " indice de token siguiente al siguiente  " + (indiceDeInput + 2));
+        System.out.println();
+
+        String tokenSiguienteDeInput = "";
+        String tokenSiguienteSiguienteDeInput = "";
+        String ultimoTokenDeLineaDeInput = "";
+        String penultimoTokenDeLineaDeInput = "";
+
+        //Valida (TextoEntreComillas,  [TextoEntreComillas y {TextoEntreComillas
+        if (!lineaDeTokens.isEmpty()) {
+            if (indiceDeInput + 2 < lineaDeTokens.size()) {
+                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
+                tokenSiguienteSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 2)).getTipoDeToken().toString();
+                if (tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
+                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) {
+                    System.out.println();
+                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
+                    if (!tokenSiguienteSiguienteDeInput.equals("COMILLAS")) {
+                        numeroError = 518;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                        System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
+                    }
+                }
+
+            }
+        }
+        //Valida TextoEntreComillas),  TextoEntreComillas] y TextoEntreComillas}
+        if (!lineaDeTokens.isEmpty()) {
+            if (lineaDeTokens.size() > indiceDeInput - 2) {
+                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
+                if (ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
+                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA")) {
+                    System.out.println();
+                    System.out.println("494 ultimoTokenDeLineaDeInput.equals " + ultimoTokenDeLineaDeInput);
+                    penultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 2)).getTipoDeToken().toString();
+                    if (!penultimoTokenDeLineaDeInput.equals("COMILLAS")) {
+                        numeroError = 519;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                        System.out.println("498 penultimoTokenDeLineaDeInput.equals " + penultimoTokenDeLineaDeInput + " no es igual a " + "COMILLAS");
+                    }
+                }
+            }
+        }
+        //Valida TextoEntreComillas no hay comillas al inicio del texto
+        if (!lineaDeTokens.isEmpty()) {
+            if (indiceDeInput + 1 < lineaDeTokens.size()) {
+                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
+
+                if (!(tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
+                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA") || tokenSiguienteDeInput.equals("COMILLAS"))) {
+                    System.out.println();
+                    System.out.println("566 no hay parentesis ni comillas iniciales " + tokenSiguienteDeInput);
+
+                    numeroError = 518;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+
+                } else {
+                     System.out.println();
+                    System.out.println("566 no hay parentesis ni comillas iniciales " + tokenSiguienteDeInput);
+                }
+
+            }
+        }
+        //Valida TextoEntreComillas no hay comillas al final del texto
+        if (!lineaDeTokens.isEmpty()) {
+            if (lineaDeTokens.size() > indiceDeInput - 2) {
+                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
+                if (!(ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
+                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA") || ultimoTokenDeLineaDeInput.equals("COMILLAS")) 
+                        && !(lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema().equals("input")) ) {
+                    System.out.println();
+                    System.out.println("582 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
+
+                    numeroError = 519;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+            }
+        }
+         //Valida TextoEntreComillas no hay comillas al final del texto
+        if (!lineaDeTokens.isEmpty()) {
+            if (lineaDeTokens.size() > indiceDeInput - 1) {
+                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema();
+                if (ultimoTokenDeLineaDeInput.equals("input")) {
+                    System.out.println();
+                    System.out.println("582 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
+
+                    numeroError = 518;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    numeroError = 519;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    numeroError = 520;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                   
+                }
+            }
+        }
+    
     }
 
     public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {

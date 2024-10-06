@@ -1,1 +1,4 @@
-nombre = input"Ingrese su nombre: ")
+
+
+nombre = input
+

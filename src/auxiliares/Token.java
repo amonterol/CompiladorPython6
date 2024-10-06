@@ -69,7 +69,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" + " tipoDeToken = " + tipoDeToken + ", lexema = " + lexema + ", literal = " + literal + ", numeroLinea = " + numeroLinea + '}';
+        return "Token{" + " tipoDeToken = " + tipoDeToken + ", lexema = " + lexema + ", literal = " + literal + ", numeroLinea = " + numeroLinea + '\n' +'}';
     }
 
 }
