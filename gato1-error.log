@@ -1,7 +1,4 @@
-00001 
-00002 input("Error: La edad debe ser un número entero.")
-        Error 400. Falta incluir una variable valida.
-        Error 401. Falta incluir el operador de asignación: "=".
+00001 "CPU"
 =================================================
 0 Token ==
 0 Token <=

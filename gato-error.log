@@ -27,7 +27,6 @@
 00027     # Estrategia sencilla: mover aleatoriamente en una casilla vacía
 00028     movimientos_posibles = [(i, j) for i in range(3) for j in range(3) if tablero[i][j] == " "]
 00029     fila, columna = random.choice(movimientos_posibles)
-        Error 200. Identificador no comienza con una letra o guión bajo.
 00030     tablero[fila][columna] = jugador
 00031 
 00032 def juego_gato():
@@ -61,9 +60,8 @@
 00060         if jugador_actual == "X":  # Turno del usuario
 00061             try:
 00062                 fila, columna = map(int, input("Ingrese fila y columna (ej. '0 0'): ").split())
-        Error 200. Identificador no comienza con una letra o guión bajo.
         Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
-        Error 510. Los parentesis redondos no están balanceados.
+        Error 519. Sintaxis incorrecta. Faltan comillas de cierre
 00063             except ValueError:
 00064                 print("Error: Por favor ingrese dos números separados por espacio.")
 00065                 continue
@@ -82,7 +80,6 @@
 00078 
 00079         if verificar_ganador(tablero, jugador_actual):
 00080             resultado = f"\n¡El jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual}) ha ganado!"
-        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
 00081             break
 00082 
 00083         if all(tablero[i][j] != " " for i in range(3) for j in range(3)):
@@ -96,7 +93,7 @@
 00091     print(resultado)
 00092 juego_gato()
 =================================================
-7 Token ==
+6 Token ==
 2 Token <=
 4 Token <
 2 Token !=

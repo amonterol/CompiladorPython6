@@ -1,13 +1,29 @@
 00001            print(f" {tablero[i][j]} ", end="")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00002 print("|", end="")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00003         print()  # Salto de línea después de cada fila
 00004 print("-----------")  # Línea horizontal entre filas
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00005 
 00006             print("Error: La edad debe ser un número entero.")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00007         print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00008 print("Error: Por favor ingrese dos números separados por espacio.")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00009  print("Error: Coordenadas fuera de rango. Debe ser entre 0 y 2.")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00010  print("Casilla ocupada. Intente de nuevo.")
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
 00011 print(resultado)
 =================================================
 0 Token ==

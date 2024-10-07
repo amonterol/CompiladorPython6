@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import auxiliares.Archivo;
 import auxiliares.TiposDeError;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,7 +31,7 @@ public class Compilador {
         if (validarArchivoParaAnalizar(args)) {
             archivoDeEntrada = args[0]; //Solo hay un archivo para analizar
             if (validarExtensionArchivoParaAnalizar(archivoDeEntrada)) {
-                if (!validarContenidoArchivoParaAnalizar(archivoDeEntrada)) {
+                if (validarContenidoArchivoParaAnalizar(archivoDeEntrada)) {
                     try {
                         Archivo archivo = new Archivo();
 
@@ -121,13 +123,28 @@ public class Compilador {
         }
     }
 
+    //Valida que el archivo adjunto tenga algun contenido
     public static boolean validarContenidoArchivoParaAnalizar(String archivo) {
-
-        if (archivo.isEmpty() || archivo.isBlank()) {
-            JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(103), "Error en archivo", JOptionPane.WARNING_MESSAGE);
-            System.out.println(" 10 CLASE COMPILADOR BORRAR Archivo NO CONTIENE INFORMACION");
+        Archivo adjunto = new Archivo();
+        List<String> lineas = new ArrayList<>();
+        try {
+            lineas = adjunto.leerArchivo(archivo);
+        } catch (IOException ex) {
+            Logger.getLogger(Compilador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        int contador = 0;
+        for(String linea : lineas){
+            if(!(linea.length() == 0)){
+                ++contador;
+            }
+        }
+        
+        if (contador > 0) {
+            //Contiene informacion
             return true;
         } else {
+            //No contiene informacion
+            System.out.println("111 Error en archivo adjunto. " + tiposError.obtenerDescripcionDelError(103) + " " + lineas.isEmpty());
             return false;
         }
 

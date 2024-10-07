@@ -37,7 +37,7 @@ public class Parser {
 
     private Map<Integer, List<MiError>> erroresEncontradosMap;
 
-    Parser(List<List<Token>> tokens, List<LineaDeContenido> programa, int cantidadDeComentarios, Map<Integer, List<MiError>> errores) {
+    public Parser(List<List<Token>> tokens, List<LineaDeContenido> programa, int cantidadDeComentarios, Map<Integer, List<MiError>> errores) {
         this.listaDeTokens = tokens;
         this.listaContenidoFinal = programa;
         this.cantidadDeComentarios = cantidadDeComentarios;

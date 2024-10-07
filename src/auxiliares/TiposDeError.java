@@ -43,7 +43,7 @@ public class TiposDeError {
         errores.put(405, "Un valor numérico no es una variable valida.");
         errores.put(406, "Sintaxix incorrecto de funcion \"input\"-> variable = input(\"string\")");
 
-        //Relacionados con operadores de agrupacion-> (, ), [, ]
+       //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
         errores.put(501, "Falta el parénteris derecho: \")\".");
         errores.put(502, "Falta el corchete izquierdo: \"[\".");
@@ -54,17 +54,17 @@ public class TiposDeError {
         errores.put(507, "Falta \")\". Sintaxis incorrecta de input.");
         errores.put(508, "Falta \"(\". Sintaxis incorrecta de input");
         errores.put(509, "Falta \")\". Sintaxis incorrecta de input.");
-        errores.put(510, "Sintaxis incorrecta de input, los parentesis redondos no están balanceados.");
-        errores.put(511, "Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo \"(\".");
-        errores.put(512, "Sintaxis incorrecta de input, se esperaban parentesis redondos izquierdo \")\".");
-        errores.put(513, "Sintaxis incorrecta de input,se esperaba \"(\" en lugar de \"[\".");
-        errores.put(514, "Sintaxis incorrecta de input,se esperaba \"(\" en lugar de \"{\".");
-        errores.put(515, "Sintaxis incorrecta de input,se esperaba \")\" en lugar de \"]\".");
-        errores.put(516, "Sintaxis incorrecta de input,se esperaba \")\" en lugar de \"}\".");
-        errores.put(517, "Sintaxis incorrecta de input, faltan ambas comillas");
-        errores.put(518, "Sintaxis incorrecta de input, faltan comillas de inicio");
-        errores.put(519, "Sintaxis incorrecta de input, faltan comillas de cierre");
-        errores.put(520, "Sintaxis incorrecta de input, faltan texto entre comillas");
+        errores.put(510, "Sintaxis incorrecta. Los parentesis redondos no están balanceados.");
+        errores.put(511, "Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo \"(\".");
+        errores.put(512, "Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo \")\".");
+        errores.put(513, "Sintaxis incorrecta. Se esperaba \"(\" en lugar de \"[\".");
+        errores.put(514, "Sintaxis incorrecta. Se esperaba \"(\" en lugar de \"{\".");
+        errores.put(515, "Sintaxis incorrecta. Se esperaba \")\" en lugar de \"]\".");
+        errores.put(516, "Sintaxis incorrecta. Se esperaba \")\" en lugar de \"}\".");
+        errores.put(517, "Sintaxis incorrecta. Faltan ambas comillas");
+        errores.put(518, "Sintaxis incorrecta. Faltan comillas de inicio");
+        errores.put(519, "Sintaxis incorrecta. Faltan comillas de cierre");
+        errores.put(520, "Sintaxis incorrecta. Faltan texto entre comillas");
     }
 
     public String obtenerDescripcionDelError(int key) {
