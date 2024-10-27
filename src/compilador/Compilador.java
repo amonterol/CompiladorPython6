@@ -36,7 +36,7 @@ public class Compilador {
                         Archivo archivo = new Archivo();
 
                         archivoDeEntrada = args[0]; //Solo hay un archivo para analizar
-                        archivoDeSalida = archivoDeEntrada.replace(".py", "-error.log");
+                        archivoDeSalida = archivoDeEntrada.replace(".py", "-errores.log");
 
                         //Lee el archivo para analizar y crea una lista de array con cada linea del archivo para analizar
                         try {

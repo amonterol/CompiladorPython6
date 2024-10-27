@@ -1,0 +1,47 @@
+00001 import random
+00002 import random
+00003 import random
+00004 import random
+00005 import random
+00006 
+00007 def imprimir_tablero(tablero): import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00008     """ Función para imprimir el tablero actual """
+00009     for i in range(3):
+00010         for j in range(3):
+00011             print(f" {tablero[i][j]} ", end="")
+00012             if j < 2:
+00013                 print("|", end="")
+00014         print()  # Salto de línea después de cada fila
+00015         if i < 2:
+00016             print("-----------")  # Línea horizontal entre filas
+00017 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00018 
+00019 def verificar_ganador(tablero, jugador):
+00020     """ Función para verificar si hay un ganador """
+00021     #import random
+00022     import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00023 	for i in range(3):
+00024         if (all(tablero[i][j] == jugador for j in range(3)) or       # Filas
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00025             all(tablero[j][i] == jugador for j in range(3)) or       # Columnas
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00026             all(tablero[i][i] == jugador for i in range(3)) or       # Diagonal principal
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00027             all(tablero[i][2 - i] == jugador for i in range(3))):   # Diagonal secundaria
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00028             return True
+00029     return False
+00030 
+00031 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+=================================================
+4 Token ==
+0 Token <=
+2 Token <
+0 Token !=
+0 Token >
+0 Token >=
+7 lineas de comentario

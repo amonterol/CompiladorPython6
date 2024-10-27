@@ -1,0 +1,156 @@
+00001 def imprimir_tablero(tablero):
+00002     """ Función para imprimir el tablero actual """
+00003     for i in range(3):
+00004         for j in range(3):
+00005             print(f" {tablero[i][j]} ", end="")
+00006             if j < 2:
+00007                 print("|", end="")
+00008         print()  # Salto de línea después de cada fila
+00009         if i < 2:
+00010             print("-----------")  # Línea horizontal entre filas
+00011 # ERROR import mal colocado			
+00012 def verificar_ganador(tablero, jugador):
+00013     """ Función para verificar si hay un ganador """
+00014     # Verificar filas, columnas y diagonales
+00015     for i in range(3):
+00016         if (all(tablero[i][j] = = jugador for j in range(3)) or       # Filas  ERROR  prueba de operador de comparacion separa los ==
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00017             all(tablero[j][i] == jugador for j in range(3)) or       # Columnas
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00018             all(tablero[i][i] == jugador for i in range(3)) or       # Diagonal principal
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00019             all(tablero[i][2 - i] == jugador for i in range(3))):   # Diagonal secundaria --8
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00020             return True
+00021     return False
+00022 
+00023 def movimiento_cpu(tablero, jugador):
+00024     """ Función para que la CPU realice un movimiento """
+00025     # Estrategia sencilla: mover aleatoriamente en una casilla vacía
+00026     movimientos_posibles = [(i, j) for i in range(3) for j in range(3) if tablero[i][j] == " "]
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00027     fila, columna = random.choice(movimientos_posibles)
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00028     tablero[fila][columna] = jugador
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00029 
+00030 def juego_gato():
+00031     """ Función principal para ejecutar el juego """
+00032     tablero = [[" " for _ in range(3)] for _ in range(3)]
+00033     
+00034     # Solicitar nombre y edad del jugador
+00035     nombre = input("Ingrese su nombre: ")
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+00036 	#  ERROR  prueba de input
+00037 	nombre = inp ("Ingrese su nombre: ")
+00038 	edad + input ("Ingrese su edad: ")
+        Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
+        Error 511. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo "(".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+        Error 518. Sintaxis incorrecta. Faltan comillas de inicio
+00039 	edad = input ("Ingrese su edad: "
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+        Error 511. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo "(".
+        Error 512. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo ")".
+        Error 518. Sintaxis incorrecta. Faltan comillas de inicio
+00040 	edad = input "Ingrese su edad: ")
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+        Error 511. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo "(".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00041 	edad = input (Ingrese su edad: ")
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+        Error 511. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo "(".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+        Error 518. Sintaxis incorrecta. Faltan comillas de inicio
+00042 	edad = input ("Ingrese su edad: )
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+        Error 511. Sintaxis incorrecta. Se esperaban parentesis redondos izquierdo "(".
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+        Error 519. Sintaxis incorrecta. Faltan comillas de cierre
+        Error 518. Sintaxis incorrecta. Faltan comillas de inicio
+00043 	
+00044 	# ERROR de identificadores
+00045 	87_numero = 19
+        Error 200. Identificador no comienza con una letra o guión bajo.
+        Error 601. Sintaxis incorrecta. Se espera una variable valida previo al operador = 
+00046 	_numero = 90
+00047 	*-num = 10
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00048 	in = 8
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+00049 	
+00050     while True:
+00051         edad_str = input("Ingrese su edad: ")
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+00052         try:
+00053             edad = int(edad_str)
+00054             break  # Si la conversión es exitosa, salir del bucle
+00055         except ValueError:
+00056             print("Error: La edad debe ser un número entero.")
+00057     
+00058     jugador_usuario = nombre
+00059     jugador_cpu = "CPU"
+00060     jugador_actual = "X"  # Empieza el usuario--14
+00061     
+00062     resultado = None
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+00063 
+00064     while True:
+00065         # Verificar si ya hay un resultado antes de imprimir el tablero
+00066         if resultado:
+00067             break
+00068 
+00069         imprimir_tablero(tablero)
+00070         print(f"\nTurno del jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual})")
+00071 
+00072         if jugador_actual == "X":  # Turno del usuario
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00073             try:
+00074                 fila, columna = map(int, input("Ingrese fila y columna (ej. '0 0'): ").split())
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+        Error 406. Sintaxix incorrecto de funcion "input"-> variable = input("string")
+        Error 519. Sintaxis incorrecta. Faltan comillas de cierre
+00075             except ValueError:
+00076                 print("Error: Por favor ingrese dos números separados por espacio.")
+00077                 continue
+00078 
+00079             if not (0 <= fila < 3 and 0 >= columna > 3):
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00080                 print("Error: Coordenadas fuera de rango. Debe ser entre 0 y 2.")
+00081                 continue
+00082 
+00083             if tablero[fila][columna] ! = " ": #  ERROR  separa el != por lo tanto no cuenta como comparativos
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00084                 print("Casilla ocupada. Intente de nuevo.")
+00085                 continue
+00086 
+00087             tablero[fila][columna] = jugador_actual
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00088         else:  # Turno de la CPU
+00089             movimiento_cpu(tablero, jugador_actual)
+00090 
+00091         if verificar_ganador(tablero, jugador_actual):
+00092             resultado = f"\n¡El jugador {jugador_usuario if jugador_actual <= 'X' else jugador_cpu} ({jugador_actual}) ha ganado!"
+00093             break
+00094 
+00095         if all(tablero[i][j] != " " for i in range(3) for j in range(3)):
+        Error 600. Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+00096             resultado = "\n¡Empate!"
+00097             break
+00098 
+00099         jugador_actual = "O" if jugador_actual == "X" else "X"
+00100 
+00101     # Mostrar el tablero final y el resultado
+00102     imprimir_tablero(tablero)
+00103     print(resultado)
+00104 juego_gato()
+=================================================
+5 Token ==
+1 Token <=
+3 Token <
+1 Token !=
+1 Token >
+1 Token >=
+19 lineas de comentario

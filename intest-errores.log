@@ -1,0 +1,16 @@
+00001 in = 10
+        Error 602. Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida
+00002 inabc%^ = 10
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 601. Sintaxis incorrecta. Se espera una variable valida previo al operador = 
+00003 in_123 = numero%%$$
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 603. Sintaxis incorrecta. Se esperaba una variable valida o un número despues de = 
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

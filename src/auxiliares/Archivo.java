@@ -35,7 +35,8 @@ public class Archivo {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("El archivo " + nombreArchivo + " no existe en el directorio usado");
+            System.exit(0);
         }
         return lineas;
     }

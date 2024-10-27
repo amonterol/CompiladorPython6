@@ -7,6 +7,7 @@ package compilador;
 import auxiliares.LineaDeContenido;
 import auxiliares.MiError;
 import auxiliares.TiposDeError;
+import auxiliares.TipoDeToken;
 import auxiliares.Token;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -49,28 +48,39 @@ public class Parser {
         System.out.println(" 40 ESTAMOS EN EL ANALISIS SINTACTICO ");
         System.out.println();
 
-        boolean existeInstruccionAntesDeImport = false;
+        boolean existeTokenAntesDeImport = false;
 
-        Set<Integer> lineasConImport = new HashSet<>();
+        System.out.println();
 
         for (List<Token> tokensEnLaLinea : listaDeTokens) {
             if (!tokensEnLaLinea.isEmpty()) {
 
                 for (int i = 0; i < tokensEnLaLinea.size(); i++) {
                     int numeroDeLineaTokenActual = 0;
+                    int numeroError = -1;
                     Token tokenActual = tokensEnLaLinea.get(i);
                     switch (tokenActual.getTipoDeToken().toString()) {
                         case "PALABRA_RESERVADA":
 
-                            OUTER:
+                            //OUTER:
                             switch (tokenActual.getLexema()) {
                                 case "import":
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                                    System.out.println();
-                                    System.out.println(" 69 IMPORT numero de linea es " + numeroDeLineaTokenActual);
-                                    System.out.println();
-                                    boolean existeInstruccionesAntesDeImport = numeroDeLineaTokenActual > obtenerLineaPrimerTokenDiferenteDeImport();
-
+                                    int indiceTokenImport = tokensEnLaLinea.indexOf(tokenActual);
+                                   
+                                    if (!existeTokenAntesDeImport) {
+                                        boolean encontradoTokenAntesDeImport = verificarOtrosTokenAntesDeImport(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenImport);
+                                        if (encontradoTokenAntesDeImport) {
+                                            existeTokenAntesDeImport = true;
+                                            numeroError = 300;
+                                            incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
+                                        }
+                                    } else {
+                                        numeroError = 300;
+                                        incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
+                                    }
+                                    
+/*
                                     if (existeInstruccionesAntesDeImport) {
                                         int numeroError = 300;
                                         incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
@@ -88,6 +98,7 @@ public class Parser {
                                             erroresEncontradosMap.put((numeroDeLineaTokenActual + 1), errores3);
                                         }
                                     }
+                                     */
                                     break;
                                 case "input":
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
@@ -109,7 +120,7 @@ public class Parser {
                                         boolean parentesisBalanceadosEnInput = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
                                         if (!parentesisBalanceadosEnInput) {
                                             System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnInput);
-                                            int numeroError = 510;
+                                             numeroError = 510;
                                             incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
                                         }
                                         System.out.println();
@@ -154,7 +165,7 @@ public class Parser {
                                         boolean parentesisBalanceadosEnPrint = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
                                         if (!parentesisBalanceadosEnPrint) {
                                             System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnPrint);
-                                            int numeroError = 510;
+                                            numeroError = 510;
                                             incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
                                         }
                                         System.out.println();
@@ -173,8 +184,18 @@ public class Parser {
                         case "all":
                             //Validar uso de la funcion all
                             break;
+
+                        case "ASIGNACION":
+                            int indiceTokenAsignacion = tokensEnLaLinea.indexOf(tokenActual);
+                            numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                            validarOperadorAsignacion(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenAsignacion);
+                            System.out.println();
+                            System.out.println("182 Token de asignacion ");
+                            System.out.println();
+                            break;
                         default:
-                            existeInstruccionAntesDeImport = false;
+                            break;
+
                     }
 
                 }
@@ -208,6 +229,66 @@ public class Parser {
         System.out.println();
 
         return programaRevisado;
+    } // fin metodo analisisSintactico
+
+    public boolean verificarOtrosTokenAntesDeImport(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenImport) {
+        int numeroError = 0;
+        boolean encontradoOtroToken = false;
+
+        if (indiceTokenImport != 0) {
+            encontradoOtroToken = true;
+        }
+
+        System.out.println();
+        System.out.println("251 Salimos de verificarImportAntsDeOtrostokens" + numeroDeLinea);
+        System.out.println();
+        return encontradoOtroToken;
+    }
+
+    public void validarOperadorAsignacion(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenAsignacion) {
+        // SINTEXIS CORRECTA:  VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+
+        int numeroError = 0;
+        String token_en_posicion_0 = "";
+        String token_en_posicion_2 = "";
+
+        switch (indiceTokenAsignacion) {
+            case 0: // Forma>  = 
+                numeroError = 601;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                break;
+            case 1:
+                //Revisa el token anterior a =
+                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
+                if (token_en_posicion_0.equals("PALABRA_RESERVADA")) {
+                    // Forma> PALABRA_RESERVADA =
+                    numeroError = 602;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("238 AQUI ESTA BIEN");
+                } else if (token_en_posicion_0.equals("DESCONOCIDO")) {
+                    // Forma> DESCONOCIDO =
+                    numeroError = 601;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("244 PERO AQUI NO");
+                }
+                //Revisa el token siguiente a =
+                token_en_posicion_2 = lineaDeTokens.get(2).getTipoDeToken().toString();
+                if (token_en_posicion_2.equals("PALABRA_RESERVADA")) {
+                    // Forma> IDENTIFICADOR = PALABRA_RESERVADA
+                    numeroError = 602;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+
+                } else if (token_en_posicion_2.equals("DESCONOCIDO")) {
+                    numeroError = 603;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+
+                break;
+            default:
+                numeroError = 600;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                break;
+        }
     }
 
     public int obtenerLineaPrimerTokenDiferenteDeImport() {
@@ -402,18 +483,18 @@ public class Parser {
                 case "PARENTESIS_DERECHO":
                     System.out.println(" 403 Contenido de la pila: " + pila);
                     if (pila.isEmpty()) {
-                        System.out.println("403 Error: pila vacía al encontrar un paréntesis derecho.  " + pila.isEmpty() );
+                        System.out.println("403 Error: pila vacía al encontrar un paréntesis derecho.  " + pila.isEmpty());
                         return false;
                     }
                     System.out.println(" 403 Contenido de la pila: " + pila);
-                    System.out.println("406Error: pila vacía al encontrar un paréntesis derecho." + pila.isEmpty() );
+                    System.out.println("406Error: pila vacía al encontrar un paréntesis derecho." + pila.isEmpty());
                     String ultimoParentesis = pila.pop();
                     System.out.println(" 406 Se retiro un   " + ultimoParentesis);
                     if (!"(".equals(ultimoParentesis)) {
                         System.out.println(" 406 Se retiro un   " + ultimoParentesis + " coinciden " + !"(".equals(ultimoParentesis));
                         return false;
                     }
-             
+
                     break;
 
                 default:
@@ -428,7 +509,7 @@ public class Parser {
         System.out.println("Resultado final: " + resultado);
         return resultado;
     }
-    
+
     public boolean verificarCorchetesBalanceados(List<Token> lineaDeTokens, int numeroDeLinea) {
         Stack<String> pila = new Stack<>();
 
