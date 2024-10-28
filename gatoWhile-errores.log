@@ -1,0 +1,23 @@
+00001 xxxx import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00002 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00003 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00004 while contador < 5: # La condicion es que contador sea menor que 5
+00005     x = 10 
+        Error 604. Se esperaba una variable valida despues del operador ",".
+00006     import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00007     y = x 
+        Error 604. Se esperaba una variable valida despues del operador ",".
+00008 import random
+        Error 300. La posición de la palabra reservada "import" es incorrecta.
+=================================================
+0 Token ==
+0 Token <=
+1 Token <
+0 Token !=
+0 Token >
+0 Token >=
+1 lineas de comentario

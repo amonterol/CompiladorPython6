@@ -66,11 +66,12 @@ public class TiposDeError {
         errores.put(519, "Sintaxis incorrecta. Faltan comillas de cierre");
         errores.put(520, "Sintaxis incorrecta. Faltan texto entre comillas");
         
-         //Errores relacionados con operador de asignacion
-        errores.put(600, "Sintaxis incorrecta. Se esperaba VARIABLE VALIDA = VARIABLE VALIDA o NUMERO");
-        errores.put(601, "Sintaxis incorrecta. Se espera una variable valida previo al operador = ");
-        errores.put(602, "Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida");
-        errores.put(603, "Sintaxis incorrecta. Se esperaba una variable valida o un número despues de = ");
+        //Errores relacionados con operador de asignacion
+        errores.put(600, "Expresión inválida. Se esperaba Variable_valida = Numero o Variable_valida");
+        errores.put(601, "Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida");
+        errores.put(602, "El lado izquierdo de un asignación debe ser una variable válida.");
+        errores.put(603, "El lado derecho de una asignación debe ser una variable valida o un número entero o número decimal.");
+        errores.put(604, "Se esperaba una variable valida despues del operador \",\".");
     }
 
     public String obtenerDescripcionDelError(int key) {

@@ -15,6 +15,7 @@ import auxiliares.TiposDeError;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class Lexer {
             //registrarLineaAnalizadaEnProgramaPythonRevisado(lineaDeCodigoActual, numeroLineaActual);
             //listaContenidoFinal.add(nuevoContenido);
             System.out.println();
-            System.out.println("76 La linea que estamos leyendo: " + lineaActual + " " + lineaDeCodigoActual);
+            System.out.println("76 La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
 
             //Verifica si la linea esta en blanco 
             if (lineaDeCodigoActual.isBlank() || lineaDeCodigoActual.isEmpty()) {
@@ -93,32 +94,35 @@ public class Lexer {
                 cantidadComentarios++;
                 //Si hay un comentario despues de codigo,elimina la parte del comentario en la línea
                 //para poder tokenizarlo
-                lineaDeCodigoActual = lineaDeCodigoActual.split("#")[0].trim();
+                lineaDeCodigoActual = lineaDeCodigoActual.split("#")[0];
             }
+            
+            int contadorIndentacion = contarIndentacion(lineaDeCodigoActual);
+      
 
-            //Separa cada linea de codigo en Tokens
-            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual, " \n()[]{}=<>*/+-:\",.", true);
 
-            System.out.println("94 Tokenizer to  La linea que estamos leyendo: " + lineaActual + " " + lineaDeCodigoActual);
+            
+            
+            //Separa cada linea de codigo en Tokens, quitamos la espacios vacios antes del primer token de la linea.
+            StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual.trim(), " \n()[]{}=<>*/+-:\",.", true);
+
+            System.out.println("94 Tokenizer to  La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
             System.out.println();
 
-            //tokenizer.toString();
-            //Para poder ver hacia adelante convertimos el StringTokenizer en arreglo de Tokens
-            /*
-            String[] arregloDeTokens = new String[tokenizer.countTokens()];
-            int j = 0;
-            while (tokenizer.hasMoreTokens()) {
-                String token = tokenizer.nextToken();
-                arregloDeTokens[j++] = token;
-            }
-             */
             String[] arregloDeTokens = convertirStringTokenizerEnArregloDeStrings(tokenizer);
 
-            //Almanacena los Token de una linea de codigo
+            System.out.println("114 Contenido de arreglo de Tokens: ");
+            Arrays.stream(arregloDeTokens).forEach(System.out::println);
+            System.out.println();
+
+            //Almanacena los Token clasificados de la linea actual de codigo
             tokens = new ArrayList<Token>();
+            agregarNuevoToken(TipoDeToken.INDENTACION, null, String.valueOf(contadorIndentacion), numeroLineaActual);
+            contadorIndentacion = 0;
+            
+
             //Itera sobre la linea de codigo ya convertida en arreglo de Strings
             for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
-
                 boolean existeFuncionInput = false;
                 boolean existeComillasIniciales = false;
 
@@ -130,9 +134,12 @@ public class Lexer {
                 } else {
                     tokenSiguiente = arregloDeTokens[indice + 1];
                 }
-                System.out.println("119 Antes switch tokenActual es " + tokenActual + " esta en " + indice + " <" + arregloDeTokens.length);
+                System.out.println("133 Antes switch tokenActual es " + tokenActual + " esta en " + indice + " <" + arregloDeTokens.length);
+                System.out.println();
+                
+                
                 switch (tokenActual) {
-                    //Ignora los espacios en blanco
+                  
                     case " ":
                         break;
 
@@ -549,6 +556,19 @@ public class Lexer {
         System.out.println();
     }
 
+    private static int contarIndentacion(String linea) {
+        int contador = 0;
+        for (char c : linea.toCharArray()) {
+            if (c == ' ' || c == '\t') {
+                contador++;
+            } else {
+                break;
+            }
+        }
+        return contador;
+    }
+
+    
     public static String[] extraerTextoEntreComillas(List<Token> lineaDeTokens) {
         StringBuilder textoEntreComillas = new StringBuilder();
         boolean dentroDeComillas = false;

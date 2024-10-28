@@ -64,7 +64,9 @@ public enum TipoDeToken {
         
         SALTO_DE_LINEA,        
         
-        DESCONOCIDO,;
+        DESCONOCIDO,
+        
+        INDENTACION,;
 
        
     }

@@ -45,11 +45,7 @@ public class Compilador {
                             e.printStackTrace();
                         }
 
-                        System.out.println("""
-                                       
-                                       2 CLASE COMIPILADOR BORRAR: ESTE ES EL CONTENIDO DEL ARCHIVO                                       
-                                       """);
-
+                      
                         imprimirListas(contenidoArchivo); //BORRAR
 
                        
@@ -61,11 +57,7 @@ public class Compilador {
                         Parser parser = new Parser(lexer.getListaDeTokens(), lexer.getListaContenidoFinal(), lexer.getCantidadComentarios(), lexer.getErroresEncontradosMap());
                         List<String>  programaRevisado = parser.analisisSintactico();
 
-                        System.out.println("""
-                                        
-                                       3 CLASE COMIPILADOR BORRAR: ESTE ES EL CONTENIDO DEL ARCHIVO log
-                                       
-                                       """);
+                       
                         archivo.escribirArchivo( programaRevisado, archivoDeSalida);
                         archivo.imprimirArchivo(archivoDeSalida); //BORRAR
                  
@@ -101,10 +93,10 @@ public class Compilador {
             return false;
         } else if (args.length > 1) {
             JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(101), "Error en archivo", JOptionPane.WARNING_MESSAGE);
-            System.out.println("5 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(101));
+            //System.out.println("5 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(101));
             return false;
         } else {
-            System.out.println("6 CLASE COMIPILADOR BORRAR: Este es el archivo para analizar: " + args[0]);
+            //System.out.println("6 CLASE COMIPILADOR BORRAR: Este es el archivo para analizar: " + args[0]);
             return true;
 
         }
@@ -113,12 +105,12 @@ public class Compilador {
 
     //Verifica que la extension del archivo a analizar tenga extension .py
     public static boolean validarExtensionArchivoParaAnalizar(String archivo) {
-        System.out.println("7 CLASE COMIPILADOR CLASE COMIPILADOR BORRAR: Archivo con extension correcta: " + archivo.toLowerCase().endsWith(".py"));
+       // System.out.println("7 CLASE COMIPILADOR CLASE COMIPILADOR BORRAR: Archivo con extension correcta: " + archivo.toLowerCase().endsWith(".py"));
         if (archivo.toLowerCase().endsWith(".py")) {
             return true;
         } else {
             JOptionPane.showMessageDialog(null, tiposError.obtenerDescripcionDelError(102), "Código Fuente", JOptionPane.WARNING_MESSAGE);
-            System.out.println("8 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(102));
+           // System.out.println("8 CLASE COMIPILADOR BORRAR " + tiposError.obtenerDescripcionDelError(102));
             return false;
         }
     }
