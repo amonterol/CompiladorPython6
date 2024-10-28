@@ -77,12 +77,11 @@ public class Parser {
                                     System.out.println();
                                     System.out.println(" 80 Numero de linea primera instruccion diferente de IMPORT " + obtenerLineaPrimerTokenDiferenteDeImport());
                                     System.out.println();
-                                    
+
                                     boolean existeInstruccionesAntesDeImport = numeroDeLineaTokenActual >= obtenerLineaPrimerTokenDiferenteDeImport();
 
-                                                              
                                     if (existeInstruccionesAntesDeImport) {
-                                       numeroError = 300;
+                                        numeroError = 300;
                                         incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
 
                                         //USANDO HASHMAP PARA ERRORES ENCONTRADOS
@@ -98,9 +97,15 @@ public class Parser {
                                             errores3.add(e);
                                             erroresEncontradosMap.put((numeroDeLineaTokenActual + 1), errores3);
                                         }
-                                        */
+                                         */
                                     }
-                                    
+
+                                    break;
+                                case "while":
+                                    numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    int indiceTokenWhile = tokensEnLaLinea.indexOf(tokenActual);
+                                    validarWhile(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenWhile);
+
                                     break;
                                 case "input":
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
@@ -233,13 +238,59 @@ public class Parser {
         return programaRevisado;
     } // fin metodo analisisSintactico
 
-    public boolean verificarOtrosTokenAntesDeImport(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenImport) {
-        boolean encontradoOtroToken = false;
+    public void validarWhile(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenWhile) {
+        System.out.println();
+        System.out.println("245 validarWhile " + " indice de token de while  " + indiceTokenWhile);
+        System.out.println();
 
-        if (indiceTokenImport != 1) {
-            encontradoOtroToken = true;
+        int numeroError = 0;
+        String token_en_posicion_0 = "";
+        String token_en_posicion_1 = "";
+        String token_en_posicion_2 = "";
+
+        Token tkn_en_posicion_siguiente_while = new Token();
+        Token ultimoTokenDeLaLinea = new Token();
+
+        if (indiceTokenWhile == 1) {
+            // Forma>  while 
+            if (lineaDeTokens.size() == 1) {
+                numeroError = 620;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
         }
-        return encontradoOtroToken;
+        ultimoTokenDeLaLinea = lineaDeTokens.getLast();
+        if (indiceTokenWhile == 1 && !ultimoTokenDeLaLinea.getTipoDeToken().toString().equals("DOS_PUNTOS")) {
+            numeroError = 622;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Forma while -> :
+        if (indiceTokenWhile == 1) {
+            if ((indiceTokenWhile + 1) < lineaDeTokens.size()) {
+                tkn_en_posicion_siguiente_while = lineaDeTokens.get(indiceTokenWhile + 1);
+                if (!(tkn_en_posicion_siguiente_while.getTipoDeToken().toString().equals("DOS_PUNTOS"))) {
+                    numeroError = 623;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+                if (!(tkn_en_posicion_siguiente_while.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO"))) {
+                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
+                    if (!parentesisBalanceados) {
+                        numeroError = 510;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    }
+
+                }
+                Token penultimoTokenDeLaLinea = lineaDeTokens.get((lineaDeTokens.size()- 2));
+                if (!(penultimoTokenDeLaLinea.getTipoDeToken().toString().equals("PARENTESIS_DERECHO"))) {
+                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
+                    if (!parentesisBalanceados) {
+                        numeroError = 510;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    }
+
+                }
+            }
+        }
+
     }
 
     public int obtenerLineaPrimerTokenDiferenteDeImport() {
@@ -268,8 +319,7 @@ public class Parser {
         System.out.println();
         return lineaPrimerTokenDiferenteDeImport;
     }
-    
-    
+
     public void validarOperadorAsignacion(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenAsignacion) {
         // SINTEXIS CORRECTA:  VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
 
@@ -358,24 +408,24 @@ public class Parser {
 
             default:
                 List<Token> sublistaDeTokens = lineaDeTokens.subList(0, indiceTokenAsignacion);
-                if(!esListaDeVariablesValidas(sublistaDeTokens)){
+                if (!esListaDeVariablesValidas(sublistaDeTokens)) {
                     numeroError = 604;
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
                 }
-              
+
                 break;
         }
     }
 
     private static boolean esListaDeVariablesValidas(List<Token> sublistaDeTokens) {
-        for (int i = 0; i <sublistaDeTokens.size(); i++) {
+        for (int i = 0; i < sublistaDeTokens.size(); i++) {
             Token token = sublistaDeTokens.get(i);
             if (i % 2 == 0) { // Posiciones pares deben ser identificadores
                 if (token.getTipoDeToken() != TipoDeToken.IDENTIFICADOR) {
                     return false;
                 }
             } else { // Posiciones impares deben ser comas
-                if (token.getTipoDeToken() != TipoDeToken.COMA ) {
+                if (token.getTipoDeToken() != TipoDeToken.COMA) {
                     return false;
                 }
             }
@@ -383,13 +433,13 @@ public class Parser {
         // Verificar que la lista no termine en una coma
         if (sublistaDeTokens.size() % 2 == 0) {
             Token ultimoToken = sublistaDeTokens.get(sublistaDeTokens.size() - 1);
-            if (ultimoToken.getTipoDeToken() == TipoDeToken.COMA ) {
+            if (ultimoToken.getTipoDeToken() == TipoDeToken.COMA) {
                 return false;
             }
         }
         return true;
     }
-          
+
     public void incluirErrorEncontrado(int numeroDeLinea, int numeroError) {
         MiError e = new MiError(numeroDeLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
         for (LineaDeContenido linea : listaContenidoFinal) {

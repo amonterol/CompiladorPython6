@@ -72,6 +72,14 @@ public class TiposDeError {
         errores.put(602, "El lado izquierdo de un asignación debe ser una variable válida.");
         errores.put(603, "El lado derecho de una asignación debe ser una variable valida o un número entero o número decimal.");
         errores.put(604, "Se esperaba una variable valida despues del operador \",\".");
+        
+        
+        //Errores relacionados con operador while
+         errores.put(620, "Expresión inválida. Se esperaba while -> condicion -> :");
+         errores.put(621, "Sintaxis incorrecta. while debe estar al comienzo de la línea");
+         errores.put(622, "Sintaxis incorrecta. Falta el operador dos puntos \":\"");
+         errores.put(623, "Sintaxis incorrecta. Falta la condicion a evaluar.");
+                 
     }
 
     public String obtenerDescripcionDelError(int key) {
