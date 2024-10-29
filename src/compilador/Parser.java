@@ -49,16 +49,54 @@ public class Parser {
         System.out.println();
 
         boolean existeTokenAntesDeImport = false;
-
+        boolean enBloqueWhile = false;
+        int indentacionBloqueWhile = -1;
+        int indentacionInstruccionActual = -1;
+        int contadorInstruccionesBloqueWhile = 0;
         System.out.println();
 
-        for (List<Token> tokensEnLaLinea : listaDeTokens) {
-            if (!tokensEnLaLinea.isEmpty()) {
+        for (List<Token> lineaDeCodigoEnTokens : listaDeTokens) {
+            if (!lineaDeCodigoEnTokens.isEmpty()) {
+                int numeroError = -1;
 
-                for (int i = 0; i < tokensEnLaLinea.size(); i++) {
+                //Valida si es la primera instruccion del bloque while para determinar cual es la indentacion del bloque
+                if (enBloqueWhile) {
+                    ++contadorInstruccionesBloqueWhile;
+                    indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+                    System.out.println();
+                    System.out.println("67 Indentacion token actual " + indentacionInstruccionActual + " contador " + contadorInstruccionesBloqueWhile);
+
+                    if (contadorInstruccionesBloqueWhile == 1) {
+                        indentacionBloqueWhile = indentacionInstruccionActual;
+                        System.out.println();
+                        System.out.println("67 Indentacion while " + indentacionBloqueWhile);
+                        if (indentacionBloqueWhile == 0) { //No hay instrucciones en el bloque
+                            numeroError = 629;
+                            incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            enBloqueWhile = false;
+                            contadorInstruccionesBloqueWhile = 0;
+                        }
+                    } else if (contadorInstruccionesBloqueWhile > 1) {
+                        if (validarIndentacionBloqueWhile(indentacionBloqueWhile, indentacionInstruccionActual)) {
+                            if (indentacionInstruccionActual == 0) { //Salimos del bloque
+                                enBloqueWhile = false;
+                                contadorInstruccionesBloqueWhile = 0;
+                            } else {
+                                //Instruccion con indentacion diferente al definido para el bloque
+                                System.out.println();
+                                System.out.println("67 Indentacion while " + indentacionBloqueWhile + indentacionInstruccionActual);
+                                numeroError = 630;
+                                incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < lineaDeCodigoEnTokens.size(); i++) {
                     int numeroDeLineaTokenActual = 0;
-                    int numeroError = -1;
-                    Token tokenActual = tokensEnLaLinea.get(i);
+                    Token tokenActual = lineaDeCodigoEnTokens.get(i);
+                    indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+
                     switch (tokenActual.getTipoDeToken().toString()) {
                         case "PALABRA_RESERVADA":
 
@@ -66,7 +104,7 @@ public class Parser {
                             switch (tokenActual.getLexema()) {
                                 case "import":
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                                    int indiceTokenImport = tokensEnLaLinea.indexOf(tokenActual);
+                                    int indiceTokenImport = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     //Valida los tokens antes de input
                                     System.out.println();
                                     System.out.println("72 Indice de import " + indiceTokenImport);
@@ -102,29 +140,34 @@ public class Parser {
 
                                     break;
                                 case "while":
+                                    enBloqueWhile = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                                    int indiceTokenWhile = tokensEnLaLinea.indexOf(tokenActual);
-                                    validarSintaxisDeWhile(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenWhile);
+                                    int indiceTokenWhile = lineaDeCodigoEnTokens.indexOf(tokenActual);
+                                    System.out.println();
+                                    System.out.println("147 Encontramos una instruccion  while " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenWhile);
+                                    System.out.println();
+                                    validarSintaxisDeWhile(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenWhile);
 
                                     break;
                                 case "input":
+                                    //existeInput = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                                    int indiceTokenInput = tokensEnLaLinea.indexOf(tokenActual);
+                                    int indiceTokenInput = lineaDeCodigoEnTokens.indexOf(tokenActual);
 
                                     //Valida los tokens antes de input
                                     System.out.println();
-                                    System.out.println("97 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    System.out.println("97 Indice de input " + lineaDeCodigoEnTokens.indexOf(tokenActual));
                                     System.out.println();
-                                    validarOperadoresAntesDeInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+                                    validarOperadoresAntesDeInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenInput);
 
                                     System.out.println();
-                                    System.out.println("101 Indice de input " + tokensEnLaLinea.indexOf(tokenActual));
+                                    System.out.println("101 Indice de input " + lineaDeCodigoEnTokens.indexOf(tokenActual));
                                     System.out.println();
 
                                     //Valida que los parentesis esten balanceados
-                                    if (verificarExistenciaParentesis(tokensEnLaLinea)) {
-                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
-                                        boolean parentesisBalanceadosEnInput = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
+                                    if (verificarExistenciaParentesis(lineaDeCodigoEnTokens)) {
+                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenInput);
+                                        boolean parentesisBalanceadosEnInput = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLineaTokenActual);
                                         if (!parentesisBalanceadosEnInput) {
                                             System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnInput);
                                             numeroError = 510;
@@ -135,7 +178,7 @@ public class Parser {
                                         System.out.println();
 
                                     } else {
-                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenInput);
                                         System.out.println();
                                         System.out.println("121 No hay parentesis => validarParentesisEnInput ");
                                         System.out.println();
@@ -145,31 +188,31 @@ public class Parser {
                                     System.out.println();
                                     System.out.println("128 No hay comillas => validarComillasEnInput ");
                                     System.out.println();
-                                    validarComillasEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenInput);
+                                    validarComillasEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenInput);
 
                                     break;
                                 case "print":
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                                    int indiceTokenPrint = tokensEnLaLinea.indexOf(tokenActual);
+                                    int indiceTokenPrint = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     Token tokenSiguienteDePrint = new Token();
 
-                                    if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
-                                        tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                    if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
+                                        tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
                                     }
                                     if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
-                                        if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
-                                            tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                        if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
+                                            tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
                                         }
                                     }
                                     if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                                        if ((indiceTokenPrint + 1) < tokensEnLaLinea.size()) {
-                                            tokenSiguienteDePrint = tokensEnLaLinea.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
+                                        if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
+                                            tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
                                         }
                                     }
 
-                                    if (verificarExistenciaParentesis(tokensEnLaLinea)) {
-                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenPrint);
-                                        boolean parentesisBalanceadosEnPrint = verificarParentesisBalanceados(tokensEnLaLinea, numeroDeLineaTokenActual);
+                                    if (verificarExistenciaParentesis(lineaDeCodigoEnTokens)) {
+                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
+                                        boolean parentesisBalanceadosEnPrint = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLineaTokenActual);
                                         if (!parentesisBalanceadosEnPrint) {
                                             System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnPrint);
                                             numeroError = 510;
@@ -179,7 +222,7 @@ public class Parser {
                                         System.out.println("115 verificarExistenciaParentesis ");
                                         System.out.println();
                                     } else {
-                                        validarParentesisEnInput(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenPrint);
+                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
                                         System.out.println();
                                         System.out.println("141 No hay parentesis => validarParentesisEnInput ");
                                         System.out.println();
@@ -193,9 +236,9 @@ public class Parser {
                             break;
 
                         case "ASIGNACION":
-                            int indiceTokenAsignacion = tokensEnLaLinea.indexOf(tokenActual);
+                            int indiceTokenAsignacion = lineaDeCodigoEnTokens.indexOf(tokenActual);
                             numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
-                            validarOperadorAsignacion(tokensEnLaLinea, numeroDeLineaTokenActual, indiceTokenAsignacion);
+                            validarOperadorAsignacion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenAsignacion);
                             System.out.println();
                             System.out.println("182 Token de asignacion ");
                             System.out.println();
@@ -238,135 +281,11 @@ public class Parser {
         return programaRevisado;
     } // fin metodo analisisSintactico
 
-    /*
-    public void validarWhile(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenWhile) {
-        System.out.println();
-        System.out.println("245 validarWhile " + " indice de token de while  " + indiceTokenWhile);
-        System.out.println();
-
-        int numeroError = 0;
-        Token tknPosicionInicial = lineaDeTokens.getFirst();
-        Token tknPosicionSiguienteWhile = new Token();
-        Token tknPosicionFinal = lineaDeTokens.getLast();
-
-        //Verifica que indentacion no sea mayor que 0
-        if (tknPosicionInicial.getTipoDeToken().toString().equals("INDENTACION") && (Integer.parseInt(tknPosicionInicial.getLiteral()) > 0)) {
-            numeroError = 620;
-            incluirErrorEncontrado(numeroDeLinea, numeroError);
-        }
-    
-        //while en posicion correcta => indiceTokenWhile == 1
-        //Valida que exista condicion a evaluar
-        if (indiceTokenWhile == 1) {
-            if ((indiceTokenWhile + 1) < lineaDeTokens.size()) {
-                tknPosicionSiguienteWhile = lineaDeTokens.get(indiceTokenWhile + 1);
-                if ((tknPosicionSiguienteWhile.getTipoDeToken().toString().equals("DOS_PUNTOS"))) {
-                    numeroError = 624;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            } else {
-                numeroError = 621;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 624;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 625;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-        }
-
-        if (indiceTokenWhile == 2) {
-            Token tknAnteriorWhile = lineaDeTokens.get((indiceTokenWhile - 1));
-            if (tknAnteriorWhile != null) {
-                numeroError = 626;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-        }
-
-        if (indiceTokenWhile >= 2) {
-            if ((indiceTokenWhile + 1) == lineaDeTokens.size()) {
-                numeroError = 621;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 624;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 625;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-            if ((indiceTokenWhile + 1) < lineaDeTokens.size()) {
-                tknPosicionSiguienteWhile = lineaDeTokens.get(indiceTokenWhile + 1);
-                if ((tknPosicionSiguienteWhile.getTipoDeToken().toString().equals("DOS_PUNTOS"))) {
-                    numeroError = 624;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            } else {
-                numeroError = 621;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 624;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 625;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-        }
-        
-        //Valida si hay parentesis y estan balanceados
-        if (indiceTokenWhile == 1) {
-            if ((indiceTokenWhile + 1) < lineaDeTokens.size()) {
-                tknPosicionSiguienteWhile = lineaDeTokens.get(indiceTokenWhile + 1);
-                if ((tknPosicionSiguienteWhile.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 510;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-                if ((tknPosicionSiguienteWhile.getTipoDeToken().toString().equals("CORCHETE_IZQUIERDOO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 513;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-                if ((tknPosicionSiguienteWhile.getTipoDeToken().toString().equals("LLAVE_IZQUIERDOO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 514;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-
-                Token penultimoTokenDeLaLinea = lineaDeTokens.get((lineaDeTokens.size() - 2));
-                if ((penultimoTokenDeLaLinea.getTipoDeToken().toString().equals("PARENTESIS_DERECHO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 510;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-                if ((penultimoTokenDeLaLinea.getTipoDeToken().toString().equals("CORCHETE_DERECHO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 515;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-                if ((penultimoTokenDeLaLinea.getTipoDeToken().toString().equals("LLAVE_DERECHO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 516;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-                if ((penultimoTokenDeLaLinea.getTipoDeToken().toString().equals("LLAVE_DERECHO"))) {
-                    boolean parentesisBalanceados = verificarParentesisBalanceados(lineaDeTokens, numeroDeLinea);
-                    if (!parentesisBalanceados) {
-                        numeroError = 516;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    }
-                }
-            }
-        }
-
+    //Valida la indentacion de la linea de codigo actual
+    public boolean validarIndentacionBloqueWhile(int indentacionBloqueWhile, int indentacionInstruccionActual) {
+        return indentacionInstruccionActual != indentacionBloqueWhile;
     }
-     */
+
     public void validarSintaxisDeWhile(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenWhile) {
         int numeroError = 0;
 
@@ -538,7 +457,6 @@ public class Parser {
 
     }
 
-  
     public int buscarTokenPorTipoDeToken(List<Token> lineaDeTokens, TipoDeToken tipoABuscar) {
         int posicion = -1;
         for (int i = 0; i < lineaDeTokens.size(); ++i) {
@@ -586,20 +504,20 @@ public class Parser {
 
         int numeroError = 0;
         String token_en_posicion_0 = "";
-        String token_en_posicion_1 = "";
+
         String token_en_posicion_2 = "";
+        Token tokenAntecesorAlOperador = new Token();
+        Token tokenSucesorAlOperador = new Token();
 
         switch (indiceTokenAsignacion) {
-            case 0: // Forma>  = 
-                if (lineaDeTokens.size() == 1) {
+            case 1: // Valida la form->  = 
+                if (lineaDeTokens.size() == 2) {
                     numeroError = 600;
                     incluirErrorEncontrado(numeroDeLinea, numeroError);
                 } else {
-                    if ((indiceTokenAsignacion + 1) < lineaDeTokens.size()) {
-                        Token tkn_en_posicion_1 = lineaDeTokens.get(1);
-                        if (!(tkn_en_posicion_1.getTipoDeToken().toString().equals(("NUMERO_ENTERO"))
-                                || tkn_en_posicion_1.getTipoDeToken().toString().equals(("NUMERO_ENTERO"))
-                                || tkn_en_posicion_1.getTipoDeToken().toString().equals(("IDENTIFICADOR")))) {
+                    if ((indiceTokenAsignacion + 1) < lineaDeTokens.size()) { //Verifica que haya mas token para evitar null
+                        tokenSucesorAlOperador = lineaDeTokens.get((indiceTokenAsignacion + 1));
+                        if (!esIdentificadorONumero(tokenSucesorAlOperador)) {
                             numeroError = 603;
                             incluirErrorEncontrado(numeroDeLinea, numeroError);
                         }
@@ -607,49 +525,39 @@ public class Parser {
 
                 }
                 break;
-            case 1:
-                // Operador en posicion correcta.Revisa el token anterior a el "="
-                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
-                System.out.println("278 Token en posicion 0 " + token_en_posicion_0);
-                switch (token_en_posicion_0) {
-                    case "PALABRA_RESERVADA":
+            case 2:
+                // Operador en posicion correcta.Valida el lado izquierdo de la asignacion"
+                // Valida la form->  x =  ó  x = y ó x = 10
+                tokenAntecesorAlOperador = lineaDeTokens.get((indiceTokenAsignacion - 1));
+                System.out.println("278 Token en posicion 0 " + tokenAntecesorAlOperador.getTipoDeToken());
+                switch (tokenAntecesorAlOperador.getTipoDeToken()) {
+                    case TipoDeToken.PALABRA_RESERVADA:
                         // Forma> PALABRA_RESERVADA =
                         numeroError = 601;
                         incluirErrorEncontrado(numeroDeLinea, numeroError);
                         System.out.println("238 AQUI ESTA BIEN");
                         break;
-                    case "DESCONOCIDO":
-                        // Forma> DESCONOCIDO =
-                        numeroError = 602;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    case TipoDeToken.IDENTIFICADOR:
                         break;
-                    case "NUMERO_ENTERO":
-                    case "NUMERO_DECIMAL":
+                    default:
                         // Forma> 10 ó 10.25 =
                         numeroError = 602;
                         incluirErrorEncontrado(numeroDeLinea, numeroError);
                         break;
-                    default:
-                        break;
                 }
 
-                //Verifica si hay un token despues de "="
+                //Valida el lado derecho de la asignacion
                 if ((indiceTokenAsignacion + 1) < lineaDeTokens.size()) {
-                    //Operador en posicion correcta. Revisa el token siguiente a =
-                    token_en_posicion_2 = lineaDeTokens.get(2).getTipoDeToken().toString();
-                    switch (token_en_posicion_2) {
-                        case "PALABRA_RESERVADA":
+                    tokenSucesorAlOperador = lineaDeTokens.get((indiceTokenAsignacion + 1));
+                    switch (tokenSucesorAlOperador.getTipoDeToken()) {
+                        case TipoDeToken.PALABRA_RESERVADA:
                             // Forma> IDENTIFICADOR = PALABRA_RESERVADA
                             numeroError = 601;
                             incluirErrorEncontrado(numeroDeLinea, numeroError);
                             break;
-                        case "DESCONOCIDO":
-                            numeroError = 602;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "IDENTIFICADOR":
-                        case "NUMERO_ENTERO":
-                        case "NUMERO_DECIMAL":
+                        case TipoDeToken.IDENTIFICADOR:
+                        case TipoDeToken.NUMERO_ENTERO:
+                        case TipoDeToken.NUMERO_DECIMAL:
                             break;
                         default:
                             numeroError = 602;
@@ -662,39 +570,57 @@ public class Parser {
                 }
 
                 break;
-
-            default:
-                List<Token> sublistaDeTokens = lineaDeTokens.subList(0, indiceTokenAsignacion);
-                if (!esListaDeVariablesValidas(sublistaDeTokens)) {
-                    numeroError = 604;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+            default: //Forma id1, id2, ..., idN = variable_valida o numero
+                if (tokenAntecesorAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR && indiceTokenAsignacion == 2) {
+                    //Esto es correcto
+                } else if (indiceTokenAsignacion > 3) {
+                    List<Token> sublistaDeTokens = lineaDeTokens.subList(1, indiceTokenAsignacion);
+                    boolean listaValida[] = esListaDeVariablesValidas(sublistaDeTokens);
+                    if (!listaValida[0]) { // false => hay al menos un identificador no valido
+                        numeroError = 604;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    }
+                    if (!listaValida[1]) { //Comas despues de cada identificador excepto el ultimo
+                        numeroError = 605;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    }
+                    if (listaValida[2]) {//Existe una coma despues del ultimo identificador
+                        numeroError = 606;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    }
                 }
 
                 break;
         }
     }
 
-    private static boolean esListaDeVariablesValidas(List<Token> sublistaDeTokens) {
+    private boolean[] esListaDeVariablesValidas(List<Token> sublistaDeTokens) {
+        boolean[] listaValida = {false, false, false};
         for (int i = 0; i < sublistaDeTokens.size(); i++) {
             Token token = sublistaDeTokens.get(i);
-            if (i % 2 == 0) { // Posiciones pares deben ser identificadores
-                if (token.getTipoDeToken() != TipoDeToken.IDENTIFICADOR) {
-                    return false;
+            if (i % 2 == 0) { // Posiciones pares deben ser identificadores validos
+                if (token.getTipoDeToken() == TipoDeToken.IDENTIFICADOR) {
+                    listaValida[0] = true;
                 }
             } else { // Posiciones impares deben ser comas
-                if (token.getTipoDeToken() != TipoDeToken.COMA) {
-                    return false;
+                if (token.getTipoDeToken() == TipoDeToken.COMA) {
+                    listaValida[1] = true;
                 }
             }
         }
         // Verificar que la lista no termine en una coma
-        if (sublistaDeTokens.size() % 2 == 0) {
-            Token ultimoToken = sublistaDeTokens.get(sublistaDeTokens.size() - 1);
-            if (ultimoToken.getTipoDeToken() == TipoDeToken.COMA) {
-                return false;
-            }
+        Token ultimoToken = sublistaDeTokens.getLast();
+        if (ultimoToken.getTipoDeToken() == TipoDeToken.COMA) {
+            listaValida[2] = true;
         }
-        return true;
+        return listaValida;
+    }
+
+    //Valida si el token es del tipo identificador o un numero
+    public boolean esIdentificadorONumero(Token token) {
+        return token.getTipoDeToken() == TipoDeToken.NUMERO_DECIMAL
+                || token.getTipoDeToken() == TipoDeToken.NUMERO_DECIMAL
+                || token.getTipoDeToken() == TipoDeToken.IDENTIFICADOR;
     }
 
     public void incluirErrorEncontrado(int numeroDeLinea, int numeroError) {

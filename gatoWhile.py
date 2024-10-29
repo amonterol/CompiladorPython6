@@ -1,7 +1,6 @@
- while							
- xxx while:					
- xxx while x<y			
- xxx while x<y:		
- xxx while(x<y:	
- xxx while x<y):	
- xxx while(x<y):
+x = 10
+while x < 11:
+    x = x -1
+   print(x)
+    x = x + 1
+print("Hello")

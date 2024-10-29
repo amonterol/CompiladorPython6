@@ -1,33 +1,14 @@
-00001  while							
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 623. Sintaxis incorrecta. Falta la condicion a evaluar.
-        Error 624. Sintaxis incorrecta. La instruccion while debe terminar con el operador ":" que da inicio al bloque de código
-00002  xxx while:					
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
-        Error 623. Sintaxis incorrecta. Falta la condicion a evaluar.
-00003  xxx while x<y			
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
-        Error 624. Sintaxis incorrecta. La instruccion while debe terminar con el operador ":" que da inicio al bloque de código
-00004  xxx while x<y:		
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
-00005  xxx while(x<y:	
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
-        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
-00006  xxx while x<y):	
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
-        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
-00007  xxx while(x<y):
-        Error 620. Expresión inválida. No se esperaba indentacion.
-        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+00001 x = 10
+00002 while x < 11:
+00003     x = x -1
+00004    print(x)
+        Error 630. Sintaxis incorrecta. Indentación incorrecta en bloque de código while.
+00005     x = x + 1
+00006 print("Hello")
 =================================================
 0 Token ==
 0 Token <=
-5 Token <
+1 Token <
 0 Token !=
 0 Token >
 0 Token >=

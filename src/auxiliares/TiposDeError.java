@@ -74,9 +74,10 @@ public class TiposDeError {
         errores.put(600, "Expresión inválida. Se esperaba Variable_valida = Numero o Variable_valida");
         errores.put(601, "Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida");
         errores.put(602, "El lado izquierdo de un asignación debe ser una variable válida.");
-        errores.put(603, "El lado derecho de una asignación debe ser una variable valida o un número entero o número decimal.");
+        errores.put(603, "El lado derecho de una asignación debe ser una variable valida o un número.");
         errores.put(604, "Se esperaba una variable valida despues del operador \",\".");
-        
+        errores.put(605, "Lado izquierdo de una asignacion deber una variable valida o una lista de variables valida.");
+        errores.put(606, "Una lista de variables en el lado izquierdo de una asignación no puede terminar en coma.");        
         
         //Errores relacionados con operador while
          errores.put(620, "Expresión inválida. No se esperaba indentacion.");
@@ -89,6 +90,8 @@ public class TiposDeError {
          errores.put(626, "Sintaxis incorrecta. El operador \":\" debe ser el último token de la instruccion while");
          errores.put(627, "Sintaxis incorrecta. Uso incorrecto del operador aritmetico");
          errores.put(628, "Sintaxis incorrecta. Uso incorrecto del operador relacional");
+         errores.put(629, "Sintaxis incorrecta. Bloque de código while sin instrucciones.");
+         errores.put(630, "Sintaxis incorrecta. Indentación incorrecta en bloque de código while.");
     }
 
     public String obtenerDescripcionDelError(int key) {
