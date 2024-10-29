@@ -12,10 +12,12 @@ public enum TipoDeToken {
 
         PALABRA_RESERVADA,
         
+        NUMERO,
         NUMERO_ENTERO,
         NUMERO_DECIMAL,
         
         IDENTIFICADOR,
+        
         
         SUMA,
         RESTA,
@@ -25,6 +27,7 @@ public enum TipoDeToken {
         POTENCIA,
         DIVISION_ENTERA,
         
+       
         MAYOR_QUE,
         MAYOR_O_IGUAL_QUE,
         MENOR_QUE,

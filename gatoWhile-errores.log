@@ -1,23 +1,34 @@
-00001 xxxx import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta.
-00002 import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta.
-00003 import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta.
-00004 while contador < 5: # La condicion es que contador sea menor que 5
-00005     x = 10 
-        Error 604. Se esperaba una variable valida despues del operador ",".
-00006     import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta.
-00007     y = x 
-        Error 604. Se esperaba una variable valida despues del operador ",".
-00008 import random
-        Error 300. La posición de la palabra reservada "import" es incorrecta.
+00001  while							
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 623. Sintaxis incorrecta. Falta la condicion a evaluar.
+        Error 624. Sintaxis incorrecta. La instruccion while debe terminar con el operador ":" que da inicio al bloque de código
+00002  xxx while:					
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+        Error 623. Sintaxis incorrecta. Falta la condicion a evaluar.
+00003  xxx while x<y			
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+        Error 624. Sintaxis incorrecta. La instruccion while debe terminar con el operador ":" que da inicio al bloque de código
+00004  xxx while x<y:		
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+00005  xxx while(x<y:	
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00006  xxx while x<y):	
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00007  xxx while(x<y):
+        Error 620. Expresión inválida. No se esperaba indentacion.
+        Error 622. Sintaxis incorrecta. La instruccion while debe comenzar la palabra while
 =================================================
 0 Token ==
 0 Token <=
-1 Token <
+5 Token <
 0 Token !=
 0 Token >
 0 Token >=
-1 lineas de comentario
+0 lineas de comentario

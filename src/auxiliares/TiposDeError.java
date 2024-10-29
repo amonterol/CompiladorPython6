@@ -65,6 +65,10 @@ public class TiposDeError {
         errores.put(518, "Sintaxis incorrecta. Faltan comillas de inicio");
         errores.put(519, "Sintaxis incorrecta. Faltan comillas de cierre");
         errores.put(520, "Sintaxis incorrecta. Faltan texto entre comillas");
+        errores.put(521, "Sintaxis incorrecta. Debe usar parentesis, en lugar de corchetes o llaves.");
+         errores.put(522, "Sintaxis incorrecta. Los corchetes no están balanceados.");
+           errores.put(523, "Sintaxis incorrecta. Las llaves no están balanceadas.");
+        
         
         //Errores relacionados con operador de asignacion
         errores.put(600, "Expresión inválida. Se esperaba Variable_valida = Numero o Variable_valida");
@@ -75,11 +79,16 @@ public class TiposDeError {
         
         
         //Errores relacionados con operador while
-         errores.put(620, "Expresión inválida. Se esperaba while -> condicion -> :");
-         errores.put(621, "Sintaxis incorrecta. while debe estar al comienzo de la línea");
-         errores.put(622, "Sintaxis incorrecta. Falta el operador dos puntos \":\"");
+         errores.put(620, "Expresión inválida. No se esperaba indentacion.");
+         errores.put(621, "Expresión inválida. Se esperaba while -> condicion -> :");
+         errores.put(622, "Sintaxis incorrecta. La instruccion while debe comenzar la palabra while");
          errores.put(623, "Sintaxis incorrecta. Falta la condicion a evaluar.");
-                 
+        
+        errores.put(624, "Sintaxis incorrecta. La instruccion while debe terminar con el operador \":\" que da inicio al bloque de código");
+         errores.put(625, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
+         errores.put(626, "Sintaxis incorrecta. El operador \":\" debe ser el último token de la instruccion while");
+         errores.put(627, "Sintaxis incorrecta. Uso incorrecto del operador aritmetico");
+         errores.put(628, "Sintaxis incorrecta. Uso incorrecto del operador relacional");
     }
 
     public String obtenerDescripcionDelError(int key) {
