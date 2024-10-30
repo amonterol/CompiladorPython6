@@ -1055,30 +1055,7 @@ public class Parser {
         }
         return contadorComillas;
     }
-/*
-    public String extractStringBetweenQuotes(List<Token> tokens) {
-        StringBuilder extractedString = new StringBuilder();
-        boolean insideQuotes = false;
 
-        for (Token token : tokens) {
-            String lexema = token.getLexema();
-            if (lexema.equals("\"")) {
-                if (insideQuotes && extractedString.length() > 0 && extractedString.charAt(extractedString.length() - 1) == '\\') {
-                    // Remove the escape character and add the quote
-                    extractedString.setCharAt(extractedString.length() - 1, '\"');
-                } else {
-                    insideQuotes = !insideQuotes;
-                    continue;
-                }
-            }
-            if (insideQuotes) {
-                extractedString.append(lexema);
-            }
-        }
-
-        return extractedString.toString();
-    }
-*/
     public boolean verificarExistenciaParentesis(List<Token> lineaDeTokens) {
 
         for (Token token : lineaDeTokens) {

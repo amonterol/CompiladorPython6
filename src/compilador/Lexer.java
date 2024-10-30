@@ -119,7 +119,7 @@ public class Lexer {
             tokens = new ArrayList<Token>();
             agregarNuevoToken(TipoDeToken.INDENTACION, null, String.valueOf(contadorIndentacion), numeroLineaActual);
             contadorIndentacion = 0;
-            
+            boolean existeTextoEntreComillas = false;
 
             //Itera sobre la linea de codigo ya convertida en arreglo de Strings
             for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
@@ -228,8 +228,10 @@ public class Lexer {
                         break;
 
                     case "\"":
-                        System.out.println(" 225 NUEVAMENTE EN EL COMILLAS " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
+                         System.out.println(" 225 NUEVAMENTE EN EL COMILLAS " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
                         agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, numeroLineaActual);
+                        if(!existeTextoEntreComillas) {
+                       
 
                         StringBuilder textoEntreComillas = new StringBuilder();
 
@@ -262,11 +264,14 @@ public class Lexer {
                             System.out.println();
                             if (!textoEntreComillas.isEmpty()) {
                                 agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
+                                existeTextoEntreComillas = true;
                                 System.out.println(" 249 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                             } else {
                                 System.out.println(" 250 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                             }
+                            
                             --indice;
+                        }//fin if existeTextoEntreComillas
                         } else {
 
                         }
@@ -556,6 +561,29 @@ public class Lexer {
         System.out.println();
     }
 
+    public String extractStringBetweenQuotes(List<Token> tokens) {
+        StringBuilder extractedString = new StringBuilder();
+        boolean insideQuotes = false;
+
+        for (Token token : tokens) {
+            String lexema = token.getLexema();
+            if (lexema.equals("\"")) {
+                if (insideQuotes && extractedString.length() > 0 && extractedString.charAt(extractedString.length() - 1) == '\\') {
+                    // Remove the escape character and add the quote
+                    extractedString.setCharAt(extractedString.length() - 1, '\"');
+                } else {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+            }
+            if (insideQuotes) {
+                extractedString.append(lexema);
+            }
+        }
+
+        return extractedString.toString();
+    }
+    
     private static int contarIndentacion(String linea) {
         int contador = 0;
         for (char c : linea.toCharArray()) {
