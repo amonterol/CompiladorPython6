@@ -1,0 +1,21 @@
+00001 x + 10
+00002 x% - y
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 122. Se esperaba una variable_valida o un número antes del operador
+00003 x% - y^
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 201. Identificador contiene caracteres especiales diferentes de guión bajo.
+        Error 122. Se esperaba una variable_valida o un número antes del operador
+        Error 123. Se esperaba una variable_valida o un número después del operador
+00004 
+00005 x y + 10 12
+        Error 124. El lado izquierdo de una operación aritmética debe ser una sola variable_valida o un número
+        Error 125. El lado derecho de una operación aritmética debe ser una sola variable_valida o un número
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

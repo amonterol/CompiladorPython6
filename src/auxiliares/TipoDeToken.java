@@ -64,6 +64,7 @@ public enum TipoDeToken {
         IS_NOT,
         
         TEXTO_ENTRE_COMILLAS,
+        STRING,
         
         SALTO_DE_LINEA,        
         
