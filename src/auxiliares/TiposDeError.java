@@ -25,6 +25,7 @@ public class TiposDeError {
         errores.put(101, "Se ha incluido más de un archivo para analizar.");
         errores.put(102, "El archivo para analizar debe tener la extensión .py.");
         errores.put(103, "El archivo para analizar no contiene información.");
+        errores.put(104, "No se esperaba la indentación.");
 
         //Relacionados con operadores aritméticos
         errores.put(120, "Un operador aritmético no puede comenzar una instrucción. Se esperava variable_valida operador_aritmetico variable_valida o número");
@@ -117,6 +118,19 @@ public class TiposDeError {
         errores.put(664, "Falta bloque de código.");
         errores.put(665, "Faltan los paréntesis y los parametros.");
         errores.put(666, "Sintaxis incorrecta. Falta nombre de la funcion, los paréntesis, los parámetros de la funcion, los dos puntos.");
+        errores.put(667, "Sintaxis incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
+        errores.put(668, "La línea de código de una llamada de función comenzar con el nombre de la función.");
+        errores.put(669, "La línea de código de una llamada de función debe terminar con un )");
+        errores.put(670, "La línea de código de return debe comenzar con la palabra return");
+        errores.put(671, "La línea de código de return no debe terminar con una palabra reservada.");
+        errores.put(672, "La línea de código de return termina con un operador relacional");
+        errores.put(673, "La línea de código de return termina con un operador artimetico");
+        errores.put(674, "La línea de código de return termina caon caracter especial");
+        errores.put(675, "La función no ha sido definida previamente");
+
+        //Errores relacionados con operador PRINT
+        errores.put(700, "Sintaxis incorrecta. La instruccion print debe comenzar la palabra print");
+        errores.put(701, "Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis \")\"");
 
     }
 

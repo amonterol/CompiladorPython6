@@ -1,0 +1,21 @@
+00001 xxx print("texto entre comillas" xxx
+        Error 700. Sintaxis incorrecta. La instruccion print debe comenzar la palabra print
+        Error 701. Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis ")"
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00002 xxx print( xxxx
+        Error 700. Sintaxis incorrecta. La instruccion print debe comenzar la palabra print
+        Error 701. Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis ")"
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00003 xxx print( variable xxxx
+        Error 700. Sintaxis incorrecta. La instruccion print debe comenzar la palabra print
+        Error 701. Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis ")"
+        Error 510. Sintaxis incorrecta. Los parentesis redondos no están balanceados.
+00004 
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

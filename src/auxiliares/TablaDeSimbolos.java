@@ -18,16 +18,16 @@ public class TablaDeSimbolos {
         tabla = new HashMap<>();
     }
 
-    public void agregarSimbolo(String valor, Simbolo simbolo) {
-        tabla.put(valor, simbolo);
+    public void agregarSimbolo(String nombreDeVariable, Simbolo datosDeVariable) {
+        tabla.put(nombreDeVariable, datosDeVariable);
     }
 
-    public Simbolo obtenerSimbolo(String valor) {
-        return tabla.get(valor);
+    public Simbolo obtenerSimbolo(String nombreDeVariable) {
+        return tabla.get(nombreDeVariable);
     }
 
-    public boolean contieneSimbolo(String valor) {
-        return tabla.containsKey(valor);
+    public boolean contieneSimbolo(String nombreDeVariable) {
+        return tabla.containsKey(nombreDeVariable);
     }
        
     public Set<String> obtenerClaves() {
@@ -37,9 +37,9 @@ public class TablaDeSimbolos {
         @Override
     public String toString() {
         StringBuilder simbolosEnTabla = new StringBuilder();
-        for (String valor : obtenerClaves()) {
-            Simbolo simbolo = obtenerSimbolo(valor);
-            simbolosEnTabla.append("Nombre: ").append(valor)
+        for (String clave : obtenerClaves()) {
+            Simbolo simbolo = obtenerSimbolo(clave);
+            simbolosEnTabla.append("Nombre: ").append(clave)
               .append(", Tipo: ").append(simbolo.getTipo())
               .append(", Valor: ").append(simbolo.getValor())
               .append(", Línea: ").append(simbolo.getNumeroLinea())

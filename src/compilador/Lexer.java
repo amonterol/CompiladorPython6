@@ -34,6 +34,7 @@ public class Lexer {
     private static List<Token> tokens; //Almacena en cada entrada son los Tokens de la linea de codigo que se esta analizando
     private TablaDeSimbolos tablaDeSimbolos;
 
+   
     //Lo cambiamos>
     private static List<String> programaEnPythonRevisado; //Almacena los tokens que se identifican
 
@@ -497,7 +498,7 @@ public class Lexer {
                             //Solo probando construir una tabla de simbolos
                             incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
 
-                            System.out.println("479 TABLA DE SIMBOLOS ");
+                            System.out.println("500 LEXER TABLA DE SIMBOLOS ");
                             imprimirTablaDeSimbolos();
 
                         } else {
@@ -651,6 +652,11 @@ public class Lexer {
     public Map<Integer, List<MiError>> getErroresEncontradosMap() {
         return erroresEncontradosMap;
     }
+    
+     public TablaDeSimbolos getTablaDeSimbolos() {
+        return tablaDeSimbolos;
+    }
+
 
     //FUNCIONES AUXILIARES
     public static String[] convertirStringTokenizerEnArregloDeStrings(StringTokenizer tokenizer) {
@@ -791,18 +797,8 @@ public class Lexer {
 
     public void incluirNuevaVariableEnTablaDeSimbolos(Token token) {
         String nombre = token.getLexema();
-        String tipo;
+        String tipo = "variable";
         String literal = token.getLiteral();
-
-        // Asigna el tipo de simbolo basado en el tipo de token
-        tipo = switch (token.getTipoDeToken()) {
-            case NUMERO_ENTERO ->
-                "int";
-            case NUMERO_DECIMAL ->
-                "float";
-            default ->
-                "String";
-        };
 
         int numeroLinea = token.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
 

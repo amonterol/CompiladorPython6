@@ -1,9 +1,14 @@
-00001 while(((saludo"Braulio"))):
-00002 
-00003 
-00004 
-00005    		
-00006 
+00001 def saludo(nombre):
+00002     mensaje = "Hola, " + nombre
+00003     x = 10
+00004     y = y + 2
+00005     return mensaje
+00006 print(saludo("Braulio"))
+00007 
+00008 
+00009 
+00010    		
+00011 
 =================================================
 0 Token ==
 0 Token <=
