@@ -4,7 +4,12 @@
 00004   z = x/y
 00005 except ZeroDivisionError:
 00006      print("Error: no se puede dividir por cero.")
-        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+00007      print("Error: no se puede dividir por cero.")
+        Error 862. En bloque de instrucciones de except solo se permite una única instrucción.
+00008  print("Error: no se puede dividir por cero.")
+        Error 861. Indentación incorrecta en bloque de código except.
+        Error 862. En bloque de instrucciones de except solo se permite una única instrucción.
+00009 print("Error: no se puede dividir por cero.")
 =================================================
 0 Token ==
 0 Token <=

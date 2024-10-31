@@ -154,8 +154,9 @@ public class TiposDeError {
         errores.put(858, "Sintaxis incorrecta. Falta tipo de excepción.");
         errores.put(859, "Sintaxis incorrecta. No es permitido usar el nombre de una variable como tipo de excepción.");
         errores.put(860, "Bloque except sin instrucción.");
-        errores.put(861, "Solo se permite una instrucción print en el bloque de except.");
-        errores.put(862, "Indentación incorrecta en bloque de código except.");
+        errores.put(861, "Indentación incorrecta en bloque de código except.");
+        errores.put(862, "En bloque de instrucciones de except solo se permite una única instrucción.");
+        
 
     }
 
