@@ -1,0 +1,15 @@
+00001 try:
+00002   x = 10
+00003   y = 0
+00004   z = x/y
+00005 except ZeroDivisionError:
+00006      print("Error: no se puede dividir por cero.")
+        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

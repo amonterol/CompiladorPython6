@@ -292,7 +292,17 @@ public class Lexer {
                             }
                         }
                         break;
-
+                        
+                    case "ArithmeticError":
+                        agregarNuevoToken(TipoDeToken.EXCEPCION, "ArithmeticError" , null, numeroLineaActual);
+                        break;
+                    case "ZeroDivisionError": 
+                         agregarNuevoToken(TipoDeToken.EXCEPCION, "ZeroDivisionError" , null, numeroLineaActual);
+                        break;
+                    case "ValueError":
+                         agregarNuevoToken(TipoDeToken.EXCEPCION, "ValueError" , null, numeroLineaActual);
+                        break;
+                        
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
 

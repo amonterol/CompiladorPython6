@@ -70,7 +70,9 @@ public enum TipoDeToken {
         
         DESCONOCIDO,
         
-        INDENTACION,;
+        INDENTACION,
+        
+        EXCEPCION;
 
        
     }

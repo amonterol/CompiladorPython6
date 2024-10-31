@@ -63,16 +63,16 @@ public class Parser {
         int indentacionDef = 0;
         int indentacionBloqueDef = -1;
         int contadorInstruccionesBloqueDef = 0;
-        
+
         boolean enBloqueTry = false;
         int indentacionTry = 0;
         int indentacionBloqueTry = -1;
         int contadorInstruccionesBloqueTry = 0;
-        
-         boolean enBloqueCatch = false;
-        int indentacionCatch = 0;
-        int indentacionBloqueCatch = -1;
-        int contadorInstruccionesBloqueCatch = 0;
+
+        boolean enBloqueExcept = false;
+        int indentacionExcept = 0;
+        int indentacionBloqueExcept = -1;
+        int contadorInstruccionesBloqueExcept = 0;
 
         boolean enInstruccionReturn = false;
 
@@ -86,7 +86,7 @@ public class Parser {
             if (!lineaDeCodigoEnTokens.isEmpty()) {
                 int numeroError = -1;
                 indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
-                if (indentacionInstruccionActual != 0 && !enBloqueWhile && !enBloqueDef) {
+                if (indentacionInstruccionActual != 0 && !enBloqueWhile && !enBloqueDef && !enBloqueTry && !enBloqueExcept) {
                     numeroError = 104;
                     incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
                 }
@@ -159,6 +159,82 @@ public class Parser {
                     }
                 }
 
+                //Valida si es la primera instruccion del bloque while para determinar cual es la indentacion del bloque
+                if (enBloqueTry) {
+                    int indice = 0;
+                    Token token = new Token();
+                    if ((indice + 1) < lineaDeCodigoEnTokens.size()) {
+                        token = lineaDeCodigoEnTokens.get((indice + 1));
+                    }
+                    if (!token.getLexema().equals("except")) {
+
+                        ++contadorInstruccionesBloqueTry;
+                        indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+                        System.out.println();
+                        System.out.println("168 Indentacion en try token actual " + indentacionInstruccionActual + " contador " + contadorInstruccionesBloqueTry);
+
+                        if (contadorInstruccionesBloqueTry == 1) {
+                            indentacionBloqueTry = indentacionInstruccionActual;
+                            System.out.println();
+                            System.out.println("1739Indentacion try " + indentacionBloqueTry);
+                            if (indentacionBloqueTry == indentacionTry) { //No hay instrucciones en el bloque
+                                numeroError = 756;
+                                incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            }
+                        } else if (contadorInstruccionesBloqueTry > 1 ) {
+                            if (validarIndentacionBloque(indentacionBloqueTry, indentacionInstruccionActual)) {
+                                //Instruccion con indentacion diferente al definido para el bloque
+                                System.out.println();
+                                System.out.println("188 Indentacion try " + indentacionBloqueTry + indentacionInstruccionActual);
+                                numeroError = 750;
+                                incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            }
+                        }
+                    } else if (contadorInstruccionesBloqueTry == 0 && token.getLexema().equals("except")) {
+                        enBloqueTry = false;
+                        numeroError = 757;
+                        incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea()-1, numeroError);
+                    }
+                }
+
+                //Valida si es la primera instruccion del bloque except para determinar cual es la indentacion del bloque
+                if (enBloqueExcept) {
+
+                    ++contadorInstruccionesBloqueWhile;
+                    indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+                    System.out.println();
+                    System.out.println("74 Indentacion en while token actual " + indentacionInstruccionActual + " contador " + contadorInstruccionesBloqueWhile);
+
+                    if (contadorInstruccionesBloqueWhile == 1) {
+                        indentacionBloqueExcept = indentacionInstruccionActual;
+                        System.out.println();
+                        System.out.println("211 Indentacion bloque except " + indentacionBloqueExcept);
+                        if (indentacionBloqueExcept == 0) { //No hay instrucciones en el bloque
+                            numeroError = 860;
+                            incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            enBloqueExcept = false;
+                            contadorInstruccionesBloqueExcept = 0;
+                        }
+                    } else if (contadorInstruccionesBloqueWhile > 1) {
+                        if (validarIndentacionBloque(indentacionBloqueExcept, indentacionInstruccionActual)) {
+                            if (indentacionInstruccionActual == indentacionExcept) { //Salimos del bloque
+                                enBloqueExcept = false;
+                                contadorInstruccionesBloqueExcept = 0;
+                                numeroError = 861;
+                                incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            } else {
+                                //Instruccion con indentacion diferente al definido para el bloque
+                                System.out.println();
+                                System.out.println("67 Indentacion Except " + indentacionBloqueExcept + indentacionInstruccionActual);
+                                numeroError = 862;
+                                incluirErrorEncontrado(lineaDeCodigoEnTokens.getFirst().getNumeroLinea(), numeroError);
+                            }
+                        }
+                    }
+                }
+
+                //Iniciamos el recorrido de la los tokens de la linea de código, token por token
+                //Y los clasificamos de acuerdo a su tipo para analizar su sintaxis.
                 for (int i = 0; i < lineaDeCodigoEnTokens.size(); i++) {
                     int numeroDeLineaTokenActual = 0;
                     Token tokenActual = lineaDeCodigoEnTokens.get(i);
@@ -300,9 +376,18 @@ public class Parser {
                                     System.out.println();
                                     System.out.println("278 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenTry);
                                     System.out.println();
-                                    validarSintaxisDeLineaWhile(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenWhile);
-
-
+                                    validarSintaxisDeLineaTry(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenTry);
+                                    break;
+                                case "except":
+                                    enBloqueExcept = true;
+                                    numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    int indiceTokenExcept = lineaDeCodigoEnTokens.indexOf(tokenActual);
+                                    indentacionExcept = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+                                   
+                                    System.out.println();
+                                    System.out.println("278 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenExcept);
+                                    System.out.println();
+                                    validarSintaxisDeLineaExcept(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenExcept);
                                     break;
                                 default:
                                     break;
@@ -414,6 +499,122 @@ public class Parser {
         imprimirTablaDeSimbolos();
         return programaRevisado;
     } // fin metodo analisisSintactico
+
+    //INICIO METODOS AUXILIARES
+    public void validarSintaxisDeLineaExcept(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenExcept) {
+        int numeroError = 0;
+        int posicionTokenDosPuntos = buscarTokenPorTipoDeToken(lineaDeTokens, TipoDeToken.DOS_PUNTOS);
+        Token tokenIndentacion = lineaDeTokens.getFirst();
+        Token tokenAntecesorDeExcept = lineaDeTokens.get((indiceTokenExcept - 1));
+        Token tokenSucesorDeExcept = new Token();
+        Token tokenSucesorDelSucesorDeExcept = new Token();
+        Token ultimoToken = lineaDeTokens.getLast();
+
+        if ((indiceTokenExcept + 1) < lineaDeTokens.size()) {
+            tokenSucesorDeExcept = lineaDeTokens.get((indiceTokenExcept + 1));
+        }
+
+        //Valida la indentacion de except
+        if (tokenIndentacion.getTipoDeToken() != null) {
+            if (Integer.parseInt(tokenIndentacion.getLiteral()) > 0) {
+                //return "Error: indentación incorrecta debe ser cero";
+                numeroError = 750;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
+        }
+        //Valida que except este al comienzo de la linea de la instruccion while
+        if (indiceTokenExcept > 1) {
+            numeroError = 852;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que existan los dos puntos
+        if (posicionTokenDosPuntos == -1) {
+            numeroError = 854;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que cuando no existe los dos puntos no se puede usar otro token en su lugar 
+        if ((indiceTokenExcept + 2) < lineaDeTokens.size()) {
+            tokenSucesorDelSucesorDeExcept = lineaDeTokens.get((indiceTokenExcept + 2));
+        }
+        if (tokenSucesorDelSucesorDeExcept.getLexema().equals(ultimoToken.getLexema()) && posicionTokenDosPuntos == -1) {
+            numeroError = 853;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+
+        //Valida que existe algun otro token despues de :
+        if (posicionTokenDosPuntos == 3 && ultimoToken.getTipoDeToken() != TipoDeToken.DOS_PUNTOS) {
+            numeroError = 855;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida si aparecen parentesis
+        if (verificarExistenciaParentesis(lineaDeTokens)) {
+            numeroError = 851;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que el siguiente token despues de except sea una token de EXCEPTION
+        if (tokenSucesorDeExcept.getTipoDeToken() != TipoDeToken.EXCEPCION) {
+            numeroError = 851;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que el siguiente token no sea una palabra reservada
+        if (tokenSucesorDeExcept.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA) {
+            numeroError = 858;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que el siguiente token no sea un identificador
+        if (tokenSucesorDeExcept.getTipoDeToken() == TipoDeToken.IDENTIFICADOR) {
+            numeroError = 859;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+
+    }
+
+    public void validarSintaxisDeLineaTry(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenTry) {
+
+        int numeroError = 0;
+        int posicionTokenDosPuntos = buscarTokenPorTipoDeToken(lineaDeTokens, TipoDeToken.DOS_PUNTOS);
+        Token tokenIndentacion = lineaDeTokens.getFirst();
+        Token tokenAntecesorATry = lineaDeTokens.get((indiceTokenTry - 1));
+        Token tokenSucesorATry = new Token();
+        Token ultimoToken = lineaDeTokens.getLast();
+        if ((indiceTokenTry + 1) < lineaDeTokens.size()) {
+            tokenSucesorATry = lineaDeTokens.get((indiceTokenTry + 1));
+        }
+
+        //Valida la indentacion de try
+        if (tokenIndentacion.getTipoDeToken() != null) {
+            if (Integer.parseInt(tokenIndentacion.getLiteral()) > 0) {
+                //return "Error: indentación incorrecta debe ser cero";
+                numeroError = 750;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
+        }
+        //Valida que try este al comienzo de la linea de la instruccion while
+        if (indiceTokenTry > 1) {
+            numeroError = 752;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que existan los dos puntos
+        if (posicionTokenDosPuntos == -1) {
+            numeroError = 754;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        //Valida que cuando no existe los dos puntos no se puede usar otro token en su lugar 
+        if (tokenSucesorATry.getLexema().equals(ultimoToken.getLexema()) && posicionTokenDosPuntos == -1) {
+            numeroError = 753;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+
+        if (posicionTokenDosPuntos == 2 && ultimoToken.getTipoDeToken() != TipoDeToken.DOS_PUNTOS) {
+            numeroError = 755;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        if (verificarExistenciaParentesis(lineaDeTokens)) {
+            numeroError = 751;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+
+    }
 
     public void validarSintaxisPrint(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenPrint) {
         int numeroError = 0;

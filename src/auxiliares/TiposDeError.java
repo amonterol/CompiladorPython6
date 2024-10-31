@@ -132,6 +132,31 @@ public class TiposDeError {
         errores.put(700, "Sintaxis incorrecta. La instruccion print debe comenzar la palabra print");
         errores.put(701, "Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis \")\"");
 
+        //Errores relacionados con operador try
+        errores.put(750, "Sintaxis incorrecta. No se esperaba cambio en la indentacion.");
+        errores.put(751, "Sintaxis incorrecta. Se esperaba try -> : ");
+        errores.put(752, "Sintaxis incorrecta. La línea de la instrucción try debe comenzar la palabra try");
+        errores.put(753, "Sintaxis incorrecta. La línea de la instrucción try debe terminar con :");
+        errores.put(754, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
+        errores.put(755, "Sintaxis incorrecta. No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
+        errores.put(756, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción try");
+        errores.put(757, "Bloque try sin instrucciones.");
+
+        //Errores relacionados con operador except
+        errores.put(850, "Sintaxis incorrecta. No se esperaba cambio en la indentacion.");
+        errores.put(851, "Sintaxis incorrecta. Se esperaba except -> ArithmeticError | ZeroDivisionError | ValueError -> : ");
+        errores.put(852, "Sintaxis incorrecta. La línea de la instrucción except debe comenzar la palabra except");
+        errores.put(853, "Sintaxis incorrecta. La línea de la instrucción except debe terminar con :");
+        errores.put(854, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
+        errores.put(855, "Sintaxis incorrecta. No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
+        errores.put(856, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción except");
+        errores.put(857, "Bloque except sin instrucciones.");
+        errores.put(858, "Sintaxis incorrecta. Falta tipo de excepción.");
+        errores.put(859, "Sintaxis incorrecta. No es permitido usar el nombre de una variable como tipo de excepción.");
+        errores.put(860, "Bloque except sin instrucción.");
+        errores.put(861, "Solo se permite una instrucción print en el bloque de except.");
+        errores.put(862, "Indentación incorrecta en bloque de código except.");
+
     }
 
     public String obtenerDescripcionDelError(int key) {
