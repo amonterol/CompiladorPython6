@@ -264,42 +264,6 @@ public class Parser {
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                                     int indiceTokenPrint = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     validarSintaxisPrint(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
-                                    /*
-                                    Token tokenSiguienteDePrint = new Token();
-
-                                    if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
-                                        tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
-                                    }
-                                    if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("PARENTESIS_IZQUIERDO")) {
-                                        if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
-                                            tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
-                                        }
-                                    }
-                                    if (tokenSiguienteDePrint.getTipoDeToken().toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                                        if ((indiceTokenPrint + 1) < lineaDeCodigoEnTokens.size()) {
-                                            tokenSiguienteDePrint = lineaDeCodigoEnTokens.get((indiceTokenPrint + 1)); //Se mueve al token siguiente del siguiente de print
-                                        }
-                                    }
-
-                                     *
-                                    if (verificarExistenciaParentesis(lineaDeCodigoEnTokens)) {
-                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
-                                        boolean parentesisBalanceadosEnPrint = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLineaTokenActual);
-                                        if (!parentesisBalanceadosEnPrint) {
-                                            System.out.println("109 Parentesis NO balanceados:" + parentesisBalanceadosEnPrint);
-                                            numeroError = 510;
-                                            incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
-                                        }
-                                        System.out.println();
-                                        System.out.println("115 verificarExistenciaParentesis ");
-                                        System.out.println();
-                                    } else {
-                                        validarParentesisEnInput(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
-                                        System.out.println();
-                                        System.out.println("141 No hay parentesis => validarParentesisEnInput ");
-                                        System.out.println();
-                                    }
-                                     */
                                     break;
 
                                 case "def":
@@ -336,7 +300,8 @@ public class Parser {
                                     System.out.println();
                                     System.out.println("278 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenTry);
                                     System.out.println();
-                                    boolean existenErrores = validarSintaxisBloqueTryCatch(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenTry); //false no hay errores
+                                    validarSintaxisDeLineaWhile(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenWhile);
+
 
                                     break;
                                 default:
