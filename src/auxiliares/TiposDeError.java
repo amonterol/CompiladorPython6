@@ -44,13 +44,11 @@ public class TiposDeError {
         errores.put(300, "La posición de la palabra reservada \"import\" es incorrecta.");
 
         //Relacionados con palabra reserva-> input
-        errores.put(400, "Falta incluir una variable valida.");
-        errores.put(401, "Falta incluir el operador de asignación: \"=\".");
-        errores.put(402, "La variable a asignar debe ser un identificador valido.");
-        errores.put(403, "Uso de operador incorrecto, debe utilizar: \"=\".");
-        errores.put(404, "Una palabra reservada no se puede usar como variable valida.");
-        errores.put(405, "Un valor numérico no es una variable valida.");
-        errores.put(406, "Sintaxix incorrecto de funcion \"input\"-> variable = input(\"string\")");
+     
+        errores.put(401, "Sintaxis incorrecta. Se esperaba \"(\" despues de input.");
+        errores.put(402, "Sintaxis incorrecta. Se esperaba  \")\" como último token en la instrucción input.");
+        errores.put(403, "El argumento de input no puede ser una palabra reservada.");
+        errores.put(404, "El argumento de input debe ser un identificador valido o una cadena de caracteres.");
 
         //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
@@ -77,6 +75,7 @@ public class TiposDeError {
         errores.put(521, "Sintaxis incorrecta. Debe usar parentesis, en lugar de corchetes o llaves.");
         errores.put(522, "Sintaxis incorrecta. Los corchetes no están balanceados.");
         errores.put(523, "Sintaxis incorrecta. Las llaves no están balanceadas.");
+        errores.put(524, "Sintaxis incorrecta. Las comillas no están balanceadas.");
 
         //Errores relacionados con operador de asignacion
         errores.put(600, "Expresión inválida. Se esperaba Variable_valida = Numero o Variable_valida");
@@ -156,7 +155,6 @@ public class TiposDeError {
         errores.put(860, "Bloque except sin instrucción.");
         errores.put(861, "Indentación incorrecta en bloque de código except.");
         errores.put(862, "En bloque de instrucciones de except solo se permite una única instrucción.");
-        
 
     }
 

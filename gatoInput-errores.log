@@ -1,0 +1,12 @@
+00001 input(Esto es un texto entre comillas)
+        Error 518. Sintaxis incorrecta. Faltan comillas de inicio
+        Error 519. Sintaxis incorrecta. Faltan comillas de cierre
+        Error 404. El argumento de input debe ser un identificador valido o una cadena de caracteres.
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario
