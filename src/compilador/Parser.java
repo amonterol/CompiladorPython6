@@ -333,11 +333,7 @@ public class Parser {
                                     //Valida los tokens antes de input
                                     System.out.println();
                                     System.out.println("72 Indice de import " + indiceTokenImport);
-                                    System.out.println();
-                                    System.out.println();
                                     System.out.println(" 75 IMPORT esta en numero de linea " + numeroDeLineaTokenActual);
-                                    System.out.println();
-                                    System.out.println();
                                     System.out.println(" 80 Numero de linea primera instruccion diferente de IMPORT " + obtenerLineaPrimerTokenDiferenteDeImport());
                                     System.out.println();
 
@@ -376,7 +372,7 @@ public class Parser {
 
                                     break;
                                 case "input":
-                                    
+                                    existeInput = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                                     int indiceTokenInput = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     System.out.println();
@@ -498,18 +494,39 @@ public class Parser {
                                     validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
                                 }
                             }
-                            if (esLlamadaAFuncion(lineaDeCodigoEnTokens, indiceTokenActual) && !enInstruccionPrint) {
-                                System.out.println();
-                                System.out.println("364 Una funcion no definida antes" + tokenActual.getLexema() + " " + numeroDeLineaTokenActual);
-                                if (!esFuncion(tokenActual.getLexema())) {
 
+                            if (esFuncion(tokenActual.getLexema())) {
+                                boolean llamadaDeFuncion = esLlamadaAFuncion(lineaDeCodigoEnTokens, indiceTokenActual);
+                                if (llamadaDeFuncion) {
+                                    System.out.println();
+                                    System.out.println("502 El identificador es una llamda de funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                } else {
+                                    System.out.println();
+                                    System.out.println("505 El identificador no es una llamda de funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                }
+                            } else {
+                                System.out.println();
+                                System.out.println("509 El identificador no es una funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                            }
+
+
+                            /*
+                            if (!existeInput) {
+
+                                if (esLlamadaAFuncion(lineaDeCodigoEnTokens, indiceTokenActual) && !enInstruccionPrint) {
                                     System.out.println();
                                     System.out.println("364 Una funcion no definida antes" + tokenActual.getLexema() + " " + numeroDeLineaTokenActual);
-                                    numeroError = 675;
-                                    incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
-                                    validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
+                                    if (!esFuncion(tokenActual.getLexema())) {
+
+                                        System.out.println();
+                                        System.out.println("364 Una funcion no definida antes" + tokenActual.getLexema() + " " + numeroDeLineaTokenActual);
+                                        numeroError = 675;
+                                        incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
+                                        validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
+                                    }
                                 }
                             }
+                             */
                             break;
                         default:
                             break;
@@ -594,8 +611,6 @@ public class Parser {
             }
         }
 
-        
-
         //Validamos si el arguemento de input es una string, en cuyo caso debe existir  comillas antes y despues
         int posicionTextoEntreComillas = buscarPosicionDeTokenPorTipoDeToken(lineaDeTokens, TipoDeToken.TEXTO_ENTRE_COMILLAS);
         if (posicionTextoEntreComillas != -1) {
@@ -621,7 +636,7 @@ public class Parser {
             incluirErrorEncontrado(numeroDeLinea, numeroError);
             System.out.println("654 Encontramos un error  524" + indiceParentesisIzquierdo);
         }
-       
+
         if (tokenSiguienteInput.getTipoDeToken() == TipoDeToken.PARENTESIS_IZQUIERDO) {
             switch (tokenSiguienteSiguienteInput.getTipoDeToken()) {
                 case TipoDeToken.PALABRA_RESERVADA:
@@ -630,7 +645,14 @@ public class Parser {
                     break;
 
                 case TipoDeToken.COMILLAS:
-                case TipoDeToken.IDENTIFICADOR:    
+                    break;
+                case TipoDeToken.IDENTIFICADOR:
+                    if (!verificarVariableEnTablaDeSimbolos(tokenSiguienteSiguienteInput.getLexema())) {
+                        numeroError = 405;
+                        incluirErrorEncontrado(numeroDeLinea, numeroError);
+                        System.out.println("638 Encontramos un error  405 " + tokenSiguienteSiguienteInput.getLexema());
+
+                    }
                     break;
 
                 default:
@@ -776,7 +798,7 @@ public class Parser {
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
         if (tokenSucesorAPrint.getTipoDeToken() != TipoDeToken.PARENTESIS_IZQUIERDO) {
-            numeroError = 500;
+            numeroError = 702;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
 
@@ -1072,46 +1094,87 @@ public class Parser {
         int numeroError = 0;
         Token tokenAntecesorAlOperador = lineaDeTokens.get((indiceToken - 1));
         Token tokenSucesorAlOperador = new Token();
+        Token tokenReturn = new Token();
+        Token tokenPrint = new Token();
+        int posicionTokenReturn = buscarPosicionDeTokenPorLexema(lineaDeTokens, "return");
+        System.out.println("1100 existe return en posicion: " + posicionTokenReturn);
+        int posicionTokenPrint = buscarPosicionDeTokenPorLexema(lineaDeTokens, "print");
+        System.out.println("1102 existe print en posicion: " + posicionTokenPrint);
+        
         if ((indiceToken + 1) < lineaDeTokens.size()) {
-            tokenSucesorAlOperador = lineaDeTokens.get((indiceToken + 1));
-        }
+                tokenSucesorAlOperador = lineaDeTokens.get((indiceToken + 1));
+            }
 
-        if (indiceToken == 1) {
-            numeroError = 120;
-            incluirErrorEncontrado(numeroDeLinea, numeroError);
-        }
-        if (indiceToken == (lineaDeTokens.size() - 1)) {
-            numeroError = 121;
-            incluirErrorEncontrado(numeroDeLinea, numeroError);
-        }
+        if (posicionTokenReturn != -1) {
+            tokenReturn = lineaDeTokens.get(posicionTokenReturn);
+            System.out.println("1110 existe return en posicion: " + tokenAntecesorAlOperador.getLexema());
+            System.out.println("1111 existe return en posicion: " + tokenSucesorAlOperador.getLexema());
+            if (posicionTokenReturn == 1) {
+                if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
+                    numeroError = 122;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("1116 existe return en posicion: " + tokenAntecesorAlOperador.getLexema());
+                }
+                if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
+                    numeroError = 123;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                    System.out.println("1121 existe return en posicion: " + tokenSucesorAlOperador.getLexema());
+                }
+            }
+        } else if (posicionTokenPrint != -1) {
+            tokenPrint = lineaDeTokens.get(posicionTokenPrint);
+             System.out.println("1126  print  token antecesorr a operador: " + tokenAntecesorAlOperador.getLexema());
+            System.out.println("1127 print token sucesor a operador" + tokenSucesorAlOperador.getLexema());
+            if (posicionTokenPrint == 1) {
+                if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
+                    numeroError = 122;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+                if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
+                    numeroError = 123;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+            }
+        } else {
+            
 
-        if (indiceToken == 2 && lineaDeTokens.size() == 4) {
-            if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
-                numeroError = 122;
+            if (indiceToken == 1) {
+                numeroError = 120;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
             }
-            if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
-                numeroError = 123;
+            if (indiceToken == (lineaDeTokens.size() - 1)) {
+                numeroError = 121;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
             }
-        }
-        if (indiceToken == 2 && lineaDeTokens.size() > 4) {
-            List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
-            if (listaLadoDerecho.size() > 2) {
-                numeroError = 125;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+
+            if (indiceToken == 2 && lineaDeTokens.size() == 4) {
+                if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
+                    numeroError = 122;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+                if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
+                    numeroError = 123;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
             }
-        }
-        if (indiceToken == 3 && lineaDeTokens.size() >= 4) {
-            List<Token> listaLadoIzquierdo = lineaDeTokens.subList(1, indiceToken);
-            List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
-            if (listaLadoIzquierdo.size() > 1) {
-                numeroError = 124;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            if (indiceToken == 2 && lineaDeTokens.size() > 4) {
+                List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
+                if (listaLadoDerecho.size() > 2) {
+                    numeroError = 125;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
             }
-            if (listaLadoDerecho.size() > 1) {
-                numeroError = 125;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            if (indiceToken == 3 && lineaDeTokens.size() >= 4) {
+                List<Token> listaLadoIzquierdo = lineaDeTokens.subList(1, indiceToken);
+                List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
+                if (listaLadoIzquierdo.size() > 1) {
+                    numeroError = 124;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
+                if (listaLadoDerecho.size() > 1) {
+                    numeroError = 125;
+                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                }
             }
         }
 
@@ -1311,10 +1374,32 @@ public class Parser {
     public int buscarPosicionDeTokenPorTipoDeToken(List<Token> lineaDeTokens, TipoDeToken tipoABuscar) {
         int posicion = -1;
         for (int i = 0; i < lineaDeTokens.size(); ++i) {
-            if (lineaDeTokens.get(i).getTipoDeToken() == tipoABuscar) {
-                posicion = i;
-                break;
+            if (lineaDeTokens.get(i) != null) {
+                if (lineaDeTokens.get(i).getTipoDeToken() != null) {
+                    if (lineaDeTokens.get(i).getTipoDeToken() == tipoABuscar) {
+                        posicion = i;
+                        break;
+                    }
+                }
+
             }
+        }
+        return posicion;
+    }
+
+    public int buscarPosicionDeTokenPorLexema(List<Token> lineaDeTokens, String lexemaABuscar) {
+        int posicion = -1;
+        for (int i = 0; i < lineaDeTokens.size(); ++i) {
+            if (lineaDeTokens.get(i) != null) {
+                if (lineaDeTokens.get(i).getLexema() != null) {
+                    if (lineaDeTokens.get(i).getLexema().equals(lexemaABuscar)) {
+                        posicion = i;
+                        break;
+                    }
+                }
+
+            }
+
         }
         return posicion;
     }
@@ -1347,7 +1432,7 @@ public class Parser {
     }
 
     public void validarOperadorAsignacion(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenAsignacion) {
-        // SINTEXIS CORRECTA:  VARIABLE VALIDA = VARIABLE VALIDA o NUMERO
+        // SINTEXIS CORRECTA:  VARIABLE_VALIDA = VARIABLE_VALIDA | NUMERO | LLAMADA_FUNCION
 
         System.out.println();
         System.out.println("789 validarOperadorAsignacion " + " indice de token de asignacion  " + indiceTokenAsignacion);
@@ -1399,14 +1484,30 @@ public class Parser {
                     tokenSucesorAlOperador = lineaDeTokens.get((indiceTokenAsignacion + 1));
                     switch (tokenSucesorAlOperador.getTipoDeToken()) {
                         case TipoDeToken.PALABRA_RESERVADA:
-                            if( !tokenSucesorAlOperador.getTipoDeToken().toString().equals("input")){
-                               // Forma> IDENTIFICADOR = PALABRA_RESERVADA (diferente de input
-                            numeroError = 601;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError); 
+                            if (!tokenSucesorAlOperador.getLexema().equals("input")) {
+                                // Forma> IDENTIFICADOR = PALABRA_RESERVADA (diferente de input
+                                numeroError = 601;
+                                incluirErrorEncontrado(numeroDeLinea, numeroError);
+                                System.out.println("1428 El termino derecho del operador de asignacion es: " + tokenSucesorAlOperador.getLexema());
+
                             }
-                            
+
                             break;
                         case TipoDeToken.IDENTIFICADOR:
+                            if (esLlamadaAFuncion(lineaDeTokens, indiceTokenAsignacion)) {
+                                if (!esFuncion(tokenSucesorAlOperador.getLexema())) {
+                                    numeroError = 675;
+                                    incluirErrorEncontrado(numeroDeLinea, numeroError);
+                                    System.out.println();
+                                    System.out.println("509 El identificador no es una funcion: " + tokenSucesorAlOperador.getLexema() + " en linea " + numeroDeLinea);
+
+                                }
+                            } else {
+                                System.out.println();
+                                System.out.println("505 El identificador no es una llamda de funcion: " + tokenSucesorAlOperador.getLexema() + " en linea " + numeroDeLinea);
+                            }
+
+                            break;
                         case TipoDeToken.NUMERO_ENTERO:
                         case TipoDeToken.NUMERO_DECIMAL:
                         case TipoDeToken.COMILLAS:
@@ -1425,8 +1526,10 @@ public class Parser {
             default: //Forma id1, id2, ..., idN = variable_valida o numero
                 if (tokenAntecesorAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR && indiceTokenAsignacion == 2) {
                     //Esto es correcto
-                } else if (indiceTokenAsignacion > 3) {
+                } else if (indiceTokenAsignacion >= 3) {
                     List<Token> sublistaDeTokens = lineaDeTokens.subList(1, indiceTokenAsignacion);
+                    System.out.println();
+                    System.out.println("1455 Existe una sublista de variables: " + sublistaDeTokens.toString());
                     boolean listaValida[] = esListaDeVariablesValidas(sublistaDeTokens);
                     if (!listaValida[0]) { // false => hay al menos un identificador no valido
                         numeroError = 604;
@@ -1490,130 +1593,6 @@ public class Parser {
         }
     }
 
-    /*
-    //Valida-> identificador, =, input, (, "string", )
-    public void validarOperadoresAntesDeInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceTokenInput) {
-        int numeroError = 0;
-        String token_en_posicion_0 = "";
-
-        switch (indiceTokenInput) {
-            case 0:
-                numeroError = 400;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                numeroError = 401;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                break;
-            case 1:
-                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
-                if (token_en_posicion_0.equals("IDENTIFICADOR")) { //Falta =
-                    numeroError = 401;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                } else if (token_en_posicion_0.equals("ASIGNACION")) {//Falta ID
-                    numeroError = 400;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                } else if (!(token_en_posicion_0.equals("IDENTIFICADOR") && token_en_posicion_0.equals("ASIGNACION"))) {
-                    switch (token_en_posicion_0) {
-                        case "DESCONOCIDO":
-                            numeroError = 402;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "PALABRA_RESERVADA":
-                            numeroError = 404;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "NUMERO_DECIMAL":
-                        case "NUMERO_ENTERO":
-                            numeroError = 405;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        default:
-                            numeroError = 400;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                    }
-                }
-                break;
-            case 2:
-                token_en_posicion_0 = lineaDeTokens.get(0).getTipoDeToken().toString();
-                String token_en_posicion_1 = lineaDeTokens.get(1).getTipoDeToken().toString();
-                if (!(token_en_posicion_0.equals("IDENTIFICADOR") && token_en_posicion_1.equals("ASIGNACION"))) {
-                    numeroError = 406;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                } else if (!(token_en_posicion_0.equals("IDENTIFICADOR")) && token_en_posicion_1.equals("ASIGNACION")) {
-                    switch (token_en_posicion_0) {
-                        case "DESCONOCIDO":
-                            numeroError = 402;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "PALABRA_RESERVADA":
-                            numeroError = 404;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "NUMERO_DECIMAL":
-                        case "NUMERO_ENTERO":
-                            numeroError = 405;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        default:
-                            numeroError = 400;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                    }
-                } else if (token_en_posicion_0.equals("IDENTIFICADOR") && !(token_en_posicion_1.equals("ASIGNACION"))) {
-                    switch (token_en_posicion_0) {
-                        case "DESCONOCIDO":
-                            numeroError = 402;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "PALABRA_RESERVADA":
-                            numeroError = 404;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        case "NUMERO_DECIMAL":
-                        case "NUMERO_ENTERO":
-                            numeroError = 405;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                        default:
-                            numeroError = 400;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            numeroError = 401;
-                            incluirErrorEncontrado(numeroDeLinea, numeroError);
-                            break;
-                    }
-                }
-                break;
-            default:
-                numeroError = 406;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                break;
-        }
-
-    }
-
-     */
     private int verificarExistenciaDeComillas(List<Token> lineaDeTokens) {
         int contadorComillas = 0;
         for (Token token : lineaDeTokens) {
@@ -1758,225 +1737,10 @@ public class Parser {
         return pila.isEmpty();
     }
 
-    /*
-    
-    
-    private void validarParentesisEnInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDeInput) {
-        System.out.println();
-        System.out.println("469 No hay parentesis => validarParentesisEnInput " + " el indice de input es " + indiceDeInput);
-        System.out.println();
-
-        int numeroError;
-
-        String tokenSiguienteDeInput = "";
-        String tokenSiguienteSiguienteDeInput = "";
-        String ultimoTokenDeLineaDeInput = "";
-        String penultimoTokenDeLineaDeInput = "";
-
-        //Valida si el token input es el ultimo de la linea de tokens
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDeInput + 1 == lineaDeTokens.size()) {
-                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput)).getTipoDeToken().toString();
-
-                numeroError = 511;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-                System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
-
-            }
-
-        }
-
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDeInput + 1 < lineaDeTokens.size()) {
-                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
-
-                if (!(tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
-                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA"))) {
-                    System.out.println();
-                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
-
-                    numeroError = 511;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
-
-                }
-
-            }
-        }
-        //Valida si el ultimo token de la linea es "
-        if (!lineaDeTokens.isEmpty()) {
-            if (lineaDeTokens.size() > indiceDeInput - 2) {
-                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
-                if (!(ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
-                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA"))) {
-                    System.out.println();
-                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
-
-                    numeroError = 512;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            }
-        }
-
-        //Valida [ o {
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDeInput + 1 < lineaDeTokens.size()) {
-                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
-
-                if (tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")) {
-                    System.out.println();
-                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
-
-                    numeroError = 513;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
-
-                }
-
-                if (tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) {
-                    System.out.println();
-                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
-
-                    numeroError = 514;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
-                }
-
-            }
-        }
-        //Valida ] o }
-        if (!lineaDeTokens.isEmpty()) {
-            if (lineaDeTokens.size() > indiceDeInput - 2) {
-                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
-                if (ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")) {
-                    System.out.println();
-                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
-
-                    numeroError = 515;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                } else if (ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA")) {
-                    System.out.println();
-                    System.out.println("511 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
-
-                    numeroError = 516;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            }
-        }
-
+    public boolean verificarVariableEnTablaDeSimbolos(String nombreDeVariable) {
+        return this.tablaDeSimbolos.contieneSimbolo(nombreDeVariable);
     }
 
-     */
- /*
-    private void validarComillasEnInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceDeInput) {
-        System.out.println();
-        System.out.println("511 No hay comillas => validarComillasEnInput ");
-        System.out.println();
-
-        int numeroError;
-
-        System.out.println();
-        System.out.println("466 No hay comillas => validarComillasEnInput indice de input es "
-                + indiceDeInput + " indice siguiente a input " + (indiceDeInput + 1)
-                + " indice de token siguiente al siguiente  " + (indiceDeInput + 2));
-        System.out.println();
-
-        String tokenSiguienteDeInput = "";
-        String tokenSiguienteSiguienteDeInput = "";
-        String ultimoTokenDeLineaDeInput = "";
-        String penultimoTokenDeLineaDeInput = "";
-
-        //Valida (TextoEntreComillas,  [TextoEntreComillas y {TextoEntreComillas
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDeInput + 2 < lineaDeTokens.size()) {
-                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
-                tokenSiguienteSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 2)).getTipoDeToken().toString();
-                if (tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
-                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA")) {
-                    System.out.println();
-                    System.out.println("480 tokenSiguienteDeInput.equals " + tokenSiguienteDeInput);
-                    if (!tokenSiguienteSiguienteDeInput.equals("COMILLAS")) {
-                        numeroError = 518;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                        System.out.println("484 tokenSiguienteSiguienteDeInput.equals " + tokenSiguienteSiguienteDeInput);
-                    }
-                }
-
-            }
-        }
-        //Valida TextoEntreComillas),  TextoEntreComillas] y TextoEntreComillas}
-        if (!lineaDeTokens.isEmpty()) {
-            if (lineaDeTokens.size() > indiceDeInput - 2) {
-                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
-                if (ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
-                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA")) {
-                    System.out.println();
-                    System.out.println("494 ultimoTokenDeLineaDeInput.equals " + ultimoTokenDeLineaDeInput);
-                    penultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 2)).getTipoDeToken().toString();
-                    if (!penultimoTokenDeLineaDeInput.equals("COMILLAS")) {
-                        numeroError = 519;
-                        incluirErrorEncontrado(numeroDeLinea, numeroError);
-                        System.out.println("498 penultimoTokenDeLineaDeInput.equals " + penultimoTokenDeLineaDeInput + " no es igual a " + "COMILLAS");
-                    }
-                }
-            }
-        }
-        //Valida TextoEntreComillas no hay comillas al inicio del texto
-        if (!lineaDeTokens.isEmpty()) {
-            if (indiceDeInput + 1 < lineaDeTokens.size()) {
-                tokenSiguienteDeInput = lineaDeTokens.get((indiceDeInput + 1)).getTipoDeToken().toString();
-
-                if (!(tokenSiguienteDeInput.equals("PARENTESIS_IZQUIERDO") || tokenSiguienteDeInput.equals("CORCHETE_IZQUIERDO")
-                        || tokenSiguienteDeInput.equals("LLAVE_IZQUIERDA") || tokenSiguienteDeInput.equals("COMILLAS"))) {
-                    System.out.println();
-                    System.out.println("566 no hay parentesis ni comillas iniciales " + tokenSiguienteDeInput);
-
-                    numeroError = 518;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-
-                } else {
-                    System.out.println();
-                    System.out.println("566 no hay parentesis ni comillas iniciales " + tokenSiguienteDeInput);
-                }
-
-            }
-        }
-        //Valida TextoEntreComillas no hay comillas al final del texto
-        if (!lineaDeTokens.isEmpty()) {
-            if (lineaDeTokens.size() > indiceDeInput - 2) {
-                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getTipoDeToken().toString();
-                if (!(ultimoTokenDeLineaDeInput.equals("PARENTESIS_DERECHO") || ultimoTokenDeLineaDeInput.equals("CORCHETE_DERECHO")
-                        || ultimoTokenDeLineaDeInput.equals("LLAVE_DERECHA") || ultimoTokenDeLineaDeInput.equals("COMILLAS"))
-                        && !(lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema().equals("input"))) {
-                    System.out.println();
-                    System.out.println("582 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
-
-                    numeroError = 519;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            }
-        }
-        //Valida TextoEntreComillas no hay comillas al final del texto
-        if (!lineaDeTokens.isEmpty()) {
-            if (lineaDeTokens.size() > indiceDeInput - 1) {
-                ultimoTokenDeLineaDeInput = lineaDeTokens.get((lineaDeTokens.size() - 1)).getLexema();
-                if (ultimoTokenDeLineaDeInput.equals("input")) {
-                    System.out.println();
-                    System.out.println("582 no hay parentesis ni comillas finales " + ultimoTokenDeLineaDeInput);
-
-                    numeroError = 518;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    numeroError = 519;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                    numeroError = 520;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-
-                }
-            }
-        }
-
-    }
-     */
     public void modificarTipoSimboloEnTablaSimbolos(String nombre, String nuevoTipo) {
         System.out.println();
         System.out.println("1482 Token sucesor def " + nombre);
@@ -1992,60 +1756,16 @@ public class Parser {
 
     public boolean esFuncion(String nombre) {
         Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
-        if (simbolo.getTipo().equals("funcion")) {
-            return true;
-        }
-        System.out.println();
-        System.out.println("1491 Es funcion " + simbolo.getTipo() + " " + simbolo.getTipo().equals("funcion"));
-        System.out.println();
-        return false;
-    }
-
-    public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {
-        List<String> programaEnPythonRevisado = new ArrayList<>();
-
-        for (int i = 0; i < listaContenidoFinal.size(); ++i) {
-            int numeroDeLinea = listaContenidoFinal.get(i).getNumeroDeLinea() + 1;
-            String instruccion = listaContenidoFinal.get(i).getInstruccion();
-
-            String formatoLinea = String.format("%05d", numeroDeLinea);
-            String formatoError = String.format("%14s", "Error ");
-
-            if (listaContenidoFinal.get(i).getErroresEncontrados() == null) {
-                programaEnPythonRevisado.add(formatoLinea + " " + instruccion);
-            } else {
-                programaEnPythonRevisado.add(formatoLinea + " " + instruccion);
-                for (int k = 0; k < listaContenidoFinal.get(i).getErroresEncontrados().size(); ++k) {
-                    int numeroDeError = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getKey();
-                    String descripcion = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getDescripcion();
-                    programaEnPythonRevisado.add(formatoError + numeroDeError + ". " + descripcion);
-                }
+        if (simbolo != null) {
+            if (simbolo.getTipo().equals("funcion")) {
+                return true;
             }
+            System.out.println();
+            System.out.println("1666 Es funcion " + simbolo.getTipo() + " " + simbolo.getTipo().equals("funcion"));
+
         }
 
-        HashMap<String, Integer> histograma = contarLaCantidadOperadoresComparacion();
-
-        ArrayList<String> operadores = new ArrayList<String>(histograma.keySet());
-        programaEnPythonRevisado.add("=================================================");
-        for (String operador : operadores) {
-            programaEnPythonRevisado.add(histograma.get(operador) + " Token " + operador);
-        }
-        programaEnPythonRevisado.add(this.cantidadDeComentarios + " lineas de comentario");
-
-        return programaEnPythonRevisado;
-    }
-
-    //Recorre una lista de string y la imprime BORRAR
-    public static void imprimirListas(List<String> contenidoArchivo) {
-        for (String linea : contenidoArchivo) {
-            System.out.println(linea);
-        }
-    }
-
-    public static void imprimirListasDeContenidoFinal(List<LineaDeContenido> contenido) {
-        for (LineaDeContenido linea : contenido) {
-            System.out.println(linea);
-        }
+        return false;
     }
 
     public HashMap<String, Integer> inicializarHistogramaOperadoresComparacion() {
@@ -2108,6 +1828,53 @@ public class Parser {
 
     public void imprimirTablaDeSimbolos() {
         System.out.println(tablaDeSimbolos.toString());
+    }
+
+    //Recorre una lista de string y la imprime BORRAR
+    public void imprimirListas(List<String> contenidoArchivo) {
+        for (String linea : contenidoArchivo) {
+            System.out.println(linea);
+        }
+    }
+
+    public void imprimirListasDeContenidoFinal(List<LineaDeContenido> contenido) {
+        for (LineaDeContenido linea : contenido) {
+            System.out.println(linea);
+        }
+    }
+
+    public List<String> generarProgramaEnPythonRevisado(List<LineaDeContenido> listaContenidoFinal) {
+        List<String> programaEnPythonRevisado = new ArrayList<>();
+
+        for (int i = 0; i < listaContenidoFinal.size(); ++i) {
+            int numeroDeLinea = listaContenidoFinal.get(i).getNumeroDeLinea() + 1;
+            String instruccion = listaContenidoFinal.get(i).getInstruccion();
+
+            String formatoLinea = String.format("%05d", numeroDeLinea);
+            String formatoError = String.format("%14s", "Error ");
+
+            if (listaContenidoFinal.get(i).getErroresEncontrados() == null) {
+                programaEnPythonRevisado.add(formatoLinea + " " + instruccion);
+            } else {
+                programaEnPythonRevisado.add(formatoLinea + " " + instruccion);
+                for (int k = 0; k < listaContenidoFinal.get(i).getErroresEncontrados().size(); ++k) {
+                    int numeroDeError = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getKey();
+                    String descripcion = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getDescripcion();
+                    programaEnPythonRevisado.add(formatoError + numeroDeError + ". " + descripcion);
+                }
+            }
+        }
+
+        HashMap<String, Integer> histograma = contarLaCantidadOperadoresComparacion();
+
+        ArrayList<String> operadores = new ArrayList<String>(histograma.keySet());
+        programaEnPythonRevisado.add("=================================================");
+        for (String operador : operadores) {
+            programaEnPythonRevisado.add(histograma.get(operador) + " Token " + operador);
+        }
+        programaEnPythonRevisado.add(this.cantidadDeComentarios + " lineas de comentario");
+
+        return programaEnPythonRevisado;
     }
 
 }

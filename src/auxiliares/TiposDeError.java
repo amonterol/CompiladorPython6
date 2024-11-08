@@ -28,12 +28,13 @@ public class TiposDeError {
         errores.put(104, "No se esperaba la indentación.");
 
         //Relacionados con operadores aritméticos
-        errores.put(120, "Un operador aritmético no puede comenzar una instrucción. Se esperava variable_valida operador_aritmetico variable_valida o número");
-        errores.put(121, "Un operador aritmético no puede terminar una instrucción. Se esperava variable_valida operador_aritmetico variable_valida o número");
+        errores.put(120, "Un operador aritmético no puede comenzar una instrucción. Se esperaba variable_valida operador_aritmetico variable_valida o número");
+        errores.put(121, "Un operador aritmético no puede terminar una instrucción. Se esperaba variable_valida operador_aritmetico variable_valida o número");
         errores.put(122, "Se esperaba una variable_valida o un número antes del operador");
         errores.put(123, "Se esperaba una variable_valida o un número después del operador");
         errores.put(124, "El lado izquierdo de una operación aritmética debe ser una sola variable_valida o un número");
         errores.put(125, "El lado derecho de una operación aritmética debe ser una sola variable_valida o un número");
+        errores.put(126, "El numero de valores en el lado derecho debe coincidir con el número de variables a asignar");
 
         // Relacionados con verificación de identificadores válidos
         errores.put(200, "Identificador no comienza con una letra o guión bajo.");
@@ -49,6 +50,8 @@ public class TiposDeError {
         errores.put(402, "Sintaxis incorrecta. Se esperaba  \")\" como último token en la instrucción input.");
         errores.put(403, "El argumento de input no puede ser una palabra reservada.");
         errores.put(404, "El argumento de input debe ser un identificador valido o una cadena de caracteres.");
+        errores.put(405, "La variable incluida en el argumento de la función no ha sido declarada anteriormente.");
+        
 
         //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
@@ -116,8 +119,8 @@ public class TiposDeError {
         errores.put(663, "El nombre de la función debe ser un identificador válido");
         errores.put(664, "Falta bloque de código.");
         errores.put(665, "Faltan los paréntesis y los parametros.");
-        errores.put(666, "Sintaxis incorrecta. Falta nombre de la funcion, los paréntesis, los parámetros de la funcion, los dos puntos.");
-        errores.put(667, "Sintaxis incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
+        errores.put(666, "Sintaxis incorrecta: se espera el nombre de la función, los paréntesis (), los parámetros de la función (si los hay) y los dos puntos : después de def.");
+        errores.put(667, "Sintaxis incorrecta: se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
         errores.put(668, "La línea de código de una llamada de función comenzar con el nombre de la función.");
         errores.put(669, "La línea de código de una llamada de función debe terminar con un )");
         errores.put(670, "La línea de código de return debe comenzar con la palabra return");
@@ -128,8 +131,9 @@ public class TiposDeError {
         errores.put(675, "La función no ha sido definida previamente");
 
         //Errores relacionados con operador PRINT
-        errores.put(700, "Sintaxis incorrecta. La instruccion print debe comenzar la palabra print");
-        errores.put(701, "Sintaxis incorrecta. La instruccion print debe terminar con cierre de parentesis \")\"");
+        errores.put(700, "Error de sintaxis: la línea de código contiene caracteres no permitidos antes de la función print.");
+        errores.put(701, "Error de sintaxis: la línea de código contiene caracteres no permitidos después del cierre del paréntesis de la función print.");
+        errores.put(702, "Error de sintaxis: se espera un paréntesis de apertura \"(\" después de la función print.");
 
         //Errores relacionados con operador try
         errores.put(750, "Sintaxis incorrecta. No se esperaba cambio en la indentacion.");
