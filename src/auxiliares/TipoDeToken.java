@@ -27,6 +27,10 @@ public enum TipoDeToken {
         POTENCIA,
         DIVISION_ENTERA,
         
+        UNARIO_SUMA,
+        UNARIO_RESTA,
+       
+        
        
         MAYOR_QUE,
         MAYOR_O_IGUAL_QUE,

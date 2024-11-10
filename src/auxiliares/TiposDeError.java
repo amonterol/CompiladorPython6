@@ -35,6 +35,7 @@ public class TiposDeError {
         errores.put(124, "El lado izquierdo de una operación aritmética debe ser una sola variable_valida o un número");
         errores.put(125, "El lado derecho de una operación aritmética debe ser una sola variable_valida o un número");
         errores.put(126, "El numero de valores en el lado derecho debe coincidir con el número de variables a asignar");
+        errores.put(127, "El operador unario solo acepta una variable valida antes o despues del operador");
 
         // Relacionados con verificación de identificadores válidos
         errores.put(200, "Identificador no comienza con una letra o guión bajo.");
@@ -45,13 +46,11 @@ public class TiposDeError {
         errores.put(300, "La posición de la palabra reservada \"import\" es incorrecta.");
 
         //Relacionados con palabra reserva-> input
-     
         errores.put(401, "Sintaxis incorrecta. Se esperaba \"(\" despues de input.");
         errores.put(402, "Sintaxis incorrecta. Se esperaba  \")\" como último token en la instrucción input.");
         errores.put(403, "El argumento de input no puede ser una palabra reservada.");
         errores.put(404, "El argumento de input debe ser un identificador valido o una cadena de caracteres.");
         errores.put(405, "La variable incluida en el argumento de la función no ha sido declarada anteriormente.");
-        
 
         //Relacionados con operadores de agrupacion-> (, ), [, ]
         errores.put(500, "Falta el parénteris izquierdo: \"(\".");
@@ -92,7 +91,7 @@ public class TiposDeError {
         //Errores relacionados con operador while
         errores.put(620, "Expresión inválida. No se esperaba cambio en la indentacion.");
         errores.put(621, "Expresión inválida. Se esperaba while -> condicion -> :");
-        errores.put(622, "Sintaxis incorrecta. La instruccion while debe comenzar la palabra while");
+        errores.put(622, "\"Error de sintaxis: la línea de código contiene caracteres no permitidos antes del while.\"");
         errores.put(623, "Sintaxis incorrecta. Falta la condicion a evaluar.");
         errores.put(624, "Sintaxis incorrecta. La instruccion while debe terminar con el operador \":\" que da inicio al bloque de código");
         errores.put(625, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
@@ -146,7 +145,7 @@ public class TiposDeError {
         errores.put(757, "Bloque try sin instrucciones.");
 
         //Errores relacionados con operador except
-        errores.put(850, "Sintaxis incorrecta. No se esperaba cambio en la indentacion.");
+        errores.put(850, "Error de sintaxis. Cambio en la indentación. Cualquier instrucción fuera de un bloque debe tener indentación igual a 0");
         errores.put(851, "Sintaxis incorrecta. Se esperaba except -> ArithmeticError | ZeroDivisionError | ValueError -> : ");
         errores.put(852, "Sintaxis incorrecta. La línea de la instrucción except debe comenzar la palabra except");
         errores.put(853, "Sintaxis incorrecta. La línea de la instrucción except debe terminar con :");
@@ -159,6 +158,8 @@ public class TiposDeError {
         errores.put(860, "Bloque except sin instrucción.");
         errores.put(861, "Indentación incorrecta en bloque de código except.");
         errores.put(862, "En bloque de instrucciones de except solo se permite una única instrucción.");
+        errores.put(863, "Error de sintaxis. Bloque sin instrucciones.");
+        errores.put(864, "En bloque de instrucciones de except solo se permite una instrucción con el comando print.");
 
     }
 

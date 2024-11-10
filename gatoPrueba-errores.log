@@ -1,0 +1,27 @@
+00001 
+00002 while True:
+00003    edad_str = input("Ingrese su edad: ")
+        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+00004     try:
+00005         edad = int(edad_str)
+00006        break  # Si la conversión es exitosa, salir del bucle
+        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+00007     except ValueError:
+00008         input("Error: La edad debe ser un número entero.")
+        Error 864. En bloque de instrucciones de except solo se permite una instrucción con el comando print.
+00009         print("Error: La edad debe ser un número entero.")
+        Error 862. En bloque de instrucciones de except solo se permite una única instrucción.
+00010 x=10        
+00011  print("Error: La edad debe ser un número entero.")
+        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+00012     
+00013   jugador_usuario = nombre
+        Error 750. Sintaxis incorrecta. No se esperaba cambio en la indentacion.
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+1 lineas de comentario

@@ -75,12 +75,37 @@ public class Lexer {
             nuevoContenido = new LineaDeContenido(lineaActual, lineaDeCodigoActual);
             listaContenidoFinal.add(nuevoContenido);
 
+            //Pattern pattern = Pattern.compile("print\\(f?\".*\".*\\)| print\\(\"\\|.*\"\\)");
+            //Matcher matcher = pattern.matcher(lineaDeCodigoActual);
+            //Problemas con algunas lineas if que contiene == asi que combinamos enfoques
+            if (lineaDeCodigoActual.contains("print(f\"")
+                    || lineaDeCodigoActual.contains("print(\"|\",")
+                    || lineaDeCodigoActual.contains("if")
+                    || lineaDeCodigoActual.contains("all(")
+                    || lineaDeCodigoActual.contains(" fila, columna")
+                    || lineaDeCodigoActual.contains("resultado = f\"\\n")
+                    || lineaDeCodigoActual.contains("if jugador_actual ==")
+                    || lineaDeCodigoActual.contains("tablero[fila][columna]")
+                    || lineaDeCodigoActual.contains("tablero = [[")
+                   ) {
+
+                //System.out.println();
+                //System.out.println("84 Saldo de linea: " + lineaDeCodigoActual + " en la linea " + lineaActual);
+                if (existeComentarioDeUnaLinea(lineaDeCodigoActual)) {
+                    cantidadComentarios++;
+                }
+                // Saltar la línea
+                continue;
+            } else {
+                //System.out.println();
+                //System.out.println("89 No saldo la linea: " + lineaDeCodigoActual + " en la linea " + lineaActual);
+            }
+
             //Agrega la linea que actualmente se analiza al archivo de salida 
             //registrarLineaAnalizadaEnProgramaPythonRevisado(lineaDeCodigoActual, numeroLineaActual);
             //listaContenidoFinal.add(nuevoContenido);
-            System.out.println();
-            System.out.println("76 La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
-
+            //System.out.println();
+            //System.out.println("76 La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
             //Verifica si la linea esta en blanco 
             if (lineaDeCodigoActual.isBlank() || lineaDeCodigoActual.isEmpty()) {
                 continue;
@@ -97,26 +122,26 @@ public class Lexer {
                 //Si hay un comentario despues de codigo,elimina la parte del comentario en la línea
                 //para poder tokenizarlo
                 lineaDeCodigoActual = lineaDeCodigoActual.split("#")[0];
-                if(lineaDeCodigoActual.isEmpty() || lineaDeCodigoActual.isBlank()){
+                if (lineaDeCodigoActual.isEmpty() || lineaDeCodigoActual.isBlank()) {
                     continue;
                 }
             }
 
             int contadorIndentacion = contarIndentacion(lineaDeCodigoActual);
 
-            System.out.println("103 La linea de codigo actual es: " + lineaDeCodigoActual + " en la linea " + lineaActual);
             System.out.println();
+            System.out.println("129 La linea de codigo actual es: " + lineaDeCodigoActual + " en la linea " + lineaActual);
 
             //Separa cada linea de codigo en Tokens, quitamos la espacios vacios antes del primer token de la linea.
             StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual.trim(), " \n()[]{}=<>*/+-:\",.", true);
 
-            System.out.println("110 Tokenizer to  La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
-            System.out.println();
-
+            //System.out.println("135 Tokenizer a linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
+            //System.out.println();
             String[] arregloDeTokens = convertirStringTokenizerEnArregloDeStrings(tokenizer);
 
-            System.out.println("114 Contenido de arreglo de Tokens: ");
-            Arrays.stream(arregloDeTokens).forEach(System.out::println);
+            System.out.println("137 Contenido de arreglo de Tokens: ");
+            Arrays.stream(arregloDeTokens)
+                    .forEach(token -> System.out.print(token + "->"));
             System.out.println();
 
             //Almanacena los Token clasificados de la linea actual de codigo
@@ -129,7 +154,7 @@ public class Lexer {
             boolean existePrint = false;
             StringBuilder textoEntreComillas = new StringBuilder();
             boolean existeTextoEntreComillas = false;
-
+            boolean existeOperadorUnario = false;
             //Itera sobre la linea de codigo ya convertida en arreglo de Strings
             for (int indice = 0; indice < arregloDeTokens.length; ++indice) {
 
@@ -143,9 +168,13 @@ public class Lexer {
                 } else {
                     tokenSiguiente = arregloDeTokens[indice + 1];
                 }
-                System.out.println("133 Antes switch tokenActual es " + tokenActual + " esta en " + indice + " <" + arregloDeTokens.length);
-                System.out.println();
+                //System.out.println("133 Antes switch tokenActual es " + tokenActual + " esta en " + indice + " <" + arregloDeTokens.length);
+                //System.out.println();
 
+                if (existeOperadorUnario) {
+                    existeOperadorUnario = false;
+                    continue;
+                }
                 switch (tokenActual) {
 
                     case " ":
@@ -153,10 +182,20 @@ public class Lexer {
 
                     //Analiza los operadores aritméticos    
                     case "+":
-                        agregarNuevoToken(TipoDeToken.SUMA, "+", numeroLineaActual);
+                        if (tokenSiguiente.equals("+")) {
+                            agregarNuevoToken(TipoDeToken.UNARIO_SUMA, "++", numeroLineaActual);
+                            existeOperadorUnario = true;
+                        } else {
+                            agregarNuevoToken(TipoDeToken.SUMA, "+", numeroLineaActual);
+                        }
                         break;
                     case "-":
-                        agregarNuevoToken(TipoDeToken.RESTA, "-", numeroLineaActual);
+                        if (tokenSiguiente.equals("-")) {
+                            agregarNuevoToken(TipoDeToken.UNARIO_RESTA, "--", numeroLineaActual);
+
+                        } else {
+                            agregarNuevoToken(TipoDeToken.RESTA, "-", numeroLineaActual);
+                        }
                         break;
                     case "*":
                         agregarNuevoToken(TipoDeToken.MULTIPLICACION, "*", numeroLineaActual);
@@ -169,7 +208,7 @@ public class Lexer {
                     case "=":
                         if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.IGUAL_QUE, "==", numeroLineaActual);
-
+                            existeOperadorUnario = true;
                         } else {
                             agregarNuevoToken(TipoDeToken.ASIGNACION, "=", numeroLineaActual);
                         }
@@ -207,7 +246,7 @@ public class Lexer {
                         break;
                     case ")":
                         agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", numeroLineaActual);
-                        System.out.println(" 199 estamos en parentesis  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
+                        //System.out.println(" 245 estamos en parentesis  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
                         break;
                     case "[":
                         agregarNuevoToken(TipoDeToken.CORCHETE_IZQUIERDO, "[", numeroLineaActual);
@@ -237,33 +276,32 @@ public class Lexer {
                         break;
 
                     case "\"":
-                        System.out.println(" 225 NUEVAMENTE EN EL COMILLAS " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
+                        //System.out.println(" 225 NUEVAMENTE EN EL COMILLAS " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
                         agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, numeroLineaActual);
                         if (!existeTextoEntreComillas) {
 
                             textoEntreComillas = new StringBuilder();
 
-                            System.out.println(" 238 ANTES DE IF " + (indice + 1) + " <" + arregloDeTokens.length);
+                            //System.out.println(" 238 ANTES DE IF " + (indice + 1) + " <" + arregloDeTokens.length);
                             if (indice + 1 < arregloDeTokens.length) {
-                                System.out.println(" 240  tokenActual es  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
+                                //System.out.println(" 240  tokenActual es  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
 
                                 ++indice;
 
                                 while (indice + 1 < arregloDeTokens.length) {
                                     tokenActual = arregloDeTokens[indice];
-                                    System.out.println(" 246  tokenActual es  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
+                                    //  System.out.println(" 246  tokenActual es  " + tokenActual + " esta en indice " + indice + " < " + arregloDeTokens.length);
                                     if (tokenActual.equals("\"") || (tokenActual.equals(")") && indice == (arregloDeTokens.length - 1))) {
 
-                                        System.out.println();
-                                        System.out.println(" 250 token actual es " + tokenActual + "  esta en indice " + indice + " <" + arregloDeTokens.length);
-
+                                        //       System.out.println();
+                                        //       System.out.println(" 250 token actual es " + tokenActual + "  esta en indice " + indice + " <" + arregloDeTokens.length);
                                         break;
                                     } else {
                                         textoEntreComillas.append(tokenActual);
-                                        System.out.println();
-                                        System.out.println(" 256 token actual es " + tokenActual + "  esta en indice " + indice + " <" + arregloDeTokens.length);
-                                        System.out.println(" 257 texto entre comillas: " + textoEntreComillas);
-                                        System.out.println();
+                                        // System.out.println();
+                                        //System.out.println(" 256 token actual es " + tokenActual + "  esta en indice " + indice + " <" + arregloDeTokens.length);
+                                        //System.out.println(" 257 texto entre comillas: " + textoEntreComillas);
+                                        //System.out.println();
                                         ++indice;
 
                                     }
@@ -275,9 +313,9 @@ public class Lexer {
                                 if (!textoEntreComillas.isEmpty()) {
                                     agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, textoEntreComillas.toString(), null, numeroLineaActual);
                                     existeTextoEntreComillas = true;
-                                    System.out.println(" 270 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
+                                    //System.out.println(" 270 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                                 } else {
-                                    System.out.println(" 272 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
+                                    //System.out.println(" 272 Texto entre comillas: " + textoEntreComillas.toString() + " indice = " + indice);
                                 }
 
                                 --indice;
@@ -294,7 +332,7 @@ public class Lexer {
                     case "\\":
 
                         if (indice < arregloDeTokens.length) {
-                            System.out.println(" 269 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length));
+                            //System.out.println(" 269 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length));
                             if ((arregloDeTokens[indice + 1].equals("n"))) {
                                 agregarNuevoToken(TipoDeToken.SALTO_DE_LINEA, "\n", null, numeroLineaActual);
                                 ++indice;
@@ -314,11 +352,11 @@ public class Lexer {
 
                     default:
                         PalabraReservada palabraReservada = new PalabraReservada();
-                        System.out.println("307 estamos en palabra reservada: " + tokenActual);
+                        //System.out.println("307 estamos en palabra reservada: " + tokenActual);
                         if (palabraReservada.esPalabraReservada(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, tokenActual.trim(), null, this.numeroLineaActual);
 
-                            System.out.println("310 estamos en palabra reservada: " + tokenActual);
+                            //System.out.println("310 estamos en palabra reservada: " + tokenActual);
                             if (tokenActual.trim().equals("input")) {
                                 existeInput = true;
                             }
@@ -326,32 +364,24 @@ public class Lexer {
                                 existePrint = true;
                             }
 
-                        } else if (esNumeroEntero(tokenActual.trim())) {
-                            agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
-                        } else if (esNumeroDecimal(tokenActual.trim())) {
-                            agregarNuevoToken(TipoDeToken.NUMERO_DECIMAL, tokenActual.trim(), null, this.numeroLineaActual);
-                        } else if (verificarPrimerCaracterDeUnIdentificador(tokenActual.trim(), numeroLineaActual)
-                                && verificarSecuenciaDeCaracteresDeUnIdentificador(tokenActual.trim(), numeroLineaActual)) {
-
                             if (existeInput || existePrint) {
                                 textoEntreComillas.append(tokenActual.trim());
                                 textoEntreComillas.append(" ");
                                 String tokenSiguienteDeInput = " ";
                                 if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
-                                    System.out.println(" 413 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " el indice es " + indice);
+                                    // System.out.println(" 413 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " el indice es " + indice);
                                     tokenSiguienteDeInput = arregloDeTokens[indice + 1]; //Obtiene el token siguiente a input
-                                    System.out.println(" 415 el indice es " + indice + " y el token en el arreglo es " + tokenSiguienteDeInput);
+                                    //System.out.println(" 415 el indice es " + indice + " y el token en el arreglo es " + tokenSiguienteDeInput);
                                 }
                                 if (tokenSiguienteDeInput.equals("\"") || tokenSiguienteDeInput.equals(")") || indice == arregloDeTokens.length) {
                                     existeInput = false;
                                     existePrint = false;
 
-                                    System.out.println(" 420 El texto entre comillas es  " + textoEntreComillas.toString() + " y el indice es " + indice);
-
+                                    // System.out.println(" 420 El texto entre comillas es  " + textoEntreComillas.toString() + " y el indice es " + indice);
                                     // Convertir el contenido del StringBuilder a una cadena
                                     String content = textoEntreComillas.toString().trim();
                                     textoEntreComillas.setLength(0); //borramos el StringBuilder 
-                                    System.out.println(" 350 el indice es " + indice + " el texto entre comillas es " + textoEntreComillas);
+                                    // System.out.println(" 350 el indice es " + indice + " el texto entre comillas es " + textoEntreComillas);
 
                                     // Dividir la cadena en palabras usando espacios como delimitadores
                                     String[] words = content.split("\\s+");
@@ -361,18 +391,18 @@ public class Lexer {
                                         System.out.println(str);
                                     }
 
-                                    System.out.println(" 435 el tamano de word es  " + words.length);
+                                    //  System.out.println(" 435 el tamano de word es  " + words.length);
                                     // Verificar si hay más de una palabra
                                     if (words.length > 1) {
                                         agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, content.trim(), null, this.numeroLineaActual);
                                     } else {
-                                        System.out.println(" 440 El StringBuilder contiene solo una palabra." + content);
+                                        //    System.out.println(" 440 El StringBuilder contiene solo una palabra." + content);
                                         if (palabraReservada.esPalabraReservada(content.trim())) {
                                             agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, content.trim(), null, this.numeroLineaActual);
-                                            System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                                            //      System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
                                         } else if (verificarPrimerCaracterDeUnIdentificador(content, numeroLineaActual)
                                                 && verificarSecuenciaDeCaracteresDeUnIdentificador(content, numeroLineaActual)) {
-                                            System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                                            //    System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
 
                                             //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
                                             Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, content.trim(), null, this.numeroLineaActual);
@@ -380,40 +410,47 @@ public class Lexer {
 
                                             //Solo probando construir una tabla de simbolos
                                             //incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
-                                            System.out.println("455 LEXER TABLA DE SIMBOLOS ");
+                                            //  System.out.println("455 LEXER TABLA DE SIMBOLOS ");
                                             //imprimirTablaDeSimbolos();
                                         } else {
                                             agregarNuevoToken(TipoDeToken.DESCONOCIDO, content.trim(), null, this.numeroLineaActual);
-                                            System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                                            //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
                                         }
                                     }
                                 }
 
-                            } else {
-                                System.out.println("409 ENTRAMOS A IDENTIFICADOR " + tokenActual.trim() + " POSICION " + indice + "\n");
-                                System.out.println("410 Este es el TOKEN:   " + tokenActual.trim() + " en linea " + numeroLineaActual + "\n");
-
-                                //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
-                                Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
-                                tokens.add(nuevoToken);
-
-                                //Solo probando construir una tabla de simbolos
-                                incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
-
-                                System.out.println("403 LEXER - TABLA DE SIMBOLOS ");
-                                imprimirTablaDeSimbolos();
                             }
+
+                        } else if (esNumeroEntero(tokenActual.trim())) {
+                            agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
+                        } else if (esNumeroDecimal(tokenActual.trim())) {
+                            agregarNuevoToken(TipoDeToken.NUMERO_DECIMAL, tokenActual.trim(), null, this.numeroLineaActual);
+                        } else if (verificarPrimerCaracterDeUnIdentificador(tokenActual.trim(), numeroLineaActual)
+                                && verificarSecuenciaDeCaracteresDeUnIdentificador(tokenActual.trim(), numeroLineaActual)) {
+
+                            // System.out.println("409 ENTRAMOS A IDENTIFICADOR " + tokenActual.trim() + " POSICION " + indice + "\n");
+                            //System.out.println("410 Este es el TOKEN:   " + tokenActual.trim() + " en linea " + numeroLineaActual + "\n");
+                            //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                            Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                            tokens.add(nuevoToken);
+
+                            //Solo probando construir una tabla de simbolos
+                            incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
+
+                            System.out.println();
+                            System.out.println("440 - LEXER - TABLA DE SIMBOLOS ");
+                            imprimirTablaDeSimbolos();
 
                         } else {
                             agregarNuevoToken(TipoDeToken.DESCONOCIDO, tokenActual.trim(), null, this.numeroLineaActual);
-                            System.out.println(" 410 SE AGREGO UN TOKE DESCONOCIDO:   " + tokenActual.trim() + " en linea " + numeroLineaActual + "\n");
+                            //System.out.println(" 410 SE AGREGO UN TOKE DESCONOCIDO:   " + tokenActual.trim() + " en linea " + numeroLineaActual + "\n");
                         } //aqui
                         break;
                 } //fin switch
 
             }//fir FOR arregloTokens
 
-            System.out.println(" 368 agregadon token:   " + tokens.toString() + " en linea " + numeroLineaActual + "\n");
+            //System.out.println(" 368 agregadon token:   " + tokens.toString() + " en linea " + numeroLineaActual + "\n");
             listaDeTokens.add(tokens);
 
         } //Fin for que recorre linea por linea el programa en Python
@@ -428,11 +465,10 @@ public class Lexer {
             }
 
         }
-        System.out.println("Tokens en linea  " + count);
+        //System.out.println("Tokens en linea  " + count);
 
-        System.out.println();
-        System.out.println("253");
-        System.out.println("LEXER: Contenido del mapa de errores encontrados " + erroresEncontrados.size());
+        //System.out.println();
+        System.out.println("469 LEXER: Contenido del mapa de errores encontrados " + erroresEncontrados.size());
         for (Map.Entry<Integer, List<MiError>> entry : erroresEncontradosMap.entrySet()) {
             Integer key = entry.getKey();
             List<MiError> errorList = entry.getValue();
@@ -453,8 +489,7 @@ public class Lexer {
         System.out.println("Generacion del archivo de analisis");
         generarArchivoDeSalida();
          */
-        System.out.println("254");
-        System.out.println("LISTA CONTENIDO FINAL LEXER");
+        System.out.println("254 LISTA CONTENIDO FINAL LEXER");
         //imprimirListas(listaContenidoFinal);
         if (listaContenidoFinal != null) {
             imprimirListasDeContenidoFinal(listaContenidoFinal);
@@ -488,11 +523,17 @@ public class Lexer {
 
     private int contarIndentacion(String linea) {
         int contador = 0;
+        OUTER:
         for (char c : linea.toCharArray()) {
-            if (c == ' ' || c == '\t') {
-                contador++;
-            } else {
-                break;
+            switch (c) {
+                case ' ':
+                    contador++;
+                    break;
+                case '\t':
+                    contador += 8; // Asumiendo que un tabulador equivale a 4 espacios
+                    break;
+                default:
+                    break OUTER;
             }
         }
         return contador;
@@ -587,7 +628,7 @@ public class Lexer {
     public boolean existeComentarioDeUnaLinea(String lineaActual) {
         Character caracterDeComentario = '#';
 
-        System.out.println(" 332 Existe el caracter de comentarios " + lineaActual.contains(String.valueOf(caracterDeComentario)));
+        //System.out.println(" 630 Existe el caracter de comentarios " + lineaActual.contains(String.valueOf(caracterDeComentario)));
         return lineaActual.contains(String.valueOf(caracterDeComentario));
 
     }
@@ -595,7 +636,7 @@ public class Lexer {
     public boolean existeComentarioVariasLineas(String lineaActual) {
         String tresComillas = "\"\"\"";
 
-        System.out.println(" 342 Existe el caracter de comentarios multilineas " + lineaActual.contains(tresComillas));
+        //System.out.println(" 638 Existe el caracter de comentarios multilineas " + lineaActual.contains(tresComillas));
         return lineaActual.contains(tresComillas);
 
     }
@@ -608,10 +649,10 @@ public class Lexer {
         }
 
         if (string.matches("^[a-zA-Z_].*")) {
-            System.out.println("315 verificarPrimeraCaracter Borrar " + "inicia con letra o _ " + string);
+            //System.out.println("651 verificarPrimeraCaracter Borrar " + "inicia con letra o _ " + string);
             return true;
         } else {
-            //System.out.println("300 verificarPrimeraCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(200));
+            //System.out.println("654 verificarPrimeraCaracter Borrar " + auxiliares.TiposDeError.obtenerDescripcionDelError(200));
             int numeroError = 200;
             TiposDeError tipos = new TiposDeError();
             MiError e = new MiError(numeroLinea, numeroError, tipos.obtenerDescripcionDelError(numeroError));
@@ -640,7 +681,7 @@ public class Lexer {
         }
 
         if (string.matches("[a-zA-Z0-9_]*$")) {
-            System.out.println("320 verificarSecuenciaDeCaracteres Borrar " + "cadena de caracteres alfanumericos  " + string);
+            //System.out.println("684 verificarSecuenciaDeCaracteres Borrar " + "cadena de caracteres alfanumericos  " + string);
 
             return true;
         } else {
