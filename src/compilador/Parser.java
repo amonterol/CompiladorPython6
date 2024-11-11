@@ -157,6 +157,10 @@ public class Parser {
                             System.out.println("149 pilaIndentacion.peek().tipo.equals(\"try\") = " + pilaIndentacion.peek().tipo.equals("try") + " tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
                             pilaIndentacion.pop(); //Sacamos try porque encontramos except
                         }
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("if") && tokenSiguiente.getLexema().equals("else")) {
+                            System.out.println("149 pilaIndentacion.peek().tipo.equals(\"if\") = " + pilaIndentacion.peek().tipo.equals("else") + " tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
+                            pilaIndentacion.pop(); //Sacamos if porque encontramos else
+                        }
 
                         // Verifica si la linea actual esta fuera de algun bloque
                         if (indentacionInstruccionActual != 0 && !pilaIndentacion.isEmpty() && indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4) {
