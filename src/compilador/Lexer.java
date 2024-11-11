@@ -78,6 +78,7 @@ public class Lexer {
             //Pattern pattern = Pattern.compile("print\\(f?\".*\".*\\)| print\\(\"\\|.*\"\\)");
             //Matcher matcher = pattern.matcher(lineaDeCodigoActual);
             //Problemas con algunas lineas if que contiene == asi que combinamos enfoques
+            /*
             if (lineaDeCodigoActual.contains("print(f\"")
                     || lineaDeCodigoActual.contains("print(\"|\",")
                     || lineaDeCodigoActual.contains("if")
@@ -100,6 +101,7 @@ public class Lexer {
                 //System.out.println();
                 //System.out.println("89 No saldo la linea: " + lineaDeCodigoActual + " en la linea " + lineaActual);
             }
+            */
 
             //Agrega la linea que actualmente se analiza al archivo de salida 
             //registrarLineaAnalizadaEnProgramaPythonRevisado(lineaDeCodigoActual, numeroLineaActual);
