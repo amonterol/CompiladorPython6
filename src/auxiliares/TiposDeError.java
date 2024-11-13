@@ -135,7 +135,7 @@ public class TiposDeError {
         errores.put(702, "Error de sintaxis: se espera un paréntesis de apertura \"(\" después de la función print.");
 
         //Errores relacionados con operador try
-        errores.put(750, "Sintaxis incorrecta. No se esperaba cambio en la indentacion.");
+        errores.put(750, "Error de sintaxis: cambio inesperado en la indentación. Se debe usar cuatro espacios para la indentación.");
         errores.put(751, "Sintaxis incorrecta. Se esperaba try -> : ");
         errores.put(752, "Sintaxis incorrecta. La línea de la instrucción try debe comenzar la palabra try");
         errores.put(753, "Sintaxis incorrecta. La línea de la instrucción try debe terminar con :");
@@ -156,10 +156,9 @@ public class TiposDeError {
         errores.put(858, "Sintaxis incorrecta. Falta tipo de excepción.");
         errores.put(859, "Sintaxis incorrecta. No es permitido usar el nombre de una variable como tipo de excepción.");
         errores.put(860, "Bloque except sin instrucción.");
-        errores.put(861, "Indentación incorrecta en bloque de código except.");
-        errores.put(862, "En bloque de instrucciones de except solo se permite una única instrucción.");
+        errores.put(861, "Error de sintaxis. La línea de código siguiente a except debe comenzar con el comando print.");
         errores.put(863, "Error de sintaxis. Bloque sin instrucciones.");
-        errores.put(864, "En bloque de instrucciones de except solo se permite una instrucción con el comando print.");
+       
 
     }
 

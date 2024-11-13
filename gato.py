@@ -20,7 +20,7 @@ def verificar_ganador(tablero, jugador):
             all(tablero[i][i] == jugador for i in range(3)) or       # Diagonal principal
             all(tablero[i][2 - i] == jugador for i in range(3))):   # Diagonal secundaria
             return True
-    return False
+     return False
 
 def movimiento_cpu(tablero, jugador):
     """ Función para que la CPU realice un movimiento """
@@ -63,7 +63,7 @@ def juego_gato():
             except ValueError:
                 print("Error: Por favor ingrese dos números separados por espacio.")
                 continue
-
+		
             if not (0 <= fila < 3 and 0 <= columna < 3):
                 print("Error: Coordenadas fuera de rango. Debe ser entre 0 y 2.")
                 continue
