@@ -207,9 +207,13 @@ public class Parser {
                         }
                          */
 
-                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("except") && (tokenSiguiente.getNumeroLinea() > (lineaTokenExcept))) {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("except") && (tokenSiguiente.getNumeroLinea() == (lineaTokenExcept + 1))) {
 
                             if (!tokenSiguiente.getLexema().equals("print")) {
+                                System.out.println("213 Instruccion en except que no comienza con print " 
+                                        + tokenSiguiente.getLexema() 
+                                        + "  linea " + tokenSiguiente.getNumeroLinea()
+                                        + "  linea de except " + lineaTokenExcept);
                                 numeroError = 861; // Instruccion en except que no comienza con print
                                 incluirErrorEncontrado(tokenSiguiente.getNumeroLinea(), numeroError);
                             }
@@ -251,7 +255,7 @@ public class Parser {
                             }
                             case "except" -> {
                                 lineaTokenExcept = tokenSiguiente.getNumeroLinea();
-                                System.out.println("254 lineaTokenExcept = " + lineaTokenExcept );
+                                System.out.println("254 lineaTokenExcept = " + lineaTokenExcept);
                                 enBloqueExcept = true;
                                 if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
                                     pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "except"));
@@ -637,19 +641,20 @@ public class Parser {
         if ((indice + 5) < lineaDeTokens.size()) {
             token5 = lineaDeTokens.get((indice + 5));
         }
-
-        if (token1.getLexema().equals("print") && token2.getLexema().equals("(") && token3.getLexema().equals("f") && token4.getLexema().equals("\"")) {
+        if (token1.getLexema().equals("print") && lineaDeTokens.size() == 2) {
+            lineaNoEvaluada = false;
+            System.out.println("561 print");
+        } else if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("print") && token2.getLexema().equals("(") && token3.getLexema().equals("f") && token4.getLexema().equals("\"")) {
             lineaNoEvaluada = true;
             System.out.println("561 print(f\"");
-        }
-        if (token1.getLexema().equals("print") && token2.getLexema().equals("(") && token3.getLexema().equals("\"") && token4.getLexema().equals("|") && token5.getLexema().equals("\"")) {
+        } else if (lineaDeTokens.size() >= 5 && token1.getLexema().equals("print") && token2.getLexema().equals("(") && token3.getLexema().equals("\"") && token4.getLexema().equals("|") && token5.getLexema().equals("\"")) {
             lineaNoEvaluada = true;
             System.out.println("565 print(\"|\"");
         }
         if (token1.getLexema().equals("if")) {
             lineaNoEvaluada = true;
             System.out.println("569 if");
-        }
+        } 
         if (token1.getLexema().equals("else")) {
             lineaNoEvaluada = true;
             System.out.println("569 else");
@@ -680,7 +685,12 @@ public class Parser {
             lineaNoEvaluada = true;
             System.out.println("595 tablero = [[");
         }
+        //  movimientos_posibles = [(i, j) for i in range(3) for j in range(3) if tablero[i][j] == " "]
 
+        if (token1.getLexema().equals("movimientos_posibles") && token2.getLexema().equals("=") && token3.getLexema().equals("[") && token4.getLexema().equals("(")) {
+            lineaNoEvaluada = true;
+            System.out.println("595 movimientos_posibles = [(");
+        }
         return lineaNoEvaluada;
 
     }

@@ -1036,8 +1036,11 @@ public class Lexer {
                     incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
 
                 } else {
-                    agregarNuevoToken(TipoDeToken.DESCONOCIDO, argumentoDeLaFuncion.trim(), null, this.numeroLineaActual);
-                    //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                    if (!argumentoDeLaFuncion.isBlank() || !argumentoDeLaFuncion.isEmpty()) {
+                        agregarNuevoToken(TipoDeToken.DESCONOCIDO, argumentoDeLaFuncion.trim(), null, this.numeroLineaActual);
+                        //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                    }
+
                 }
             }
         } else {
