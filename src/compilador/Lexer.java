@@ -185,6 +185,10 @@ public class Lexer {
                         if (tokenSiguiente.equals("+")) {
                             agregarNuevoToken(TipoDeToken.UNARIO_SUMA, "++", numeroLineaActual);
                             existeOperadorUnario = true;
+                            
+                        } else if (tokenSiguiente.equals("=")) {
+                            agregarNuevoToken(TipoDeToken.SUMA_Y_ASIGNACION, "+=", numeroLineaActual);
+                            ++indice;
                         } else {
                             agregarNuevoToken(TipoDeToken.SUMA, "+", numeroLineaActual);
                         }
@@ -192,16 +196,30 @@ public class Lexer {
                     case "-":
                         if (tokenSiguiente.equals("-")) {
                             agregarNuevoToken(TipoDeToken.UNARIO_RESTA, "--", numeroLineaActual);
-
+                        } else if (tokenSiguiente.equals("=")) {
+                            agregarNuevoToken(TipoDeToken.RESTA_Y_ASIGNACION, "-=", numeroLineaActual);
+                            ++indice;
                         } else {
                             agregarNuevoToken(TipoDeToken.RESTA, "-", numeroLineaActual);
                         }
                         break;
                     case "*":
                         agregarNuevoToken(TipoDeToken.MULTIPLICACION, "*", numeroLineaActual);
+                        if (tokenSiguiente.equals("=")) {
+                            agregarNuevoToken(TipoDeToken.MULTIPLICACION_Y_ASIGNACION, "*=", numeroLineaActual);
+                            ++indice;
+                        } else {
+                            agregarNuevoToken(TipoDeToken.MULTIPLICACION, "*", numeroLineaActual);
+                        }
                         break;
                     case "/":
-                        agregarNuevoToken(TipoDeToken.DIVISION, "/", numeroLineaActual);
+
+                        if (tokenSiguiente.equals("=")) {
+                            agregarNuevoToken(TipoDeToken.DIVISION_Y_ASIGNACION, "/=", numeroLineaActual);
+                            ++indice;
+                        } else {
+                            agregarNuevoToken(TipoDeToken.DIVISION, "/", numeroLineaActual);
+                        }
                         break;
 
                     //Analiza los operadores aritméticos       
@@ -1167,7 +1185,7 @@ public class Lexer {
         return tablaDeSimbolos;
     }
 
-    //FUNCIONES AUXILIARES
+    
     public static String[] convertirStringTokenizerEnArregloDeStrings(StringTokenizer tokenizer) {
         String[] arreglo = new String[tokenizer.countTokens()];
         int j = 0;

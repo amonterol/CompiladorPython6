@@ -1,0 +1,13 @@
+00001 resultado = f"\n¡El jugador {jugador_usuario if jugador_actual == 'X' else jugador_cpu} ({jugador_actual}) ha ganado!"
+00002 
+00003 resultado = "\n¡Empate!"
+00004 
+00005 
+=================================================
+0 Token ==
+0 Token <=
+0 Token <
+0 Token !=
+0 Token >
+0 Token >=
+0 lineas de comentario

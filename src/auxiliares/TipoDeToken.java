@@ -26,6 +26,11 @@ public enum TipoDeToken {
         MODULO,
         POTENCIA,
         DIVISION_ENTERA,
+        SUMA_Y_ASIGNACION,
+        RESTA_Y_ASIGNACION,
+        MULTIPLICACION_Y_ASIGNACION,
+        DIVISION_Y_ASIGNACION,
+        
         
         UNARIO_SUMA,
         UNARIO_RESTA,

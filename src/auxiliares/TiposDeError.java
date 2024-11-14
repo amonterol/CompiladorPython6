@@ -80,7 +80,7 @@ public class TiposDeError {
         errores.put(524, "Sintaxis incorrecta. Las comillas no están balanceadas.");
 
         //Errores relacionados con operador de asignacion
-        errores.put(600, "Expresión inválida. Se esperaba Variable_valida = Numero o Variable_valida");
+        errores.put(600, "Sintaxis incorrecta. Se esperaba una asignación en el formato Variable_valida = Número o Variable_valida");
         errores.put(601, "Sintaxis incorrecta. Palabra reservada no puede ser usada como variable válida");
         errores.put(602, "El lado izquierdo de un asignación debe ser una variable válida.");
         errores.put(603, "El lado derecho de una asignación debe ser una variable valida o un número.");
@@ -93,7 +93,7 @@ public class TiposDeError {
         errores.put(621, "Expresión inválida. Se esperaba while -> condicion -> :");
         errores.put(622, "\"Error de sintaxis: la línea de código contiene caracteres no permitidos antes del while.\"");
         errores.put(623, "Sintaxis incorrecta. Falta la condicion a evaluar.");
-        errores.put(624, "Sintaxis incorrecta. La instruccion while debe terminar con el operador \":\" que da inicio al bloque de código");
+        errores.put(624, "Error de sintaxis: La instrucción 'while' debe finalizar con el operador ':' para iniciar el bloque de código.");
         errores.put(625, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
         errores.put(626, "Sintaxis incorrecta. El operador \":\" debe ser el último token de la línea.");
         errores.put(627, "Sintaxis incorrecta. Uso incorrecto del operador aritmetico");
@@ -118,8 +118,8 @@ public class TiposDeError {
         errores.put(663, "El nombre de la función debe ser un identificador válido");
         errores.put(664, "Falta bloque de código.");
         errores.put(665, "Faltan los paréntesis y los parametros.");
-        errores.put(666, "Sintaxis incorrecta: se espera el nombre de la función, los paréntesis (), los parámetros de la función (si los hay) y los dos puntos : después de def.");
-        errores.put(667, "Sintaxis incorrecta: se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
+        errores.put(666, "Sintaxis incorrecta. Se espera el nombre de la función, los paréntesis (), los parámetros de la función (si los hay) y los dos puntos : después de def.");
+        errores.put(667, "Sintaxis incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
         errores.put(668, "La línea de código de una llamada de función comenzar con el nombre de la función.");
         errores.put(669, "La línea de código de una llamada de función debe terminar con un )");
         errores.put(670, "La línea de código de return debe comenzar con la palabra return");
@@ -130,12 +130,12 @@ public class TiposDeError {
         errores.put(675, "La función no ha sido definida previamente");
 
         //Errores relacionados con operador PRINT
-        errores.put(700, "Error de sintaxis: la línea de código contiene caracteres no permitidos antes de la función print.");
-        errores.put(701, "Error de sintaxis: la línea de código contiene caracteres no permitidos después del cierre del paréntesis de la función print.");
-        errores.put(702, "Error de sintaxis: se espera un paréntesis de apertura \"(\" después de la función print.");
+        errores.put(700, "Error de sintaxis. La línea de código contiene caracteres no permitidos antes de la función print.");
+        errores.put(701, "Error de sintaxis. La línea de código contiene caracteres no permitidos después del cierre del paréntesis de la función print.");
+        errores.put(702, "Error de sintaxis. Se espera un paréntesis de apertura \"(\" después de la función print.");
 
         //Errores relacionados con operador try
-        errores.put(750, "Error de sintaxis: cambio inesperado en la indentación. Se debe usar cuatro espacios para la indentación.");
+        errores.put(750, "Error de sintaxis. Cambio inesperado en la indentación. Se requiere usar cuatro espacios por nivel de indentación.");
         errores.put(751, "Sintaxis incorrecta. Se esperaba try -> : ");
         errores.put(752, "Sintaxis incorrecta. La línea de la instrucción try debe comenzar la palabra try");
         errores.put(753, "Sintaxis incorrecta. La línea de la instrucción try debe terminar con :");

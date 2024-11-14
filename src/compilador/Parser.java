@@ -210,8 +210,8 @@ public class Parser {
                         if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("except") && (tokenSiguiente.getNumeroLinea() == (lineaTokenExcept + 1))) {
 
                             if (!tokenSiguiente.getLexema().equals("print")) {
-                                System.out.println("213 Instruccion en except que no comienza con print " 
-                                        + tokenSiguiente.getLexema() 
+                                System.out.println("213 Instruccion en except que no comienza con print "
+                                        + tokenSiguiente.getLexema()
                                         + "  linea " + tokenSiguiente.getNumeroLinea()
                                         + "  linea de except " + lineaTokenExcept);
                                 numeroError = 861; // Instruccion en except que no comienza con print
@@ -484,6 +484,11 @@ public class Parser {
                             numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                             validarOperadoresBinarios(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceToken);
                             break;
+
+                        case TipoDeToken.SUMA_Y_ASIGNACION:
+                        case TipoDeToken.RESTA_Y_ASIGNACION:
+                        case TipoDeToken.MULTIPLICACION_Y_ASIGNACION:
+                        case TipoDeToken.DIVISION_Y_ASIGNACION:
                         case TipoDeToken.ASIGNACION:
                             int indiceTokenAsignacion = lineaDeCodigoEnTokens.indexOf(tokenActual);
                             numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
@@ -492,6 +497,7 @@ public class Parser {
                             System.out.println("182 Token de asignacion ");
                             System.out.println();
                             break;
+
                         case TipoDeToken.IDENTIFICADOR:
                             System.out.println();
                             System.out.println("337 En llamada de funcion " + enBloqueDef + " " + tokenActual.getLexema() + " " + i);
@@ -654,7 +660,7 @@ public class Parser {
         if (token1.getLexema().equals("if")) {
             lineaNoEvaluada = true;
             System.out.println("569 if");
-        } 
+        }
         if (token1.getLexema().equals("else")) {
             lineaNoEvaluada = true;
             System.out.println("569 else");
@@ -677,17 +683,20 @@ public class Parser {
              System.out.println("561 print(f\"");
         }
          */
-        if (token1.getLexema().equals("tablero") && token2.getLexema().equals("[") && token3.getLexema().equals("fila") && token4.getLexema().equals("]")) {
+        if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("tablero") && token2.getLexema().equals("[") && token3.getLexema().equals("fila") && token4.getLexema().equals("]")) {
             lineaNoEvaluada = true;
             System.out.println("591 tablero [fila]");
         }
-        if (token1.getLexema().equals("tablero") && token2.getLexema().equals("=") && token3.getLexema().equals("[") && token4.getLexema().equals("[")) {
+        /*
+        //tablero = [[" " for _ in range(3)] for _ in range(3)]
+        if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("tablero") && token2.getLexema().equals("=") && token3.getLexema().equals("[") && token4.getLexema().equals("[")) {
             lineaNoEvaluada = true;
             System.out.println("595 tablero = [[");
         }
-        //  movimientos_posibles = [(i, j) for i in range(3) for j in range(3) if tablero[i][j] == " "]
+         */
 
-        if (token1.getLexema().equals("movimientos_posibles") && token2.getLexema().equals("=") && token3.getLexema().equals("[") && token4.getLexema().equals("(")) {
+        //  movimientos_posibles = [(i, j) for i in range(3) for j in range(3) if tablero[i][j] == " "]
+        if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("movimientos_posibles") && token2.getLexema().equals("=") && token3.getLexema().equals("[") && token4.getLexema().equals("(")) {
             lineaNoEvaluada = true;
             System.out.println("595 movimientos_posibles = [(");
         }
@@ -1236,19 +1245,20 @@ public class Parser {
         int numeroError = 0;
         Token tokenAntecesorAlOperador = lineaDeTokens.get((indiceToken - 1));
         Token tokenSucesorAlOperador = new Token();
-        Token tokenReturn = new Token();
-        Token tokenPrint = new Token();
-        int posicionTokenReturn = buscarPosicionDeTokenPorLexema(lineaDeTokens, "return");
-        System.out.println("1100 existe return en posicion: " + posicionTokenReturn);
-        int posicionTokenPrint = buscarPosicionDeTokenPorLexema(lineaDeTokens, "print");
-        System.out.println("1102 existe print en posicion: " + posicionTokenPrint);
+        //Token tokenReturn = new Token();
+        //Token tokenPrint = new Token();
 
+        //int posicionTokenReturn = buscarPosicionDeTokenPorLexema(lineaDeTokens, "return");
+        //System.out.println("1100 existe return en posicion: " + posicionTokenReturn);
+        //int posicionTokenPrint = buscarPosicionDeTokenPorLexema(lineaDeTokens, "print");
+        //System.out.println("1102 existe print en posicion: " + posicionTokenPrint);
+        //Observa el siguiente token al operador
         if ((indiceToken + 1) < lineaDeTokens.size()) {
             tokenSucesorAlOperador = lineaDeTokens.get((indiceToken + 1));
         }
 
-        if (posicionTokenReturn != -1) {
-            tokenReturn = lineaDeTokens.get(posicionTokenReturn);
+        /*    if (posicionTokenReturn != -1) {
+           tokenReturn =  lineaDeTokens.get(posicionTokenReturn);
             System.out.println("1110 existe return en posicion: " + tokenAntecesorAlOperador.getLexema());
             System.out.println("1111 existe return en posicion: " + tokenSucesorAlOperador.getLexema());
             if (posicionTokenReturn == 1) {
@@ -1278,69 +1288,75 @@ public class Parser {
                 }
             }
         } else {
+         */
+        if (indiceToken == 1) {
+            numeroError = 120;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
+        if (indiceToken == (lineaDeTokens.size() - 1)) {
+            numeroError = 121;
+            incluirErrorEncontrado(numeroDeLinea, numeroError);
+        }
 
-            if (indiceToken == 1) {
-                numeroError = 120;
+        if (indiceToken == 2 && lineaDeTokens.size() == 4) {
+            if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
+                numeroError = 122;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
             }
-            if (indiceToken == (lineaDeTokens.size() - 1)) {
-                numeroError = 121;
+            if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
+                numeroError = 123;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-
-            if (indiceToken == 2 && lineaDeTokens.size() == 4) {
-                if (!esVariableValida_O_Numero(tokenAntecesorAlOperador.getTipoDeToken())) {
-                    numeroError = 122;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-                if (!esVariableValida_O_Numero(tokenSucesorAlOperador.getTipoDeToken())) {
-                    numeroError = 123;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            }
-            if (indiceToken == 2 && lineaDeTokens.size() > 4) {
-                List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
-                if (listaLadoDerecho.size() > 2) {
-                    numeroError = 125;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-            }
-            if (indiceToken == 3 && lineaDeTokens.size() >= 4) {
-                List<Token> listaLadoIzquierdo = lineaDeTokens.subList(1, indiceToken);
-                List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
-                if (listaLadoIzquierdo.size() > 1) {
-                    numeroError = 124;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
-                if (listaLadoDerecho.size() > 1) {
-                    numeroError = 125;
-                    incluirErrorEncontrado(numeroDeLinea, numeroError);
-                }
             }
         }
+        if (indiceToken == 2 && lineaDeTokens.size() > 4) {
+
+            List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
+            if (listaLadoDerecho.size() > 2) {
+                numeroError = 125;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
+        }
+        if (indiceToken == 3 && lineaDeTokens.size() >= 4) {
+            List<Token> listaLadoIzquierdo = lineaDeTokens.subList(1, indiceToken);
+            List<Token> listaLadoDerecho = lineaDeTokens.subList((indiceToken + 1), lineaDeTokens.size());
+            if (listaLadoIzquierdo.size() > 1) {
+                numeroError = 124;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
+            if (listaLadoDerecho.size() > 1) {
+                numeroError = 125;
+                incluirErrorEncontrado(numeroDeLinea, numeroError);
+            }
+        }
+        //}
 
     }
 
     public void validarOperadoresUnarios(List<Token> lineaDeTokens, int numeroDeLinea, int indiceToken) {
         int numeroError = 0;
-        Token tokenAntecesorAlOperador = lineaDeTokens.get((indiceToken - 1));
-        Token tokenSucesorAlOperador = new Token();
-        System.out.println("1216 El indice del operador unario es " + indiceToken + " el token anterior es " + tokenAntecesorAlOperador.getLexema());
+        Token tokenAnteriorAlOperador = lineaDeTokens.get((indiceToken - 1));
+        Token tokenSiguienteAlOperador = new Token();
+        System.out.println("1334 El indice del operador unario es " + indiceToken + " el token anterior es " + tokenAnteriorAlOperador.getLexema());
+
+        //Observa el siguiente token al operador
         if ((indiceToken + 1) < lineaDeTokens.size()) {
-            tokenSucesorAlOperador = lineaDeTokens.get((indiceToken + 1));
+            tokenSiguienteAlOperador = lineaDeTokens.get((indiceToken + 1));
         }
-        if (tokenAntecesorAlOperador.getTipoDeToken() != TipoDeToken.IDENTIFICADOR && tokenSucesorAlOperador == null) {
+        //Caso variable++
+        if (tokenAnteriorAlOperador.getTipoDeToken() != TipoDeToken.IDENTIFICADOR && tokenSiguienteAlOperador == null) {
             numeroError = 122;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
-        if (tokenSucesorAlOperador != null) {
-            if ((tokenSucesorAlOperador.getTipoDeToken() != TipoDeToken.IDENTIFICADOR) && tokenAntecesorAlOperador == null) {
+        //Caso ++variable
+        if (tokenSiguienteAlOperador != null) {
+            if ((tokenSiguienteAlOperador.getTipoDeToken() != TipoDeToken.IDENTIFICADOR) && tokenAnteriorAlOperador == null) {
                 numeroError = 123;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
             }
         }
-        if (tokenSucesorAlOperador != null) {
-            if (tokenAntecesorAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR && tokenSucesorAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR) {
+        //Caso variable++variable
+        if (tokenSiguienteAlOperador != null) {
+            if (tokenAnteriorAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR && tokenSiguienteAlOperador.getTipoDeToken() == TipoDeToken.IDENTIFICADOR) {
                 numeroError = 127;
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
             }
@@ -1689,6 +1705,28 @@ public class Parser {
                                 System.out.println("505 El identificador no es una llamda de funcion: " + tokenSucesorAlOperador.getLexema() + " en linea " + numeroDeLinea);
                             }
 
+                            break;
+                        case TipoDeToken.CORCHETE_IZQUIERDO:
+                            //Caso de linea no evaluada pero si verificar que el identificador este correcto
+                            //tablero = [[" " for _ in range(3)] for _ in range(3)]
+
+                            Token token1 = new Token();
+                            Token token2 = new Token();
+                            Token token3 = new Token();
+
+                            if ((indiceTokenAsignacion + 1) < lineaDeTokens.size()) {
+                                token1 = lineaDeTokens.get((indiceTokenAsignacion + 1));
+                            }
+                            if ((indiceTokenAsignacion + 2) < lineaDeTokens.size()) {
+                                token2 = lineaDeTokens.get((indiceTokenAsignacion + 2));
+                            }
+                            if ((indiceTokenAsignacion + 3) < lineaDeTokens.size()) {
+                                token3 = lineaDeTokens.get((indiceTokenAsignacion + 3));
+                            }
+
+                            if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("[") && token2.getLexema().equals("\"")) {
+                               //No hacemos nada
+                            }
                             break;
                         case TipoDeToken.NUMERO_ENTERO:
                         case TipoDeToken.NUMERO_DECIMAL:
@@ -2042,7 +2080,7 @@ public class Parser {
                 for (int k = 0; k < listaContenidoFinal.get(i).getErroresEncontrados().size(); ++k) {
                     int numeroDeError = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getKey();
                     String descripcion = listaContenidoFinal.get(i).getErroresEncontrados().get(k).getDescripcion();
-                    programaEnPythonRevisado.add(formatoError + numeroDeError + ". " + descripcion);
+                    programaEnPythonRevisado.add(formatoError + numeroDeError + ": " + descripcion);
                 }
             }
         }
