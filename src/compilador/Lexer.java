@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -367,10 +365,14 @@ public class Lexer {
                             }
 
                             if (existeInput || existePrint) {
-                                int inicio = 0;
+
                                 for (int i = 0; i < arregloDeTokens.length; i++) {
                                     System.out.println(i + ": " + arregloDeTokens[i]);
                                 }
+
+                                indice = extraerArgumentoDeUnaFuncion(arregloDeTokens, indice);
+
+                                /*
                                 if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
                                     tokenSiguiente = arregloDeTokens[indice + 1]; //Obtiene el token siguiente a input
                                     System.out.println(" 377 tokenSiguiente " + tokenSiguiente);
@@ -380,19 +382,19 @@ public class Lexer {
                                     tokenSiguienteSiguiente = arregloDeTokens[indice + 2]; //Obtiene el token siguiente a input
                                     System.out.println(" 382 tokenSiguienteSiguiente = " + tokenSiguienteSiguiente);
                                 }
-                                /*
+                              
                                 if (!tokenSiguiente.equals("(") && !tokenSiguienteSiguiente.equals("\"")) {
                                     inicio = indice + 1;
                                 } 
-                                */
-                                if (tokenSiguiente.equals("(") && !tokenSiguienteSiguiente.equals("\"")) {
+                                 if (tokenSiguiente.equals("(") && !tokenSiguienteSiguiente.equals("\"")) {
                                     inicio = indice + 2;
                                 } else {
                                     inicio = indice + 1;
                                 }
+                                
                                 System.out.println("392 inicio = " + inicio);
                                 if (inicio >= 1) {
-                                    argumentoDeLaFuncion = extraerArgumentoDeUnaFuncion(arregloDeTokens, inicio);
+                                    argumentoDeLaFuncion = extraerArgumentoDeUnaFuncion(arregloDeTokens, indice);
                                     System.out.println("392 El argumento de print o input es: " + argumentoDeLaFuncion[0] + " y el indice es " + indice);
                                     // Dividir la cadena en palabras usando espacios como delimitadores
                                     String[] words = argumentoDeLaFuncion[0].split("\\s+");
@@ -436,9 +438,9 @@ public class Lexer {
                             if (argumentoDeLaFuncion[1] != null) {
                                 indice = Integer.parseInt(argumentoDeLaFuncion[1]);
                             }
+                                 */
 
-
-                            /*
+ /*
                             if (existeInput || existePrint) {
                                 textoEntreComillas.append(tokenActual.trim());
                                 textoEntreComillas.append(" ");
@@ -495,7 +497,8 @@ public class Lexer {
                                 }
 
                             }
-                             */
+                                 */
+                            }
                         } else if (esNumeroEntero(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
                         } else if (esNumeroDecimal(tokenActual.trim())) {
@@ -574,51 +577,514 @@ public class Lexer {
     } //Fin del metodo analizadorSintactico
 
     //Extrae el argumento de la funcion print o input desde el 
-    public String[] extraerArgumentoDeUnaFuncion(String[] arregloDeTokens, int inicio) {
+    public int extraerArgumentoDeUnaFuncion(String[] arregloDeTokens, int indiceTokenActual) {
         StringBuilder texto = new StringBuilder();
-        String[] argumento = new String[2];
+        int inicio = indiceTokenActual + 1;
         int fin = arregloDeTokens.length - 1; // Por defecto, hasta el final del arreglo
-        int indiceSalida = -1; // Variable para almacenar el índice de salida
-        int contador = 0;
 
-        // Buscar el índice de la última aparición de comillas o paréntesis
-        for (int i = arregloDeTokens.length - 1; i >= inicio; i--) {
-            if(arregloDeTokens[i].contains(")") && arregloDeTokens[i-1].contains("\"")){
-                fin = i - 2;
-                indiceSalida = i; // Actualizar el índice de salida
-                break;
-            } else if(arregloDeTokens[i].contains(")") && !arregloDeTokens[i].contains("\"")){
-                fin = i - 1;
-                indiceSalida = i; // Actualizar el índice de salida
-                break;
-            } if (arregloDeTokens[i].contains("\"") ) {
-                fin = i - 1;
-                indiceSalida = i; // Actualizar el índice de salida
-                break;
-            } else {
-                 fin = arregloDeTokens.length - 1;
-                indiceSalida = i; // Actualizar el índice de salida
-                break;
-            }
-        }
-        // Imprimir el índice en el cual se sale del ciclo
-        System.out.println(" 526 El ciclo se sale en el índice: " + indiceSalida);
+        /*
+        TipoDeToken tipo = null;
 
-        // Construir el StringBuilder con los elementos entre los índices dados
         for (int i = inicio; i <= fin; i++) {
             texto.append(arregloDeTokens[i]);
             ++contador;
-            /*
-            if (i < fin) {
-                argumento.append(" "); // Añadir un espacio entre los tokens
-            }
-             */
-        }
-        System.out.println(" 613  inicio es " + inicio + " hasta "+ indiceSalida + " contador igual " + contador);
-        argumento[0] = texto.toString().trim();
-        argumento[1] = String.valueOf(contador);
 
-        return argumento;
+        }
+        String str = texto.toString();
+        System.out.println("598 texto entre parentesis " + str);
+
+        boolean startsWithParenthesisAndQuote = str.matches("^\\(\".*");
+        boolean endsWithQuoteAndParenthesis = str.matches(".*\"\\)$");
+
+        boolean startsWithParenthesisAndNotQuote = str.matches("^\\([^\"].*");
+
+        boolean startsWithParenthesis = str.matches("^\\(.*");
+        boolean startsWithQuote = str.matches("^\".*");
+
+        boolean endsWithParenthesis = str.matches(".*\\)$");
+        boolean endsWithQuote = str.matches(".*\"$");
+
+        System.out.println("605 startsWithParenthesisAndQuote " + startsWithParenthesisAndQuote);
+        System.out.println("607 endsWithQuoteAndParenthesis " + endsWithQuoteAndParenthesis);
+
+        //caso: print ("texto")
+        if (startsWithParenthesisAndQuote && endsWithQuoteAndParenthesis) {
+            System.out.println("618");
+            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+
+            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
+            primerIndiceDeInicioComillas = str.indexOf('\"');
+            inicio = 2; //inicio = primerIndiceDeInicioComillas + 1;
+
+            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
+            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
+            fin = str.length() - 2; //fin = ultimoIndiceDeFinComillas;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return (ultimoIndiceDeParentesisDerecho + 1);
+        }
+
+        //caso: print ("texto" o print ("texto)
+        if (startsWithParenthesisAndQuote && (endsWithParenthesis || endsWithQuote)) {
+            System.out.println("641");
+            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+
+            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
+            primerIndiceDeInicioComillas = str.indexOf('\"');
+            inicio = 2; //inicio = primerIndiceDeInicioComillas + 1;
+
+            fin = str.length() - 1;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            if (endsWithQuote) {
+                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            }
+            if (endsWithParenthesis) {
+                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+            }
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return (fin + 1);
+        }
+
+        //caso: print ("texto
+        if (startsWithParenthesisAndQuote && !endsWithParenthesis && !endsWithQuote) {
+            System.out.println("666");
+            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+
+            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
+            primerIndiceDeInicioComillas = str.indexOf('\"');
+            inicio = 2; // inicio = primerIndiceDeInicioComillas + 1;
+
+            fin = str.length();
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return fin;
+        }
+
+        System.out.println("632  startsWithParenthesisAndNotQuote " + startsWithParenthesisAndNotQuote);
+
+        //caso: print (texto") o "texto")
+        if ((startsWithParenthesis || startsWithQuote) && endsWithQuoteAndParenthesis) {
+            System.out.println("687");
+
+            if (startsWithParenthesis) {
+                agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+            }
+            if (startsWithQuote) {
+                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            }
+
+            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
+            inicio = 1; //inicio = primerIndiceDeParentesisIzquierdo + 1;
+
+            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
+            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
+            fin = str.length() - 2;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return (fin + 2);
+        }
+
+        //caso: print texto")
+        if (!startsWithParenthesis && !startsWithQuote && endsWithQuoteAndParenthesis) {
+            System.out.println("714");
+            inicio = 0;
+
+            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
+            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
+            fin = str.length() - 2;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return (fin + 2);
+        }
+
+        //caso: print (texto" o (texto) o "texto" o "texto)
+        if ((startsWithParenthesis || startsWithQuote) && (endsWithParenthesis || endsWithQuote)) {
+            System.out.println("732");
+            if (startsWithParenthesis) {
+                agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+            }
+            if (startsWithQuote) {
+                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            }
+
+            inicio = 1;
+
+            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
+            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
+            fin = str.length() - 1;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            if (endsWithQuote) {
+                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            }
+            if (endsWithParenthesis) {
+                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+            }
+
+            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
+            return (fin + 2);
+        }
+
+        //caso: print texto" o print texto)
+        if (!startsWithParenthesis && !startsWithQuote && (endsWithParenthesis || endsWithQuote)) {
+            System.out.println("762");
+            inicio = 0;
+            fin = str.length() - 1;
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            if (endsWithQuote) {
+                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+            }
+            if (endsWithParenthesis) {
+                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+            }
+
+            //System.out.println("624 subStr " + subStr);
+            return (fin + 1);
+        }
+        //caso: print (texto o print "texto
+        if ((startsWithParenthesis || startsWithQuote) && !endsWithParenthesis && !endsWithQuote && !endsWithQuoteAndParenthesis) {
+            System.out.println("780");
+            inicio = 1;
+            fin = str.length();
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            //System.out.println("624 subStr " + subStr);
+            return (fin + 1);
+        }
+
+        //caso: print texto 
+        if (!startsWithParenthesis && !startsWithQuote && !endsWithParenthesis && !endsWithQuote) {
+            System.out.println("793");
+            inicio = 0;
+            fin = str.length();
+
+            String subStr = str.substring(inicio, fin).trim();
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
+                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
+                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
+                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
+            }
+            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
+                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
+            }
+
+            //System.out.println("624 subStr " + subStr);
+            return (fin + 1);
+        }
+        return -1;
+         */
+        for (int i = inicio; i <= fin; i++) {
+            texto.append(arregloDeTokens[i]);
+
+        }
+
+        String str = texto.toString();
+        System.out.println("598 texto entre parentesis " + str);
+
+        // Expresiones regulares
+        boolean startsWithParenthesisAndQuote = str.matches("^\\(\".*");
+        boolean endsWithQuoteAndParenthesis = str.matches(".*\"\\)$");
+        //boolean startsWithParenthesisAndNotQuote = str.matches("^\\([^\"].*");
+        boolean startsWithParenthesis = str.matches("^\\(.*");
+        boolean startsWithQuote = str.matches("^\".*");
+        boolean endsWithParenthesis = str.matches(".*\\)$");
+        boolean endsWithQuote = str.matches(".*\"$");
+
+        //caso: print ("texto")
+        if (startsWithParenthesisAndQuote && endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 2, str.length() - 2, true, true, true, true);
+            return (str.length() + 1);
+        }
+        //caso: print ("texto" 
+        if (startsWithParenthesisAndQuote && endsWithQuote) {
+            procesarTokens(str, 2, str.length() - 1, true, true, true, false);
+            return str.length();
+        }
+        //caso: print ("texto) //ojo con ")
+        if (startsWithParenthesisAndQuote && endsWithParenthesis && !endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 2, str.length() - 1, true, true, false, true);
+            return str.length();
+        }
+
+        //caso: print ("texto
+        if (startsWithParenthesisAndQuote && !endsWithParenthesis && !endsWithQuote) {
+            procesarTokens(str, 2, str.length(), true, true, false, false);
+            return str.length();
+        }
+
+        //caso: print (texto") 
+        if (startsWithParenthesis && !startsWithParenthesisAndQuote && endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 1, str.length() - 2, true, false, true, true);
+            return str.length();
+        }
+        //caso: print  "texto")
+        if (startsWithQuote && endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 1, str.length() - 2, false, true, true, true);
+            return str.length();
+        }
+
+        //caso: print texto")
+        if (!startsWithParenthesis && !startsWithQuote && !startsWithParenthesisAndQuote && endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 0, str.length() - 2, false, false, true, true);
+            return str.length();
+        }
+
+        //caso: print (texto" 
+        if (startsWithParenthesis && !startsWithParenthesisAndQuote && endsWithQuote) {
+            procesarTokens(str, 1, str.length() - 1, true, false, true, false);
+            return (str.length() + 1);
+        }
+        //caso: print (texto) ->  ojo: texto podria ser un identificador
+        if (startsWithParenthesis && !startsWithParenthesisAndQuote && endsWithParenthesis) {
+            procesarTokens(str, 1, str.length() - 1, true, false, false, true);
+            return (str.length() + 1);
+        }
+        //caso: print  "texto" 
+        if (startsWithQuote && endsWithQuote) {
+            procesarTokens(str, 1, str.length() - 1, false, true, true, false);
+            return (str.length() + 1);
+        }
+        //caso: print  "texto)
+        if (startsWithQuote && endsWithParenthesis && !endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 1, str.length() - 1, false, true, false, true);
+            return (str.length() + 1);
+        }
+
+        //caso: print texto" 
+        if (!startsWithParenthesis && !startsWithQuote && endsWithQuote) {
+            procesarTokens(str, 0, str.length() - 1, false, false, true, false);
+            return str.length();
+        }
+        //caso: print texto) -> ojo: texto podria ser un identificador
+        if (!startsWithParenthesis && !startsWithQuote && endsWithParenthesis) {
+            procesarTokens(str, 0, str.length() - 1, false, false, false, true);
+            return str.length();
+        }
+
+        //caso: print (texto -> ojo: texto podria ser un identificador
+        if (startsWithParenthesis && !endsWithQuote && !endsWithParenthesis && !endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 1, str.length(), true, false, false, false);
+            return (str.length() + 1);
+        }
+        //caso: print "texto
+        if (startsWithQuote && !endsWithQuote && !endsWithParenthesis && !endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 1, str.length(), false, true, false, false);
+            return (str.length() + 1);
+        }
+
+        //caso: print texto -> ojo: texto podria ser un identificador
+        if (!startsWithParenthesis && !startsWithQuote && !endsWithParenthesis && !endsWithQuote && !endsWithQuoteAndParenthesis) {
+            procesarTokens(str, 0, str.length(), false, false, false, false);
+            return (str.length() + 1);
+        }
+        return -1;
+    }
+
+    // Método auxiliar para procesar tokens
+    private void procesarTokens(String str, int inicio, int fin, boolean addLeftParen, boolean addStartQuotes, boolean addEndQuotes, boolean addRigthParen) {
+        if (addLeftParen) {
+            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
+        }
+        if (addStartQuotes) {
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+        }
+
+        String argumentoDeLaFuncion = str.substring(inicio, fin).trim();
+        String[] words = argumentoDeLaFuncion.split("\\s+");
+        //Si no hay comillas entonces texto entre comillas podria ser un identificador o una palabra reservada
+        if (words.length == 1) {
+            if (!addStartQuotes && !addEndQuotes) {
+                PalabraReservada palabraReservada = new PalabraReservada();
+                if (palabraReservada.esPalabraReservada(argumentoDeLaFuncion.trim())) {
+                    agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, argumentoDeLaFuncion, null, this.numeroLineaActual);
+                    //      System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                } else if (verificarPrimerCaracterDeUnIdentificador(argumentoDeLaFuncion, numeroLineaActual)
+                        && verificarSecuenciaDeCaracteresDeUnIdentificador(argumentoDeLaFuncion, numeroLineaActual)) {
+                    //    System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
+
+                    //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                    Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, argumentoDeLaFuncion.trim(), null, this.numeroLineaActual);
+                    tokens.add(nuevoToken);
+
+                    //Solo probando construir una tabla de simbolos
+                    incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
+
+                } else {
+                    agregarNuevoToken(TipoDeToken.DESCONOCIDO, argumentoDeLaFuncion.trim(), null, this.numeroLineaActual);
+                    //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
+                }
+            }
+        } else {
+            agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, argumentoDeLaFuncion, null, this.numeroLineaActual);
+        }
+
+        if (addEndQuotes) {
+            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
+        }
+        if (addRigthParen) {
+            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
+        }
+
+    }
+
+    private TipoDeToken verificarTipoTokenDeUnTextoEntreComillas(String texto) {
+        // Dividir la cadena en palabras usando espacios como delimitadores
+        String[] words = texto.split("\\s+");
+        PalabraReservada palabraReservada = new PalabraReservada();
+        TipoDeToken tipo = null;
+
+        System.out.println(" 809 Contenido de words");
+        for (String str : words) {
+            System.out.println(str);
+        }
+        // Verificar si hay más de una palabra lo que implica que no es una variable
+
+        if (words.length > 1) {
+            tipo = TipoDeToken.TEXTO_ENTRE_COMILLAS;
+        } else {
+            //    System.out.println(" 440 El StringBuilder contiene solo una palabra." + content);
+            if (palabraReservada.esPalabraReservada(texto.trim())) {
+                tipo = TipoDeToken.PALABRA_RESERVADA;
+                //      System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
+            } else if (verificarPrimerCaracterDeUnIdentificador(texto, numeroLineaActual)
+                    && verificarSecuenciaDeCaracteresDeUnIdentificador(texto, numeroLineaActual)) {
+                //    System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
+
+                //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
+                tipo = TipoDeToken.IDENTIFICADOR;
+
+            } else {
+                tipo = TipoDeToken.DESCONOCIDO;
+                //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
+            }
+        }
+        return tipo;
     }
 
     private int contarIndentacion(String linea) {
