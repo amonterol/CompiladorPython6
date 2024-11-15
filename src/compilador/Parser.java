@@ -63,6 +63,30 @@ public class Parser {
 
         }
          */
+        boolean enBloqueDef = false;
+        int indentacionDef = 0;
+        int indentacionBloqueDef = -1;
+        int cantidadDeInstruccionesBloqueDef = 0;
+        int lineaTokenDef = 0;
+
+        boolean enBloqueWhile = false;
+        int indentacionWhile = 0;
+        int indentacionBloqueWhile = -1;
+        int cantidadDeInstruccionesBloqueWhile = 0;
+        int lineaTokenWhile = 0;
+
+        boolean enBloqueTry = false;
+        int indentacionTry = 0;
+        int indentacionBloqueTry = -1;
+        int cantidadDeInstruccionesBloqueTry = 0;
+        int lineaTokenTry = 0;
+
+        boolean enBloqueExcept = false;
+        int indentacionExcept = 0;
+        int indentacionBloqueExcept = -1;
+        int cantidadDeInstruccionesBloqueExcept = 0;
+        int lineaTokenExcept = 0;
+
         boolean existeTokenAntesDeImport = false;
 
         boolean existeInput = false;
@@ -73,27 +97,6 @@ public class Parser {
         boolean enBloqueElse = false;
 
         int indentacionFor = 0;
-
-        boolean enBloqueWhile = false;
-        int indentacionWhile = 0;
-        int indentacionBloqueWhile = -1;
-        int contadorInstruccionesBloqueWhile = 0;
-        int lineaTokenWhile = 0;
-
-        boolean enBloqueDef = false;
-        int indentacionDef = 0;
-        int indentacionBloqueDef = -1;
-        int contadorInstruccionesBloqueDef = 0;
-
-        boolean enBloqueTry = false;
-        int indentacionTry = 0;
-        int indentacionBloqueTry = -1;
-        int contadorInstruccionesBloqueTry = 0;
-
-        boolean enBloqueExcept = false;
-        int indentacionExcept = 0;
-        int indentacionBloqueExcept = -1;
-        int contadorInstruccionesBloqueExcept = 0;
 
         boolean enInstruccionReturn = false;
 
@@ -117,187 +120,258 @@ public class Parser {
 
         int nivelIndentacionActual = 0;
 
-        int lineaTokenExcept = 0;
-
         int numeroInstruccionesEnBloqueExcept = 0;
 
-        for (List<Token> lineaDeCodigoEnTokens : listaDeTokens) {
+        Token tokenActual = new Token();
+        Token tokenSiguiente = new Token();
+
+        //for (List<Token> lineaDeCodigoEnTokens : listaDeTokens) {
+        //if (!lineaDeCodigoEnTokens.isEmpty()) {
+        for (int linea = 0; linea < listaDeTokens.size(); linea++) {
+            List<Token> lineaDeCodigoEnTokens = listaDeTokens.get(linea);
             if (!lineaDeCodigoEnTokens.isEmpty()) {
 
                 int numeroError = -1;
 
-                System.out.println("127 Esta es pila = ");
+                System.out.println();
+                System.out.println("133 LA LINEA ES " + (linea + 1));
+
+                System.out.println("136 Esta es pila = ");
                 // Recorrer e imprimir la pila sin eliminar elementos
                 for (Bloque bloque : pilaIndentacion) {
                     System.out.println("Indentación: " + bloque.indentacion + ", Tipo: " + bloque.tipo);
                 }
                 System.out.println();
+                System.out.println();
+
+                System.out.println("143 la linea de tokens actual es:");
+                for (int i = 0; i < lineaDeCodigoEnTokens.size(); i++) {
+                    System.out.print(lineaDeCodigoEnTokens.get(i).getLexema() + " ->  ");
+                }
+                System.out.println();
+                System.out.println();
+
+                //Leemos el token de indentacion
+                //Para conocer la indentacion de la linea de codigo actual
+                tokenActual = lineaDeCodigoEnTokens.get(0);
+
+                //Leemos el token siguiente al actual
+                //Para observa cual es el primer token de la linea de codigo.
+                tokenSiguiente = new Token();
+                if (linea + 1 < lineaDeCodigoEnTokens.size()) {
+                    tokenSiguiente = lineaDeCodigoEnTokens.get(1);
+                    System.out.println("151 token anterior es " + tokenSiguiente.getLexema() + "  en linea " + tokenSiguiente.getNumeroLinea());
+                }
+
+                System.out.println();
+                System.out.println("178 linea =  " + linea + " lineaDeCodigoEnTokens size =  " + lineaDeCodigoEnTokens.size());
+
+                //Si la instruccion actual esta dentro del bloque un determinado bloque aumentamos su contador de instrucciones
+                System.out.println("182 La instruccion es " + tokenActual.getLexema() + " enBloqueTry es " + enBloqueTry);
+                System.out.println("183 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueTry es " + enBloqueTry);
+
+                if (enBloqueTry && !tokenSiguiente.getLexema().equals("except")) {
+                    ++cantidadDeInstruccionesBloqueTry;
+                }
+                System.out.println();
+                System.out.println("190 cantidadDeInstruccionesBloqueTry " + cantidadDeInstruccionesBloqueTry);
+
+                //Comprobamos la indentacion antes de clasificar los tokens y verificar la sintaxis.
+                //El primer token siempre es el token de indentacion
+                //if (linea == 0) {
+                System.out.println("194 indentacionInstruccionActual antes de asignar la de la linea de tokens es " + indentacionInstruccionActual);
+                //Almancena la indentacion de la instruccion actual no importa cual sea la instruccion
+                //indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
+                indentacionInstruccionActual = Integer.parseInt(tokenActual.getLiteral());
+
+                System.out.println("199  en la linea " + linea + " indentacionInstruccionActual = " + indentacionInstruccionActual);
+
+                //Verifica si el peek de la pila de indentacion es 'try' cuando en la linea que leemos existe 'except'
+                //porque 'try' se cierra al aparecer 'except'. Si existe try (como debe ser) lo elimina de la pila
+                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("try") && tokenSiguiente.getLexema().equals("except")) {
+                    System.out.println("149 pilaIndentacion.peek().tipo.equals(\"try\") = " + pilaIndentacion.peek().tipo.equals("try") + " tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
+                    pilaIndentacion.pop(); //Sacamos try porque encontramos except
+                    enBloqueTry = false; //Cerramos el bloque try
+                    System.out.println("184 cantidad de lineas de bloque try es " + cantidadDeInstruccionesBloqueTry);
+                    if (cantidadDeInstruccionesBloqueTry == 0) {
+                        numeroError = 863; // Bloque except sin instrucciones
+                        incluirErrorEncontrado(lineaTokenTry, numeroError);
+
+                    }
+                }
+
+                //Verifica si el peek de la pila de indentacion es 'if' cuando en la linea que leemos existe 'else'
+                //porque 'if' se cierra al aparecer 'else'. Si existe 'if' (como debe ser) lo elimina de la pila
+                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("if") && tokenSiguiente.getLexema().equals("else")) {
+                    System.out.println("174  tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
+                    pilaIndentacion.pop(); //Sacamos if porque encontramos else
+                    enBloqueIf = false; //Cerramos el bloque try
+                }
+
+                //Verifica si la linea actual tiene una indentacion mayor que la indentacion de bloque 'programa', es decir, mayor que cero.
+                if (!pilaIndentacion.isEmpty() && pilaIndentacion.size() == 1 && indentacionInstruccionActual > 0) {
+                    System.out.println("181  tokenActual " + tokenActual.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual + " peek indentacion " + pilaIndentacion.peek().indentacion);
+                    numeroError = 750; // Código de error para indentación incorrecta 
+                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
+
+                } else if (!pilaIndentacion.isEmpty() && enBloqueTry && indentacionInstruccionActual == 0) {
+
+                    numeroError = 750; // Código de error para indentación 
+                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
+
+                } else if (!pilaIndentacion.isEmpty() && indentacionInstruccionActual != 0 && indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4) {
+                    //Verifica si la linea actual tiene una indentacion diferente del bloque en que esta ( puede ser mayor o menor)
+                    //cada bloque se define por cambios en la indentacion en multiplos de 4                            
+                    System.out.println("155 Tercer if = " + (indentacionInstruccionActual != 0) + " !pilaIndentacion.isEmpty() " + !pilaIndentacion.isEmpty() + " indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4 " + (indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4));
+                    System.out.println("Error: Línea fuera de bloque con indentación incorrecta en la línea " + tokenActual.getNumeroLinea());
+
+                    //Si la indentacion de la instruccion actual es menor a la del tope de la pila implica que se esta cerrando uno o mas bloques
+                    //Asi que sacamos elementos de la pila mientras que la indentacion de la instruccion actual sea menor que la de la del tope de la pila
+                    if (indentacionInstruccionActual <= pilaIndentacion.peek().indentacion) {
+                        System.out.println("162 Sacamos el peek de la pila " + pilaIndentacion.peek().tipo);
+                        while (!pilaIndentacion.isEmpty()) {
+                            //Si la diferencia pilaIndentacion.peek().indentacion - indentacionInstruccionActual) >= 0 implica sale un bloque                                    
+                            if (((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) >= 0)) {
+                                System.out.println("162 Sacamos el peek de la pila " + pilaIndentacion.peek().tipo);
+                                //Si el bloque a sacar de la pila es 'except' y el numero de instrucciones en bloque 'except' es cero lanzamos un error
+                                if (pilaIndentacion.peek().tipo.equals("except")) {
+                                    enBloqueExcept = false;
+                                    if (numeroInstruccionesEnBloqueExcept == 0) {
+                                        numeroError = 863; // Bloque except sin instrucciones
+                                        incluirErrorEncontrado(lineaTokenExcept, numeroError);
+                                        //lineaTokenExcept = 0;
+                                    }
+                                }
+                                if (pilaIndentacion.peek().tipo.equals("def")) {
+                                    enBloqueDef = false;
+                                    if (cantidadDeInstruccionesBloqueDef == 0) {
+                                        numeroError = 863; // Bloque except sin instrucciones
+                                        incluirErrorEncontrado(lineaTokenDef, numeroError);
+
+                                    }
+                                }
+                                if (pilaIndentacion.peek().tipo.equals("while")) {
+                                    enBloqueWhile = false;
+                                    if (cantidadDeInstruccionesBloqueDef == 0) {
+                                        numeroError = 863; // Bloque except sin instrucciones
+                                        incluirErrorEncontrado(lineaTokenWhile, numeroError);
+
+                                    }
+                                }
+
+                                pilaIndentacion.pop();
+
+                            } else {
+                                break;
+                            }
+
+                        }
+                        //Si la diferencia pilaIndentacion.peek().indentacion - indentacionInstruccionActual) < 0 implica una instruccion con indentacion menor que su bloque 
+                        if ((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) < 0 && (((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) % 4) != 0)) {
+                            numeroError = 750; // Código de error para indentación 
+                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
+                            break;
+                        }
+                    } else { //La indentacion de la instruccion actual es mayor que la del bloque en que se encuentra
+                        numeroError = 750; // Código de error para indentación incorrecta 
+                        incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
+                    }
+
+                }
+                //Como la comprobacion de la indentacion la hacemos con el token de indentacion 
+                //podemos ahora verificar si en la linea actual el token en posicion 1 es un token de bloque
+                //si es asi lo incluimos
+                switch (tokenSiguiente.getLexema()) {
+                    case "def" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "def"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "def"));
+                        }
+                        enBloqueDef = true;
+                    }
+                    case "while" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "while"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "while"));
+                        }
+                        enBloqueWhile = true;
+                    }
+                    case "try" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "try"));
+                            System.out.println("296 insertando try en pila");
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "try"));
+                        }
+                        enBloqueTry = true;
+                    }
+                    case "except" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "except"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "except"));
+                        }
+                        enBloqueExcept = true;
+                    }
+                    case "for" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "for"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "for"));
+                        }
+
+                    }
+                    case "if" -> {
+                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "if"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "if"));
+                        }
+
+                    }
+                    case "else" -> {
+                        if (!pilaIndentacion.isEmpty()) {
+                            pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "else"));
+                        } else {
+                            nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
+                            pilaIndentacion.push(new Bloque(nivelDeIndentacion, "else"));
+                        }
+
+                    }
+                    default -> {
+                    }
+                }
+                // }//Fin comprobacion de indentacion ( i == 0)
+
+                //Verifica si la linea siguiente a la linea de 'except' comienza con print, de lo contrario es error
+                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("except") && (tokenSiguiente.getNumeroLinea() == (lineaTokenExcept + 1))) {
+
+                    if (!tokenSiguiente.getLexema().equals("print")) {
+                        System.out.println("213 Instruccion en except que no comienza con print "
+                                + tokenSiguiente.getLexema()
+                                + "  linea " + tokenSiguiente.getNumeroLinea()
+                                + "  linea de except " + lineaTokenExcept);
+                        numeroError = 861; // Instruccion en except que no comienza con print
+                        incluirErrorEncontrado(tokenSiguiente.getNumeroLinea(), numeroError);
+                    }
+
+                }
 
                 //Iniciamos el recorrido de la los tokens de la linea de código, token por token
                 //Y los clasificamos de acuerdo a su tipo para analizar su sintaxis.
                 for (int i = 0; i < lineaDeCodigoEnTokens.size(); i++) {
                     int numeroDeLineaTokenActual = 0;
+                    tokenActual = lineaDeCodigoEnTokens.get(i);
 
-                    Token tokenActual = lineaDeCodigoEnTokens.get(i);//Leemos el primer token de la linea, que siempre es el token de indentacion
-
-                    System.out.println("137 indentacionInstruccionActual = " + indentacionInstruccionActual);
-                    if (i == 0) {
-
-                        System.out.println("145 indentacionInstruccionActual = " + indentacionInstruccionActual);
-                        indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
-
-                        Token tokenSiguiente = new Token();
-                        if (i + 1 < lineaDeCodigoEnTokens.size()) {
-                            tokenSiguiente = lineaDeCodigoEnTokens.get(i + 1);
-                            System.out.println("155 El token siguiente es " + tokenSiguiente.getLexema() + "  en linea " + tokenSiguiente.getNumeroLinea());
-                        }
-                        // Verifica si el token sigiente es except exista try en el peek de la pila y si es asi lo elimina
-                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("try") && tokenSiguiente.getLexema().equals("except")) {
-                            System.out.println("149 pilaIndentacion.peek().tipo.equals(\"try\") = " + pilaIndentacion.peek().tipo.equals("try") + " tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
-                            pilaIndentacion.pop(); //Sacamos try porque encontramos except
-                        }
-                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("if") && tokenSiguiente.getLexema().equals("else")) {
-                            System.out.println("149 pilaIndentacion.peek().tipo.equals(\"if\") = " + pilaIndentacion.peek().tipo.equals("else") + " tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
-                            pilaIndentacion.pop(); //Sacamos if porque encontramos else
-                        }
-
-                        // Verifica si la linea actual esta fuera de algun bloque
-                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.size() == 1 && indentacionInstruccionActual > 0) {
-                            numeroError = 750; // Código de error para indentación incorrecta fuera de bloques
-                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
-
-                        } else if (indentacionInstruccionActual != 0 && !pilaIndentacion.isEmpty() && indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4) {
-                            // Verifica si la linea actual esta fuera de algun bloque
-                            System.out.println("155 Tercer if = " + (indentacionInstruccionActual != 0) + " !pilaIndentacion.isEmpty() " + !pilaIndentacion.isEmpty() + " indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4 " + (indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4));
-                            System.out.println("Error: Línea fuera de bloque con indentación incorrecta en la línea " + tokenActual.getNumeroLinea());
-
-                            if (indentacionInstruccionActual <= pilaIndentacion.peek().indentacion) {
-                                while (!pilaIndentacion.isEmpty()) {
-                                    if (((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) >= 0)) {
-                                        System.out.println("162 Sacamos el peek de la pila " + pilaIndentacion.peek().tipo);
-                                        if (pilaIndentacion.peek().tipo.equals("except")) {
-                                            enBloqueExcept = false;
-                                            if (numeroInstruccionesEnBloqueExcept == 0) {
-                                                numeroError = 863; // Bloque except sin instrucciones
-                                                incluirErrorEncontrado(lineaTokenExcept, numeroError);
-                                                lineaTokenExcept = 0;
-                                            }
-                                        }
-                                        pilaIndentacion.pop();
-
-                                    } else {
-                                        break;
-                                    }
-
-                                }
-                                if ((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) < 0 && (((pilaIndentacion.peek().indentacion - indentacionInstruccionActual) % 4) != 0)) {
-                                    numeroError = 750; // Código de error para indentación incorrecta fuera de bloques
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
-                                    break;
-                                }
-                            } else {
-                                numeroError = 750; // Código de error para indentación incorrecta fuera de bloques
-                                incluirErrorEncontrado(tokenActual.getNumeroLinea(), numeroError);
-                            }
-
-                        }
-                        /*
-                        else if (!pilaIndentacion.isEmpty() && pilaIndentacion.size() > 1 && indentacionInstruccionActual == 0 ) {
-                            pilaIndentacion.pop();
-                        }
-                         */
-
-                        if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("except") && (tokenSiguiente.getNumeroLinea() == (lineaTokenExcept + 1))) {
-
-                            if (!tokenSiguiente.getLexema().equals("print")) {
-                                System.out.println("213 Instruccion en except que no comienza con print "
-                                        + tokenSiguiente.getLexema()
-                                        + "  linea " + tokenSiguiente.getNumeroLinea()
-                                        + "  linea de except " + lineaTokenExcept);
-                                numeroError = 861; // Instruccion en except que no comienza con print
-                                incluirErrorEncontrado(tokenSiguiente.getNumeroLinea(), numeroError);
-                            }
-
-                        }
-
-                        if (enBloqueExcept) {
-                            ++numeroInstruccionesEnBloqueExcept;
-                        }
-
-                        // enBloqueExcept = false;
-                        //Identifica si hay un nuevo bloque
-                        switch (tokenSiguiente.getLexema()) {
-                            case "def" -> {
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "def"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "def"));
-                                }
-                            }
-                            case "while" -> {
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "while"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "while"));
-                                }
-
-                            }
-                            case "try" -> {
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "try"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "try"));
-                                }
-
-                            }
-                            case "except" -> {
-                                lineaTokenExcept = tokenSiguiente.getNumeroLinea();
-                                System.out.println("254 lineaTokenExcept = " + lineaTokenExcept);
-                                enBloqueExcept = true;
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "except"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "except"));
-                                }
-
-                            }
-                            case "for" -> {
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "for"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "for"));
-                                }
-
-                            }
-                            case "if" -> {
-                                if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().indentacion == 0 && indentacionInstruccionActual == 0) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "if"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "if"));
-                                }
-
-                            }
-                            case "else" -> {
-                                if (!pilaIndentacion.isEmpty()) {
-                                    pilaIndentacion.push(new Bloque(indentacionInstruccionActual, "else"));
-                                } else {
-                                    nivelDeIndentacion = ((pilaIndentacion.peek().indentacion + 4));
-                                    pilaIndentacion.push(new Bloque(nivelDeIndentacion, "else"));
-                                }
-
-                            }
-                            default -> {
-                            }
-                        }
-
-                    }
-
+               
                     switch (tokenActual.getTipoDeToken()) {
                         case TipoDeToken.PALABRA_RESERVADA:
 
@@ -375,11 +449,13 @@ public class Parser {
                                 case "def":
                                     enBloqueDef = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    lineaTokenDef = numeroDeLineaTokenActual;
+
                                     indentacionDef = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
                                     int indiceTokenDef = lineaDeCodigoEnTokens.indexOf(tokenActual);
 
                                     System.out.println();
-                                    System.out.println("278 Encontramos una instruccion  def " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenDef);
+                                    System.out.println("683 Encontramos una instruccion  def " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenDef);
                                     System.out.println();
                                     boolean existenErrores = validarSintaxisDeDef(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenDef); //false no hay errores
 
@@ -400,23 +476,26 @@ public class Parser {
                                 case "try":
                                     enBloqueTry = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    lineaTokenTry = numeroDeLineaTokenActual;
+
                                     indentacionBloqueTry = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
                                     int indiceTokenTry = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     indentacionTry = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
 
-                                    System.out.println();
-                                    System.out.println("278 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenTry);
-                                    System.out.println();
+                                    System.out.println("710 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenTry);
+
                                     validarSintaxisDeLineaTry(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenTry);
                                     break;
                                 case "except":
                                     enBloqueExcept = true;
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
+                                    lineaTokenExcept = numeroDeLineaTokenActual;
+
                                     int indiceTokenExcept = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     indentacionExcept = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
 
                                     System.out.println();
-                                    System.out.println("278 Encontramos una instruccion  try " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenExcept);
+                                    System.out.println("723 Encontramos una instruccion  except " + " linea " + numeroDeLineaTokenActual + "  indice except " + indiceTokenExcept);
                                     System.out.println();
                                     validarSintaxisDeLineaExcept(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenExcept);
                                     break;
@@ -542,23 +621,6 @@ public class Parser {
                             }
 
 
-                            /*
-                            if (!existeInput) {
-
-                                if (esLlamadaAFuncion(lineaDeCodigoEnTokens, indiceTokenActual) && !enInstruccionPrint) {
-                                    System.out.println();
-                                    System.out.println("364 Una funcion no definida antes" + tokenActual.getLexema() + " " + numeroDeLineaTokenActual);
-                                    if (!esFuncion(tokenActual.getLexema())) {
-
-                                        System.out.println();
-                                        System.out.println("364 Una funcion no definida antes" + tokenActual.getLexema() + " " + numeroDeLineaTokenActual);
-                                        numeroError = 675;
-                                        incluirErrorEncontrado(numeroDeLineaTokenActual, numeroError);
-                                        validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
-                                    }
-                                }
-                            }
-                             */
                             break;
                         default:
                             break;
@@ -567,10 +629,43 @@ public class Parser {
                     if (lineasDeCodigoNoEvaluadas(lineaDeCodigoEnTokens)) {
                         i = lineaDeCodigoEnTokens.size() - 1;
                     }
+
                 }//fin for de lectura de tokens de una lineas de codigo
 
             }
         }//fin for lectura de lineas de codigo
+
+        if (enBloqueTry && !enBloqueExcept) {
+            incluirErrorEncontrado(lineaTokenTry, 758);
+        }
+
+        System.out.println("903 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo);
+        if (!pilaIndentacion.isEmpty() && !pilaIndentacion.peek().tipo.equals("program")) {
+            System.out.println("903 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo);
+            int k = 0;
+            while (k < pilaIndentacion.size()) {
+                if (pilaIndentacion.peek().tipo.equals("except")) {
+                    // Bloque except sin instrucciones
+                    incluirErrorEncontrado(lineaTokenExcept, 863);
+                    System.out.println("903 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo + "lineaTokenExcept " + lineaTokenExcept);
+                }
+                if (pilaIndentacion.peek().tipo.equals("while")) {
+                    // Bloque except sin instrucciones
+                    incluirErrorEncontrado(lineaTokenWhile, 863);
+                }
+                if (pilaIndentacion.peek().tipo.equals("def")) {
+                    // Bloque except sin instrucciones
+                    incluirErrorEncontrado(lineaTokenDef, 863);
+                }
+                if (pilaIndentacion.peek().tipo.equals("try")) {
+                    // Bloque except sin instrucciones
+                    incluirErrorEncontrado(lineaTokenTry, 757);
+                }
+                pilaIndentacion.pop();
+                ++k;
+            }
+        }
+
         System.out.println();
         System.out.println("LISTA CONTENIDO FINAL PARSE:");
         //imprimirListas(listaContenidoFinal);
@@ -581,6 +676,8 @@ public class Parser {
         System.out.println("PROGRAMA EN PYTHON REVISADO:");
         //imprimirListas(listaContenidoFinal);
         List<String> programaRevisado = generarProgramaEnPythonRevisado(listaContenidoFinal);
+
+        /*
         imprimirListas(programaRevisado);
         System.out.println();
 
@@ -595,13 +692,16 @@ public class Parser {
                 System.out.println(error.getKey() + "  " + error.getDescripcion());
             }
         }
+        
+         */
         System.out.println();
         System.out.println("370 PARSER TABLA DE SIMBOLOS ");
         imprimirTablaDeSimbolos();
 
-        System.out.println("616 Esta es pila = ");
+        System.out.println();
+        System.out.println("616 Esta es antes de salir del sintactico: ");
         // Recorrer e imprimir la pila sin eliminar elementos
-        pilaIndentacion.pop();
+        //pilaIndentacion.pop();
         for (Bloque bloque : pilaIndentacion) {
             System.out.println("Indentación: " + bloque.indentacion + ", Tipo: " + bloque.tipo);
         }
@@ -824,17 +924,6 @@ public class Parser {
             tokenSucesorDeExcept = lineaDeTokens.get((indiceTokenExcept + 1));
         }
 
-        //Valida la indentacion de except
-        /*
-        if (tokenIndentacion.getTipoDeToken() != null) {
-            if (Integer.parseInt(tokenIndentacion.getLiteral()) > 0) {
-                //return "Error: indentación incorrecta debe ser cero";
-                numeroError = 750;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-        }
-        
-         */
         //Valida que except este al comienzo de la linea de la instruccion while
         if (indiceTokenExcept > 1) {
             numeroError = 852;
@@ -894,16 +983,6 @@ public class Parser {
             tokenSucesorATry = lineaDeTokens.get((indiceTokenTry + 1));
         }
 
-        //Valida la indentacion de try
-        /*
-        if (tokenIndentacion.getTipoDeToken() != null) {
-            if (Integer.parseInt(tokenIndentacion.getLiteral()) > 0) {
-                //return "Error: indentación incorrecta debe ser cero";
-                numeroError = 750;
-                incluirErrorEncontrado(numeroDeLinea, numeroError);
-            }
-        }
-         */
         //Valida que try este al comienzo de la linea de la instruccion while
         if (indiceTokenTry > 1) {
             numeroError = 752;
@@ -1725,7 +1804,7 @@ public class Parser {
                             }
 
                             if (lineaDeTokens.size() >= 4 && token1.getLexema().equals("[") && token2.getLexema().equals("\"")) {
-                               //No hacemos nada
+                                //No hacemos nada
                             }
                             break;
                         case TipoDeToken.NUMERO_ENTERO:
@@ -1873,7 +1952,7 @@ public class Parser {
             // Imprimir el contenido de la pila en cada iteración
             //System.out.println(" 1152 Contenido de la pila: " + pila);
         }
-        //System.out.println(" 1154 Contenido de la pila.isEmpty(): " + pila.isEmpty());
+        //System.out.println(" 1921 Contenido de la pila.isEmpty(): " + pila.isEmpty());
         resultado = pila.isEmpty();
         //System.out.println("1156 Resultado final: " + resultado);
         return resultado;
