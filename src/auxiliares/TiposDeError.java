@@ -106,7 +106,7 @@ public class TiposDeError {
         errores.put(651, "Sintaxix incorrecta. Se esperaba def -> nombre_de_la_funcion -> ( -> parametros -> ) -> : ");
         errores.put(652, "La definición de una función debe comenzar con la palabra def.");
         errores.put(653, "Falta el nombre de la funcion.");
-        errores.put(654, "Bloque de código while sin instrucciones.");
+        errores.put(654, "Bloque de código 'def' sin instrucciones.");
         errores.put(655, "La definición de una nueva función debe comenzar solo con la palabra reservada def.");
         errores.put(656, "La instrucción def no se debe usar para terminar una linea de código");
         errores.put(657, "Sintaxis incorrecta. Se esperaba \":\" al final de la línea de código.");
@@ -135,7 +135,7 @@ public class TiposDeError {
         errores.put(702, "Error de sintaxis. Se espera un paréntesis de apertura \"(\" después de la función print.");
 
         //Errores relacionados con operador try
-        errores.put(750, "Error de sintaxis. Cambio inesperado en la indentación. Se requiere usar cuatro espacios por nivel de indentación.");
+        errores.put(750, "Indentación no coincide con alguno de los bloques definidos. Se requiere usar  0 o múltiplo de 4 espacios por nivel de indentación.");
         errores.put(751, "Sintaxis incorrecta. Se esperaba try -> : ");
         errores.put(752, "Sintaxis incorrecta. La línea de la instrucción try debe comenzar la palabra try");
         errores.put(753, "Sintaxis incorrecta. La línea de la instrucción try debe terminar con :");
@@ -144,6 +144,7 @@ public class TiposDeError {
         errores.put(756, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción try");
         errores.put(757, "Bloque try sin instrucciones.");
         errores.put(758, "Error de sintaxis. Falta instruccion 'except' para cerrar el bloque 'try' abierto.");
+        errores.put(759, "Error de sintaxis. Falta instruccion 'try'.");
 
         //Errores relacionados con operador except
         errores.put(850, "Error de sintaxis. Cambio en la indentación. Cualquier instrucción fuera de un bloque debe tener indentación igual a 0");
@@ -159,6 +160,8 @@ public class TiposDeError {
         errores.put(860, "Bloque except sin instrucción.");
         errores.put(861, "Error de sintaxis. La línea de código siguiente a except debe comenzar con el comando print.");
         errores.put(863, "Error de sintaxis. Bloque except sin instrucciones.");
+        errores.put(864, "Error de sintaxis. No existe un bloque 'try' definido antes de 'except'.");
+        errores.put(865, "Error de sintaxis. Se esperaba 'except' para cerrar el bloque 'try'.");
 
     }
 
