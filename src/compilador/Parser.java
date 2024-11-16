@@ -149,8 +149,9 @@ public class Parser {
                 incluirErrorEncontrado(tryExceptBalanceados.linea, 759);
             }
         } else {
-            System.out.println("152Los bloques try y except están balanceados.");
+            System.out.println("152 Los bloques try y except están balanceados.");
         }
+
         //for (List<Token> lineaDeCodigoEnTokens : listaDeTokens) {
         //if (!lineaDeCodigoEnTokens.isEmpty()) {
         for (int linea = 0; linea < listaDeTokens.size(); linea++) {
@@ -160,9 +161,9 @@ public class Parser {
                 int numeroError = -1;
 
                 System.out.println();
-                System.out.println("133 LA LINEA ES " + (linea + 1));
+                System.out.println("168 INICIANDO LA LINEA  " + (linea + 1));
 
-                System.out.println("136 Esta es pila = ");
+                System.out.println("170 Esta es pila = ");
                 // Recorrer e imprimir la pila sin eliminar elementos
                 for (Bloque bloque : pilaIndentacion) {
                     System.out.println("Indentación: " + bloque.indentacion + ", Tipo: " + bloque.tipo);
@@ -170,53 +171,66 @@ public class Parser {
                 System.out.println();
                 System.out.println();
 
-                System.out.println("143 la linea de tokens actual es:");
+                System.out.println("178 La linea de tokens actual es:");
                 for (int i = 0; i < lineaDeCodigoEnTokens.size(); i++) {
                     System.out.print(lineaDeCodigoEnTokens.get(i).getLexema() + " ->  ");
                 }
                 System.out.println();
                 System.out.println();
 
-                //Leemos el token de indentacion
-                //Para conocer la indentacion de la linea de codigo actual
+                //Leemos el token de indentacion para conocer la indentacion de la linea de codigo actual
                 tokenActual = lineaDeCodigoEnTokens.get(0);
 
-                //Leemos el token siguiente al actual
-                //Para observa cual es el primer token de la linea de codigo.
+                //Leemos el token siguiente al de indentacion para observa cual es el primer token de la linea de codigo.
                 tokenSiguiente = new Token();
                 if (lineaDeCodigoEnTokens.size() > 2) {
                     tokenSiguiente = lineaDeCodigoEnTokens.get(1);
                     //System.out.println("151 token siguiente es " + tokenSiguiente.getLexema() + "  en linea " + tokenSiguiente.getNumeroLinea());
                 }
-                System.out.println("191 token siguiente es " + tokenSiguiente.getLexema() + "  en linea " + tokenSiguiente.getNumeroLinea());
+
+                System.out.println("191 La indentacion de la linea es  " + tokenActual.getLiteral() + "  token siguiente es " + tokenSiguiente.getLexema() + " en linea " + tokenSiguiente.getNumeroLinea());
                 System.out.println();
-                System.out.println("193 linea =  " + linea + " lineaDeCodigoEnTokens size =  " + lineaDeCodigoEnTokens.size());
 
-                //Si la instruccion actual esta dentro del bloque un determinado bloque aumentamos su contador de instrucciones
-                System.out.println("196 La instruccion es " + tokenActual.getLexema() + " enBloqueTry es " + enBloqueTry);
-                System.out.println("197 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueTry es " + enBloqueTry);
+                //Contando instrucciones de cada bloque def
+                System.out.println("195 La instruccion es " + tokenActual.getLexema() + " enBloqueDef es " + enBloqueDef + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueDef);
+                if (enBloqueDef) {
+                    ++cantidadDeInstruccionesBloqueDef;
+                }
+                System.out.println("199 La instruccion es " + tokenActual.getLexema() + " enBloqueDef es " + enBloqueDef + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueDef);
 
+                //Contando instrucciones de cada bloque while
+                System.out.println("207 La instruccion es " + tokenActual.getLexema() + " enBloqueWhile es " + enBloqueWhile + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueWhile);
+                if (enBloqueWhile) {
+                    ++cantidadDeInstruccionesBloqueWhile;
+                }
+                System.out.println("206 La instruccion es " + tokenActual.getLexema() + " enBloqueWhile es " + enBloqueWhile + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueWhile);
+
+                //Contando instrucciones de cada bloque try
+                System.out.println("209 La instruccion es " + tokenActual.getLexema() + " enBloqueTry es " + enBloqueTry + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueTry);
                 if (enBloqueTry && !tokenSiguiente.getLexema().equals("except")) {
                     ++cantidadDeInstruccionesBloqueTry;
                 }
+                System.out.println("213 La instruccion es " + tokenActual.getLexema() + " enBloqueTry es " + enBloqueTry + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueTry);
 
+                //Contando instrucciones de cada bloque except
+                System.out.println("216 La instruccion es " + tokenActual.getLexema() + " enBloqueExcept es " + enBloqueExcept + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueExcept);
+                if (enBloqueExcept) {
+                    ++cantidadDeInstruccionesBloqueExcept;
+                }
+                System.out.println("220 La instruccion es " + tokenActual.getLexema() + " enBloqueExcept es " + enBloqueExcept + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueExcept);
                 System.out.println();
-                System.out.println("203 En bloque try " + enBloqueTry + " cantidad de instruccines " + cantidadDeInstruccionesBloqueTry);
+                System.out.println("222 La indentacionInstruccionActual antes de asignar la nueva indentacion es: " + indentacionInstruccionActual);
 
-                //Comprobamos la indentacion antes de clasificar los tokens y verificar la sintaxis.
-                //El primer token siempre es el token de indentacion
-                //if (linea == 0) {
-                System.out.println("208 indentacionInstruccionActual antes de asignar la de la linea de tokens es " + indentacionInstruccionActual);
                 //Almancena la indentacion de la instruccion actual no importa cual sea la instruccion
-                //indentacionInstruccionActual = Integer.parseInt(lineaDeCodigoEnTokens.getFirst().getLiteral());
                 indentacionInstruccionActual = Integer.parseInt(tokenActual.getLiteral());
 
-                System.out.println("213  en la linea " + linea + " la indentacionInstruccionActual = " + indentacionInstruccionActual);
-
+                System.out.println("227 En la linea: " + linea + " la indentacionInstruccionActual es:  " + indentacionInstruccionActual);
+                System.out.println();
+                
                 //Verifica si el peek de la pila de indentacion es 'if' cuando en la linea que leemos existe 'else'
-                //porque 'if' se cierra al aparecer 'else'. Si existe 'if' (como debe ser) lo elimina de la pila
+                //porque 'if' se cierra al aparecer 'else'. Si existe 'if' lo elimina de la pila
                 if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("if") && tokenSiguiente.getLexema().equals("else")) {
-                    System.out.println("219  tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
+                    System.out.println("233  tokenSiguiente " + tokenSiguiente.getLexema() + " indentacionInstruccionActual  " + indentacionInstruccionActual);
                     pilaIndentacion.pop(); //Sacamos if porque encontramos else
                     enBloqueIf = false; //Cerramos el bloque try
                 }
@@ -224,18 +238,19 @@ public class Parser {
                 //Verifica si la linea actual tiene una indentacion mayor que la indentacion de bloque 'programa', es decir, mayor que cero.
                 if (!pilaIndentacion.isEmpty() && pilaIndentacion.peek().tipo.equals("programa") && indentacionInstruccionActual > 0) {
                     incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);// Código de error para indentación incorrecta 
-                    System.out.println("226  el nivel es programa en linea " + linea + " la indentacionInstruccionActual = " + indentacionInstruccionActual + " y el tope de pila es " + pilaIndentacion.peek().indentacion);
+                    System.out.println("241 El nivel de indentacion es programa. Leyendo linea: " + linea + " la indentacionInstruccionActual: " + indentacionInstruccionActual + " y la indentacion del bloque (el tope de pila) es: " + pilaIndentacion.peek().indentacion);
                 }
 
-                //Asumimos que estamos en un bloque con !pilaIndentacion.peek().tipo.equals("programa") entonces veficamos que la instruccion tenga una indentacion de 
-                //acuerdo con el bloque, por lo que deberia ser pilaIndentacion.peek().indentacion + 4 
-                System.out.println("239 instruccion " + tokenSiguiente.getLexema() + " indentacionInstruccionActual " + indentacionInstruccionActual + " indentacion tope del bloque es  " + (pilaIndentacion.peek().indentacion + 4));
+                
+                //Si estamos en un bloque diferente de 'programa', verificamos que toda instruccion tenga una indentacion igual a pilaIndentacion.peek().indentacion + 4
+                System.out.println("246 La instruccion es " + tokenSiguiente.getLexema() + " la indentacionInstruccionActual es: " + indentacionInstruccionActual + " indentacion del inicio de bloque es: " + (pilaIndentacion.peek().indentacion ));
                 if (!pilaIndentacion.isEmpty() && !pilaIndentacion.peek().tipo.equals("programa") && indentacionInstruccionActual != pilaIndentacion.peek().indentacion + 4) {
 
-                    System.out.println("242 instruccion " + tokenSiguiente.getLexema() + " indentacionInstruccionActual " + indentacionInstruccionActual + " y indentacion tope de pila  " + pilaIndentacion.peek().indentacion);
-                    //Verifica si la instruccion que leemos tiene una identacion mayor o menor que el bloque donde deberia estar
+                    System.out.println("249 La instruccion es " + tokenSiguiente.getLexema() + " indentacionInstruccionActual es: " + indentacionInstruccionActual + " y indentacion dentro del bloque debe ser igual a:  " + (pilaIndentacion.peek().indentacion+ 4));
+                    
+                    //Verifica si la instruccion que leemos tiene una identacion mayor o menor que el bloque donde se encuentra
                     if (indentacionInstruccionActual < pilaIndentacion.peek().indentacion || indentacionInstruccionActual > pilaIndentacion.peek().indentacion) {
-                        System.out.println("245 instruccion " + tokenSiguiente.getLexema() + " indentacionInstruccionActual " + indentacionInstruccionActual + " y indentacion tope de pila  " + pilaIndentacion.peek().indentacion);
+                        System.out.println("253 La instruccion es " + tokenSiguiente.getLexema() + " indentacionInstruccionActual es: " + indentacionInstruccionActual + " y indentacion del inicio de bloque es:  " + pilaIndentacion.peek().indentacion);
                         //Verifica si el peek de la pila de indentacion es 'try' cuando en la linea que leemos existe 'except'
                         //porque 'try' se cierra al aparecer 'except'. Si existe try (como debe ser) lo elimina de la pila
                         //Un except puede cerrar otros except anidados
@@ -862,6 +877,50 @@ public class Parser {
         }
         return lineaNoEvaluada;
 
+    }
+
+    public Map<String, Integer> contarInstrucciones(List<List<Token>> listaDeTokens) {
+
+        boolean enBloque = false;
+        String tipoBloque = null;
+        int indentacionBloque = 0;
+
+        Map<String, Integer> contadorBloques = new HashMap<>();
+        contadorBloques.put("def", 0);
+        contadorBloques.put("while", 0);
+        contadorBloques.put("try", 0);
+        contadorBloques.put("except", 0);
+
+        for (List<Token> tokens : listaDeTokens) {
+
+            int indentacionActual = Integer.parseInt(tokens.get(0).getLiteral());
+            String instruccionDeBloque = tokens.get(1).getLexema();
+
+            if (enBloque) {
+                if (indentacionActual <= indentacionBloque) {
+                    enBloque = false;
+                    tipoBloque = null;
+                } else {
+                    if ("except".equals(tipoBloque) && indentacionActual == indentacionBloque + 4) {
+                        contadorBloques.put(tipoBloque, contadorBloques.get(tipoBloque) + 1);
+                        enBloque = false;
+                        tipoBloque = null;
+                    } else if (!"except".equals(tipoBloque)) {
+                        contadorBloques.put(tipoBloque, contadorBloques.get(tipoBloque) + 1);
+                    }
+                }
+            }
+
+            if (!enBloque) {
+                if (instruccionDeBloque.equals("def") || instruccionDeBloque.equals("while") || instruccionDeBloque.equals("try") || instruccionDeBloque.equals("except")) {
+                    enBloque = true;
+                    tipoBloque = instruccionDeBloque;
+                    indentacionBloque = indentacionActual;
+                }
+            }
+        }
+
+        return contadorBloques;
     }
 
     public BloqueTryExcept verificarBloqueTryExceptBalanceado(List<List<Token>> listaDeTokens) {
