@@ -18,9 +18,11 @@ public class TablaDeSimbolos {
         tabla = new HashMap<>();
     }
 
+    
     public void agregarSimbolo(String nombreDeVariable, Simbolo datosDeVariable) {
         tabla.put(nombreDeVariable, datosDeVariable);
     }
+   
 
     public Simbolo obtenerSimbolo(String nombreDeVariable) {
         return tabla.get(nombreDeVariable);

@@ -73,39 +73,8 @@ public class Lexer {
             nuevoContenido = new LineaDeContenido(lineaActual, lineaDeCodigoActual);
             listaContenidoFinal.add(nuevoContenido);
 
-            //Pattern pattern = Pattern.compile("print\\(f?\".*\".*\\)| print\\(\"\\|.*\"\\)");
-            //Matcher matcher = pattern.matcher(lineaDeCodigoActual);
-            //Problemas con algunas lineas if que contiene == asi que combinamos enfoques
-            /*
-            if (lineaDeCodigoActual.contains("print(f\"")
-                    || lineaDeCodigoActual.contains("print(\"|\",")
-                    || lineaDeCodigoActual.contains("if")
-                    || lineaDeCodigoActual.contains("all(")
-                    || lineaDeCodigoActual.contains(" fila, columna")
-                    || lineaDeCodigoActual.contains("resultado = f\"\\n")
-                    || lineaDeCodigoActual.contains("if jugador_actual ==")
-                    || lineaDeCodigoActual.contains("tablero[fila][columna]")
-                    || lineaDeCodigoActual.contains("tablero = [[")
-                   ) {
-
-                //System.out.println();
-                //System.out.println("84 Saldo de linea: " + lineaDeCodigoActual + " en la linea " + lineaActual);
-                if (existeComentarioDeUnaLinea(lineaDeCodigoActual)) {
-                    cantidadComentarios++;
-                }
-                // Saltar la línea
-                continue;
-            } else {
-                //System.out.println();
-                //System.out.println("89 No saldo la linea: " + lineaDeCodigoActual + " en la linea " + lineaActual);
-            }
-             */
-            //Agrega la linea que actualmente se analiza al archivo de salida 
-            //registrarLineaAnalizadaEnProgramaPythonRevisado(lineaDeCodigoActual, numeroLineaActual);
-            //listaContenidoFinal.add(nuevoContenido);
-            //System.out.println();
             //System.out.println("76 La linea que estamos leyendo: " + lineaDeCodigoActual + " en la linea " + lineaActual);
-            //Verifica si la linea esta en blanco 
+            //Verifica si la linea esta en blanco (linea sin codigo)
             if (lineaDeCodigoActual.isBlank() || lineaDeCodigoActual.isEmpty()) {
                 continue;
             }
@@ -129,7 +98,7 @@ public class Lexer {
             int contadorIndentacion = contarIndentacion(lineaDeCodigoActual);
 
             System.out.println();
-            System.out.println("129 La linea de codigo actual es: " + lineaDeCodigoActual + " en la linea " + lineaActual);
+            System.out.println("129 La linea de codigo actual es: " + lineaDeCodigoActual + " el numero de la linea " + lineaActual);
 
             //Separa cada linea de codigo en Tokens, quitamos la espacios vacios antes del primer token de la linea.
             StringTokenizer tokenizer = new StringTokenizer(lineaDeCodigoActual.trim(), " \n()[]{}=<>*/+-:\",.", true);
@@ -146,6 +115,7 @@ public class Lexer {
             //Almanacena los Token clasificados de la linea actual de codigo
             tokens = new ArrayList<Token>();
 
+            //Agregamos el token de indentacion
             agregarNuevoToken(TipoDeToken.INDENTACION, null, String.valueOf(contadorIndentacion), numeroLineaActual);
             contadorIndentacion = 0;
 
@@ -162,7 +132,9 @@ public class Lexer {
                 String tokenActual = arregloDeTokens[indice];
                 String tokenSiguiente = " ";
                 String tokenSiguienteSiguiente = " ";
+                String tokenAnterior = " ";
 
+            
                 if (indice == arregloDeTokens.length - 1) {
                     tokenSiguiente = " ";
                 } else {
@@ -185,7 +157,7 @@ public class Lexer {
                         if (tokenSiguiente.equals("+")) {
                             agregarNuevoToken(TipoDeToken.UNARIO_SUMA, "++", numeroLineaActual);
                             existeOperadorUnario = true;
-                            
+
                         } else if (tokenSiguiente.equals("=")) {
                             agregarNuevoToken(TipoDeToken.SUMA_Y_ASIGNACION, "+=", numeroLineaActual);
                             ++indice;
@@ -390,132 +362,6 @@ public class Lexer {
 
                                 indice = extraerArgumentoDeUnaFuncion(arregloDeTokens, indice);
 
-                                /*
-                                if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
-                                    tokenSiguiente = arregloDeTokens[indice + 1]; //Obtiene el token siguiente a input
-                                    System.out.println(" 377 tokenSiguiente " + tokenSiguiente);
-                                }
-                                if (indice + 2 < arregloDeTokens.length) { //Valida si hay mas tokens
-
-                                    tokenSiguienteSiguiente = arregloDeTokens[indice + 2]; //Obtiene el token siguiente a input
-                                    System.out.println(" 382 tokenSiguienteSiguiente = " + tokenSiguienteSiguiente);
-                                }
-                              
-                                if (!tokenSiguiente.equals("(") && !tokenSiguienteSiguiente.equals("\"")) {
-                                    inicio = indice + 1;
-                                } 
-                                 if (tokenSiguiente.equals("(") && !tokenSiguienteSiguiente.equals("\"")) {
-                                    inicio = indice + 2;
-                                } else {
-                                    inicio = indice + 1;
-                                }
-                                
-                                System.out.println("392 inicio = " + inicio);
-                                if (inicio >= 1) {
-                                    argumentoDeLaFuncion = extraerArgumentoDeUnaFuncion(arregloDeTokens, indice);
-                                    System.out.println("392 El argumento de print o input es: " + argumentoDeLaFuncion[0] + " y el indice es " + indice);
-                                    // Dividir la cadena en palabras usando espacios como delimitadores
-                                    String[] words = argumentoDeLaFuncion[0].split("\\s+");
-                                    System.out.println();
-                                    System.out.println(" 396Contenido de words");
-                                    for (String str : words) {
-                                        System.out.println(str);
-                                    }
-
-                                    //  System.out.println(" 435 el tamano de word es  " + words.length);
-                                    // Verificar si hay más de una palabra
-                                    if (words.length > 1) {
-                                        agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, argumentoDeLaFuncion[0], null, this.numeroLineaActual);
-                                    } else {
-                                        //    System.out.println(" 440 El StringBuilder contiene solo una palabra." + content);
-                                        if (palabraReservada.esPalabraReservada(argumentoDeLaFuncion[0].trim())) {
-                                            agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, argumentoDeLaFuncion[0], null, this.numeroLineaActual);
-                                            //      System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
-                                        } else if (verificarPrimerCaracterDeUnIdentificador(argumentoDeLaFuncion[0], numeroLineaActual)
-                                                && verificarSecuenciaDeCaracteresDeUnIdentificador(argumentoDeLaFuncion[0], numeroLineaActual)) {
-                                            //    System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
-
-                                            //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
-                                            Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, argumentoDeLaFuncion[0].trim(), null, this.numeroLineaActual);
-                                            tokens.add(nuevoToken);
-
-                                            //Solo probando construir una tabla de simbolos
-                                            //incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
-                                            //  System.out.println("455 LEXER TABLA DE SIMBOLOS ");
-                                            //imprimirTablaDeSimbolos();
-                                        } else {
-                                            agregarNuevoToken(TipoDeToken.DESCONOCIDO, argumentoDeLaFuncion[0].trim(), null, this.numeroLineaActual);
-                                            //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
-                                        }
-                                    }
-                                }
-
-                            }
-                            existeInput = false;
-                            existePrint = false;
-                            if (argumentoDeLaFuncion[1] != null) {
-                                indice = Integer.parseInt(argumentoDeLaFuncion[1]);
-                            }
-                                 */
-
- /*
-                            if (existeInput || existePrint) {
-                                textoEntreComillas.append(tokenActual.trim());
-                                textoEntreComillas.append(" ");
-                                String tokenSiguienteDeInput = " ";
-                                if (indice + 1 < arregloDeTokens.length) { //Valida si hay mas tokens
-                                    // System.out.println(" 413 (indice < arregloDeTokens.length): " + (indice < arregloDeTokens.length) + " el indice es " + indice);
-                                    tokenSiguienteDeInput = arregloDeTokens[indice + 1]; //Obtiene el token siguiente a input
-                                    //System.out.println(" 415 el indice es " + indice + " y el token en el arreglo es " + tokenSiguienteDeInput);
-                                }
-                                if (tokenSiguienteDeInput.equals("\"") || tokenSiguienteDeInput.equals(")") || indice == arregloDeTokens.length) {
-                                    existeInput = false;
-                                    existePrint = false;
-
-                                    // System.out.println(" 420 El texto entre comillas es  " + textoEntreComillas.toString() + " y el indice es " + indice);
-                                    // Convertir el contenido del StringBuilder a una cadena
-                                    String content = textoEntreComillas.toString().trim();
-                                    textoEntreComillas.setLength(0); //borramos el StringBuilder 
-                                    // System.out.println(" 350 el indice es " + indice + " el texto entre comillas es " + textoEntreComillas);
-
-                                    // Dividir la cadena en palabras usando espacios como delimitadores
-                                    String[] words = content.split("\\s+");
-                                    System.out.println();
-                                    System.out.println(" 356 estee es el contenido de words");
-                                    for (String str : words) {
-                                        System.out.println(str);
-                                    }
-
-                                    //  System.out.println(" 435 el tamano de word es  " + words.length);
-                                    // Verificar si hay más de una palabra
-                                    if (words.length > 1) {
-                                        agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, content.trim(), null, this.numeroLineaActual);
-                                    } else {
-                                        //    System.out.println(" 440 El StringBuilder contiene solo una palabra." + content);
-                                        if (palabraReservada.esPalabraReservada(content.trim())) {
-                                            agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, content.trim(), null, this.numeroLineaActual);
-                                            //      System.out.println(" 443 encontro una palabra reservada en el input " + content.trim() + " en linea " + numeroLineaActual + "\n");
-                                        } else if (verificarPrimerCaracterDeUnIdentificador(content, numeroLineaActual)
-                                                && verificarSecuenciaDeCaracteresDeUnIdentificador(content, numeroLineaActual)) {
-                                            //    System.out.println(" 446 Este es el textoEntreComillas que es un identificador " + content.trim() + " en linea " + numeroLineaActual + "\n");
-
-                                            //agregarNuevoToken(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
-                                            Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, content.trim(), null, this.numeroLineaActual);
-                                            tokens.add(nuevoToken);
-
-                                            //Solo probando construir una tabla de simbolos
-                                            //incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
-                                            //  System.out.println("455 LEXER TABLA DE SIMBOLOS ");
-                                            //imprimirTablaDeSimbolos();
-                                        } else {
-                                            agregarNuevoToken(TipoDeToken.DESCONOCIDO, content.trim(), null, this.numeroLineaActual);
-                                            //  System.out.println(" 379 SE AGREGO UN TOKE DESCONOCIDO:   " + content.trim() + " en linea " + numeroLineaActual + "\n");
-                                        }
-                                    }
-                                }
-
-                            }
-                                 */
                             }
                         } else if (esNumeroEntero(tokenActual.trim())) {
                             agregarNuevoToken(TipoDeToken.NUMERO_ENTERO, tokenActual.trim(), null, this.numeroLineaActual);
@@ -530,11 +376,11 @@ public class Lexer {
                             Token nuevoToken = new Token(TipoDeToken.IDENTIFICADOR, tokenActual.trim(), null, this.numeroLineaActual);
                             tokens.add(nuevoToken);
 
-                            //Solo probando construir una tabla de simbolos
+                            //Contruyendo la tabla de simbolos
                             incluirNuevaVariableEnTablaDeSimbolos(nuevoToken);
 
                             System.out.println();
-                            System.out.println("440 - LEXER - TABLA DE SIMBOLOS ");
+                            System.out.println("382 - LEXER - TABLA DE SIMBOLOS ");
                             imprimirTablaDeSimbolos();
 
                         } else {
@@ -544,7 +390,7 @@ public class Lexer {
                         break;
                 } //fin switch
 
-            }//fir FOR arregloTokens
+            }//fin del 'for' que recorre cada linea de codigo token por token  en el  'arregloTokens'
 
             //System.out.println(" 368 agregadon token:   " + tokens.toString() + " en linea " + numeroLineaActual + "\n");
             listaDeTokens.add(tokens);
@@ -600,323 +446,6 @@ public class Lexer {
         int inicio = indiceTokenActual + 1;
         int fin = arregloDeTokens.length - 1; // Por defecto, hasta el final del arreglo
 
-        /*
-        TipoDeToken tipo = null;
-
-        for (int i = inicio; i <= fin; i++) {
-            texto.append(arregloDeTokens[i]);
-            ++contador;
-
-        }
-        String str = texto.toString();
-        System.out.println("598 texto entre parentesis " + str);
-
-        boolean startsWithParenthesisAndQuote = str.matches("^\\(\".*");
-        boolean endsWithQuoteAndParenthesis = str.matches(".*\"\\)$");
-
-        boolean startsWithParenthesisAndNotQuote = str.matches("^\\([^\"].*");
-
-        boolean startsWithParenthesis = str.matches("^\\(.*");
-        boolean startsWithQuote = str.matches("^\".*");
-
-        boolean endsWithParenthesis = str.matches(".*\\)$");
-        boolean endsWithQuote = str.matches(".*\"$");
-
-        System.out.println("605 startsWithParenthesisAndQuote " + startsWithParenthesisAndQuote);
-        System.out.println("607 endsWithQuoteAndParenthesis " + endsWithQuoteAndParenthesis);
-
-        //caso: print ("texto")
-        if (startsWithParenthesisAndQuote && endsWithQuoteAndParenthesis) {
-            System.out.println("618");
-            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-
-            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
-            primerIndiceDeInicioComillas = str.indexOf('\"');
-            inicio = 2; //inicio = primerIndiceDeInicioComillas + 1;
-
-            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
-            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
-            fin = str.length() - 2; //fin = ultimoIndiceDeFinComillas;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return (ultimoIndiceDeParentesisDerecho + 1);
-        }
-
-        //caso: print ("texto" o print ("texto)
-        if (startsWithParenthesisAndQuote && (endsWithParenthesis || endsWithQuote)) {
-            System.out.println("641");
-            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-
-            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
-            primerIndiceDeInicioComillas = str.indexOf('\"');
-            inicio = 2; //inicio = primerIndiceDeInicioComillas + 1;
-
-            fin = str.length() - 1;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            if (endsWithQuote) {
-                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            }
-            if (endsWithParenthesis) {
-                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-            }
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return (fin + 1);
-        }
-
-        //caso: print ("texto
-        if (startsWithParenthesisAndQuote && !endsWithParenthesis && !endsWithQuote) {
-            System.out.println("666");
-            agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-
-            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
-            primerIndiceDeInicioComillas = str.indexOf('\"');
-            inicio = 2; // inicio = primerIndiceDeInicioComillas + 1;
-
-            fin = str.length();
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return fin;
-        }
-
-        System.out.println("632  startsWithParenthesisAndNotQuote " + startsWithParenthesisAndNotQuote);
-
-        //caso: print (texto") o "texto")
-        if ((startsWithParenthesis || startsWithQuote) && endsWithQuoteAndParenthesis) {
-            System.out.println("687");
-
-            if (startsWithParenthesis) {
-                agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
-            }
-            if (startsWithQuote) {
-                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            }
-
-            primerIndiceDeParentesisIzquierdo = str.indexOf('(');
-            inicio = 1; //inicio = primerIndiceDeParentesisIzquierdo + 1;
-
-            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
-            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
-            fin = str.length() - 2;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return (fin + 2);
-        }
-
-        //caso: print texto")
-        if (!startsWithParenthesis && !startsWithQuote && endsWithQuoteAndParenthesis) {
-            System.out.println("714");
-            inicio = 0;
-
-            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
-            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
-            fin = str.length() - 2;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return (fin + 2);
-        }
-
-        //caso: print (texto" o (texto) o "texto" o "texto)
-        if ((startsWithParenthesis || startsWithQuote) && (endsWithParenthesis || endsWithQuote)) {
-            System.out.println("732");
-            if (startsWithParenthesis) {
-                agregarNuevoToken(TipoDeToken.PARENTESIS_IZQUIERDO, "(", null, this.numeroLineaActual);
-            }
-            if (startsWithQuote) {
-                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            }
-
-            inicio = 1;
-
-            ultimoIndiceDeParentesisDerecho = str.lastIndexOf(')');
-            ultimoIndiceDeFinComillas = str.lastIndexOf('\"');
-            fin = str.length() - 1;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            if (endsWithQuote) {
-                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            }
-            if (endsWithParenthesis) {
-                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-            }
-
-            System.out.println("624 ultimoIndiceDeParentesisDerecho + 1 " + ultimoIndiceDeParentesisDerecho + 1);
-            return (fin + 2);
-        }
-
-        //caso: print texto" o print texto)
-        if (!startsWithParenthesis && !startsWithQuote && (endsWithParenthesis || endsWithQuote)) {
-            System.out.println("762");
-            inicio = 0;
-            fin = str.length() - 1;
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            if (endsWithQuote) {
-                agregarNuevoToken(TipoDeToken.COMILLAS, "\"", null, this.numeroLineaActual);
-            }
-            if (endsWithParenthesis) {
-                agregarNuevoToken(TipoDeToken.PARENTESIS_DERECHO, ")", null, this.numeroLineaActual);
-            }
-
-            //System.out.println("624 subStr " + subStr);
-            return (fin + 1);
-        }
-        //caso: print (texto o print "texto
-        if ((startsWithParenthesis || startsWithQuote) && !endsWithParenthesis && !endsWithQuote && !endsWithQuoteAndParenthesis) {
-            System.out.println("780");
-            inicio = 1;
-            fin = str.length();
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            //System.out.println("624 subStr " + subStr);
-            return (fin + 1);
-        }
-
-        //caso: print texto 
-        if (!startsWithParenthesis && !startsWithQuote && !endsWithParenthesis && !endsWithQuote) {
-            System.out.println("793");
-            inicio = 0;
-            fin = str.length();
-
-            String subStr = str.substring(inicio, fin).trim();
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("TEXTO_ENTRE_COMILLAS")) {
-                agregarNuevoToken(TipoDeToken.TEXTO_ENTRE_COMILLAS, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("PALABRA_RESERVADA")) {
-                agregarNuevoToken(TipoDeToken.PALABRA_RESERVADA, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("IDENTIFICADOR")) {
-                agregarNuevoToken(TipoDeToken.IDENTIFICADOR, subStr, null, this.numeroLineaActual);
-            }
-            if (tipo != null && verificarTipoTokenDeUnTextoEntreComillas(subStr).toString().equals("DESCONOCIDO")) {
-                agregarNuevoToken(TipoDeToken.DESCONOCIDO, subStr, null, this.numeroLineaActual);
-            }
-
-            //System.out.println("624 subStr " + subStr);
-            return (fin + 1);
-        }
-        return -1;
-         */
         for (int i = inicio; i <= fin; i++) {
             texto.append(arregloDeTokens[i]);
 
@@ -1185,7 +714,6 @@ public class Lexer {
         return tablaDeSimbolos;
     }
 
-    
     public static String[] convertirStringTokenizerEnArregloDeStrings(StringTokenizer tokenizer) {
         String[] arreglo = new String[tokenizer.countTokens()];
         int j = 0;
@@ -1332,6 +860,19 @@ public class Lexer {
         Simbolo simbolo = new Simbolo(tipo, literal, numeroLinea);
         tablaDeSimbolos.agregarSimbolo(nombre, simbolo);
 
+    }
+
+    public void modificarTipoSimboloEnTablaSimbolos(String nombre, String nuevoTipo) {
+        System.out.println();
+        System.out.println("867 Token sucesor def " + nombre);
+        System.out.println();
+        Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
+        System.out.println();
+        System.out.println("871 sucesor def " + simbolo.getTipo());
+        System.out.println();
+        if (simbolo != null) {
+            simbolo.setTipo(nuevoTipo);
+        }
     }
 
     public void imprimirTablaDeSimbolos() {
