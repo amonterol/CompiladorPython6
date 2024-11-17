@@ -98,7 +98,7 @@ public class TiposDeError {
         errores.put(626, "Sintaxis incorrecta. El operador \":\" debe ser el último token de la línea.");
         errores.put(627, "Sintaxis incorrecta. Uso incorrecto del operador aritmetico");
         errores.put(628, "Sintaxis incorrecta. Uso incorrecto del operador relacional");
-        errores.put(629, "Sintaxis incorrecta. Bloque de código while sin instrucciones.");
+        errores.put(629, "Error de sintaxis. El bloque 'while' no contiene instrucciones.");
         errores.put(630, "Sintaxis incorrecta. Indentación incorrecta en bloque de código while.");
 
         //Errores relacionados con operador def
@@ -116,7 +116,7 @@ public class TiposDeError {
         errores.put(661, " El operador \":\" debe ser el último token de la línea");
         errores.put(662, "Una palabra reservada no puede ser usada como nombre de la función.");
         errores.put(663, "El nombre de la función debe ser un identificador válido");
-        errores.put(664, "Falta bloque de código.");
+        errores.put(664, "Error de sintaxis. El bloque 'def' no contiene instrucciones.");
         errores.put(665, "Faltan los paréntesis y los parametros.");
         errores.put(666, "Sintaxis incorrecta. Se espera el nombre de la función, los paréntesis (), los parámetros de la función (si los hay) y los dos puntos : después de def.");
         errores.put(667, "Sintaxis incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
@@ -143,7 +143,7 @@ public class TiposDeError {
         errores.put(754, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
         errores.put(755, "Sintaxis incorrecta. No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
         errores.put(756, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción try");
-        errores.put(757, "Bloque try sin instrucciones.");
+        errores.put(757, "Error de sintaxis. El bloque 'try' no contiene instrucciones.");
         errores.put(758, "Error de sintaxis. Falta instruccion 'except' para cerrar el bloque 'try' abierto.");
         errores.put(759, "Error de sintaxis. Falta instruccion 'try'.");
 
@@ -155,10 +155,10 @@ public class TiposDeError {
         errores.put(854, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
         errores.put(855, "Sintaxis incorrecta. No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
         errores.put(856, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción except");
-        errores.put(857, "Bloque except sin instrucciones.");
+        errores.put(857, "Error de sintaxis. El bloque 'except' no contiene instrucciones.");
         errores.put(858, "Sintaxis incorrecta. Falta tipo de excepción.");
         errores.put(859, "Sintaxis incorrecta. No es permitido usar el nombre de una variable como tipo de excepción.");
-        errores.put(860, "Bloque except sin instrucción.");
+        errores.put(860, "Error de sintaxis. Bloque de código sin instrucción.");
         errores.put(861, "Error de sintaxis. La línea de código siguiente a except debe comenzar con el comando print.");
         errores.put(863, "Error de sintaxis. Bloque except sin instrucciones.");
         errores.put(864, "Error de sintaxis. No existe un bloque 'try' definido antes de 'except'.");

@@ -820,11 +820,11 @@ public class Parser {
                             if (sucesorTokenActual.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA) {
                                 break;
                             }
-                            
+
                             antecesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
-                            if(enBloqueDef && lineaDeCodigoEnTokens.get(1).getLexema().equals("def") && antecesorTokenActual.getLexema().equals("def")){
+                            if (enBloqueDef && lineaDeCodigoEnTokens.get(1).getLexema().equals("def") && antecesorTokenActual.getLexema().equals("def")) {
                                 //Cambiamos el nombre de la funcion de variable a funcion en la tabla de simbolos
-                                
+
                                 modificarTipoSimboloEnTablaSimbolos(tokenActual.getLexema(), "funcion", tokenActual.getNumeroLinea());
 
                                 System.out.println();
@@ -896,8 +896,12 @@ public class Parser {
             }
         }//fin for lectura de lineas de codigo
         System.out.println();
-        System.out.println("875 ESTA ES LA VERIFICION EXCEPT->PRINT: ");
+        System.out.println("899 ESTA ES LA VERIFICION EXCEPT->PRINT: ");
         verificarExceptPrint(listaDeTokens);
+
+        System.out.println();
+        System.out.println("903 ESTA ES LA VERIFICION BLOQUES SIN INSTRUCCIONES: ");
+        validarBloquesConInstrucciones(listaDeTokens);
 
         System.out.println();
         System.out.println("878 Esta es pila = ");
@@ -913,32 +917,32 @@ public class Parser {
             while (k < pilaIndentacion.size()) {
                 if (pilaIndentacion.peek().tipo.equals("except")) {
                     // Bloque except sin instrucciones
-                     if (cantidadDeInstruccionesBloqueExcept == 0) {
+                    if (cantidadDeInstruccionesBloqueExcept == 0) {
                         incluirErrorEncontrado(tokenActual.getNumeroLinea(), 863);
-                     
+
                     }
                     System.out.println("903 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo + "lineaTokenExcept " + lineaTokenExcept);
                 }
                 if (pilaIndentacion.peek().tipo.equals("while")) {
                     // Bloque except sin instrucciones
-                     if (cantidadDeInstruccionesBloqueWhile == 0) {
+                    if (cantidadDeInstruccionesBloqueWhile == 0) {
                         incluirErrorEncontrado(tokenActual.getNumeroLinea(), 629);
-               
+
                     }
                 }
                 if (pilaIndentacion.peek().tipo.equals("def")) {
                     // Bloque def sin instrucciones
                     if (cantidadDeInstruccionesBloqueDef == 0) {
                         incluirErrorEncontrado(tokenActual.getNumeroLinea(), 664);
-                 
+
                     }
-                  
+
                 }
                 if (pilaIndentacion.peek().tipo.equals("try")) {
                     // Bloque except sin instrucciones
-                     if (cantidadDeInstruccionesBloqueTry == 0) {
+                    if (cantidadDeInstruccionesBloqueTry == 0) {
                         incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                   
+
                     }
                 }
                 pilaIndentacion.pop();
@@ -1081,6 +1085,67 @@ public class Parser {
         }
         return lineaNoEvaluada;
 
+    }
+
+    public void validarBloquesConInstrucciones(List<List<Token>> listaDeTokens) {
+        String[] bloques = {"def", "for", "while", "try", "except", "if", "else"};
+        int numeroDeLinea = -1;
+
+        for (int i = 0; i < listaDeTokens.size(); i++) {
+            List<Token> lineaDeCodigo = listaDeTokens.get(i);
+            String nombreDeBloque = lineaDeCodigo.get(1).getLexema(); //Segundo elemento de la linea de codigo, el primero es la indentacion
+            numeroDeLinea = lineaDeCodigo.get(0).getNumeroLinea();
+            if (!lineaDeCodigo.isEmpty() && esBloque(nombreDeBloque, bloques)) {
+                if ((i + 1) < listaDeTokens.size()) {
+                    List<Token> siguienteLineaDeCodigo = listaDeTokens.get(i + 1);
+                    String lexemaSiguiente = siguienteLineaDeCodigo.get(1).getLexema();
+                    int indentacionLineaActual = Integer.parseInt(lineaDeCodigo.get(0).getLiteral());
+                    int indentacionLineaSiguiente = Integer.parseInt(siguienteLineaDeCodigo.get(0).getLiteral());
+
+                    if ((!nombreDeBloque.isBlank() || !nombreDeBloque.isEmpty()) && (!lexemaSiguiente.isBlank() && !lexemaSiguiente.isEmpty())) {
+                        if (nombreDeBloque.equals("try") && lexemaSiguiente.equals("except")) {
+                            incluirErrorEncontrado(numeroDeLinea, 757); //Bloque try sin instrucciones
+                            System.out.println("1110 Bloque 'try' en la línea " + (i) + " tiene un 'except' correspondiente. Bloque try sin instrucciones");
+                        } else if (!siguienteLineaDeCodigo.isEmpty() && (indentacionLineaSiguiente > indentacionLineaActual)) {
+                            System.out.println("1107 Bloque '" + nombreDeBloque + "' en la línea " + (i + 1) + " tiene instrucciones.");
+                        } else {
+                            System.out.println("1112 Bloque '" + nombreDeBloque + "' en la línea " + lineaDeCodigo.get(1).getNumeroLinea()
+                                    + " no tiene instrucciones. La instruccion siguiente es " + lexemaSiguiente + " indentacionLineaSiguiente " + indentacionLineaSiguiente + " indentacionLineaActual " + indentacionLineaActual);
+                            switch (nombreDeBloque) {
+                                case "def":
+                                    incluirErrorEncontrado(numeroDeLinea, 664); //Bloque def sin instrucciones
+                                    break;
+                                case "while":
+                                    incluirErrorEncontrado(numeroDeLinea, 629); //Bloque while sin instrucciones
+                                    break;
+                                case "try":
+                                    incluirErrorEncontrado(numeroDeLinea, 629); //Bloque while sin instrucciones
+                                    break;
+                                case "except":
+                                    incluirErrorEncontrado(numeroDeLinea, 857); //Bloque except sin instrucciones
+                                    break;
+                                default:
+                                    incluirErrorEncontrado(numeroDeLinea, 860); //Bloque for o if sin instrucciones.No evaluados
+                                    break;
+                            }
+                        }
+                    }
+
+                } else {
+                    System.out.println("1135 ultima instruccion o unica ");
+                    incluirErrorEncontrado(numeroDeLinea, 860); //Bloque for o if sin instrucciones.No evaluados
+                }
+            }
+        }
+    }
+
+    private boolean esBloque(String token, String[] bloques) {
+        for (String bloque : bloques) {
+            if (bloque.equals(token)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, Integer> contarInstrucciones(List<List<Token>> listaDeTokens) {
@@ -2486,11 +2551,11 @@ public class Parser {
     public void modificarTipoSimboloEnTablaSimbolos(String nombre, String nuevoTipo, int numeroDeLinea) {
         System.out.println("2487 EN MODIFICAR TIPO SIMBOLO EN TABLA SIMBOLOS ");
         imprimirTablaDeSimbolos();
-        
+
         Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
 
         System.out.println("2492 Modificanto nombre de la funcion " + nombre + " nuevo tipo " + nuevoTipo + " en la linea " + numeroDeLinea);
-        
+
         if (simbolo != null) {
             if (nuevoTipo.equals("funcion") && tablaDeSimbolos.contieneSimbolo(nombre) && tablaDeSimbolos.obtenerSimbolo(nombre).getTipo().equals("funcion")) {
                 System.out.println("2443 Error 675: La función ya fue definida anteriormente." + " nombre de la funcion " + nombre);
@@ -2499,8 +2564,8 @@ public class Parser {
                 simbolo.setTipo(nuevoTipo);
             }
         }
-        
-         System.out.println("2503 EN MODIFICAR TIPO SIMBOLO EN TABLA SIMBOLOS ");
+
+        System.out.println("2503 EN MODIFICAR TIPO SIMBOLO EN TABLA SIMBOLOS ");
         imprimirTablaDeSimbolos();
 
     }
