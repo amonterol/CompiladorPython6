@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -67,25 +68,24 @@ public class Parser {
         boolean enBloqueDef = false;
         int indentacionDef = 0;
         int indentacionBloqueDef = -1;
-        int cantidadDeInstruccionesBloqueDef = 0;
         int lineaTokenDef = 0;
 
         boolean enBloqueWhile = false;
         int indentacionWhile = 0;
         int indentacionBloqueWhile = -1;
-        int cantidadDeInstruccionesBloqueWhile = 0;
+
         int lineaTokenWhile = 0;
 
         boolean enBloqueTry = false;
         int indentacionTry = 0;
         int indentacionBloqueTry = -1;
-        int cantidadDeInstruccionesBloqueTry = 0;
+
         int lineaTokenTry = 0;
 
         boolean enBloqueExcept = false;
         int indentacionExcept = 0;
         int indentacionBloqueExcept = -1;
-        int cantidadDeInstruccionesBloqueExcept = 0;
+
         int lineaTokenExcept = 0;
 
         boolean existeTokenAntesDeImport = false;
@@ -106,10 +106,6 @@ public class Parser {
         int indentacionInstruccionActual = -1;
         int nivelDeIndentacion = 0;
 
-        int contadorPrintEnExcept = 0;
-
-        int contadorDeInstrucciones = 0;
-
         int indentacionReturn = 0;
 
         System.out.println();
@@ -119,20 +115,11 @@ public class Parser {
         // Inicializar la pila con un valor de 0 para la indentación general de toda instrucción
         pilaIndentacion.push(new Bloque(0, "programa"));
 
-        int nivelIndentacionActual = 0;
-
-        int numeroInstruccionesEnBloqueExcept = 0;
-
+        //int nivelIndentacionActual = 0;
+        //int numeroInstruccionesEnBloqueExcept = 0;
         Token tokenActual = new Token();
         Token tokenSiguiente = new Token();
 
-        /*
-        boolean tryExceptBalanceados = verificarBloqueTryExceptBalanceado(listaDeTokens);
-        if(!tryExceptBalanceados){
-            System.out.println();
-                System.out.println("132 TRY EXCEPT NO BALANCEADOS " + !tryExceptBalanceados );
-        }
-         */
         BloqueTryExcept tryExceptBalanceados = verificarBloqueTryExceptBalanceado(listaDeTokens);
 
         // Verifica si tryExceptBalanceados es null antes de intentar acceder a sus campos
@@ -227,23 +214,15 @@ public class Parser {
                             //Si el bloque a sacar de la pila es 'except' y el numero de instrucciones en bloque 'except' es cero lanzamos un error
                             if (pilaIndentacion.peek().tipo.equals("if")) {
                                 enBloqueIf = false;
-
                             }
                             if (pilaIndentacion.peek().tipo.equals("for")) {
                                 enBloqueFor = false;
                             }
                             if (pilaIndentacion.peek().tipo.equals("def")) {
                                 enBloqueDef = false;
-                                if (cantidadDeInstruccionesBloqueDef == 0) {
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 664);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 664);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 664);
-                                }
-                                cantidadDeInstruccionesBloqueDef = 0;
                             }
                             if (pilaIndentacion.peek().tipo.equals("while")) {
                                 enBloqueWhile = false;
-                                cantidadDeInstruccionesBloqueWhile = 0;
                             }
                             pilaIndentacion.pop();
                         } else {
@@ -274,19 +253,12 @@ public class Parser {
                                 System.out.println("295 Existe un 'except' en el tope de la pila y la instruccion es otro 'except'. La instruccion es " + tokenSiguiente.getLexema() + " y el tope de pila es " + pilaIndentacion.peek().tipo);
                                 pilaIndentacion.pop(); //Sacamos 'except' porque encontramos otro 'except'
                                 enBloqueExcept = false;
-                                if (cantidadDeInstruccionesBloqueExcept == 0) {
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 857);
-                                }
                             }
                             //Verifica si exise un bloque 'try' abierto y si la indentacin coincide con la instruccion 'except' actual => no hay error
                             if (pilaIndentacion.peek().tipo.equals("try") && indentacionInstruccionActual == pilaIndentacion.peek().indentacion) {
                                 System.out.println("305 Existe un bloque 'try' abierto (en tope de pila) y la instruccion es un except. Tope de pila es: " + pilaIndentacion.peek().tipo + "  y indentacion de la instruccion actual es " + indentacionInstruccionActual + " y la indentacion del tope de pila es:  " + pilaIndentacion.peek().indentacion);
                                 pilaIndentacion.pop(); //Sacamos try porque encontramos except
                                 enBloqueTry = false; //Cerramos el bloque try
-                                if (cantidadDeInstruccionesBloqueTry == 0) {
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 757);
-                                }
                                 //Verifica si exise un bloque 'try' abierto y si la indentacin es diferente a la instruccion 'except' actual =>  hay error    
                             } else if (pilaIndentacion.peek().tipo.equals("try") && indentacionInstruccionActual != pilaIndentacion.peek().indentacion) {
                                 System.out.println("314 Encontramos un try en tope de pila y la instruccion es " + tokenSiguiente.getLexema() + " y indentacion de la instruccion actual es " + indentacionInstruccionActual + " y la indentacion del tope de pila es:  " + pilaIndentacion.peek().indentacion);
@@ -296,13 +268,6 @@ public class Parser {
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);
-                                if (cantidadDeInstruccionesBloqueTry == 0) {
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea() - 1, 757);
-                                }
-                                cantidadDeInstruccionesBloqueTry = 0;
-
                             }
 
                             //Verifica si el peek de la pila de indentacion es 'def' cuando en la linea que leemos existe 'return',
@@ -327,17 +292,9 @@ public class Parser {
                                     }
                                     if (pilaIndentacion.peek().tipo.equals("while")) {
                                         enBloqueWhile = false;
-                                        cantidadDeInstruccionesBloqueWhile = 0;
                                     }
                                     if (pilaIndentacion.peek().tipo.equals("def")) {
                                         enBloqueDef = false;
-                                        if (cantidadDeInstruccionesBloqueDef == 0) {
-                                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                        }
-                                        cantidadDeInstruccionesBloqueDef = 0;
                                     }
                                     pilaIndentacion.pop();
                                 } else {
@@ -361,15 +318,6 @@ public class Parser {
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750); // Código de error para indentación incorrecta 
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);
                                 incluirErrorEncontrado(tokenActual.getNumeroLinea(), 750);
-
-                                if (cantidadDeInstruccionesBloqueDef == 0) {
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                    incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-                                }
-                                cantidadDeInstruccionesBloqueDef = 0;
-
                             }
 
                         } else {
@@ -400,11 +348,9 @@ public class Parser {
                                             }
                                             if (pilaIndentacion.peek().tipo.equals("while")) {
                                                 enBloqueWhile = false;
-                                                cantidadDeInstruccionesBloqueWhile = 0;
                                             }
                                             if (pilaIndentacion.peek().tipo.equals("def")) {
                                                 enBloqueDef = false;
-                                                cantidadDeInstruccionesBloqueWhile = 0;
                                             }
                                             pilaIndentacion.pop();
                                         } else {
@@ -434,11 +380,9 @@ public class Parser {
                                             }
                                             if (pilaIndentacion.peek().tipo.equals("while")) {
                                                 enBloqueWhile = false;
-                                                cantidadDeInstruccionesBloqueWhile = 0;
                                             }
                                             if (pilaIndentacion.peek().tipo.equals("def")) {
                                                 enBloqueDef = false;
-                                                cantidadDeInstruccionesBloqueWhile = 0;
                                             }
                                             pilaIndentacion.pop();
                                         } else {
@@ -803,55 +747,75 @@ public class Parser {
                             break;
 
                         case TipoDeToken.IDENTIFICADOR:
-                            System.out.println();
+
                             System.out.println("337 En llamada de funcion " + enBloqueDef + " " + tokenActual.getLexema() + " " + i);
                             System.out.println();
                             int indiceTokenActual = lineaDeCodigoEnTokens.indexOf(tokenActual);
                             numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                             Token sucesorTokenActual = new Token();
                             Token antecesorTokenActual = new Token();
+
                             if (lineaDeCodigoEnTokens.size() > 2) {
                                 antecesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
                             }
+                            antecesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
 
                             if ((indiceTokenActual) + 1 < lineaDeCodigoEnTokens.size()) {
                                 sucesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual + 1);
                             }
-                            if (sucesorTokenActual.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA) {
+
+                            if (sucesorTokenActual != null && sucesorTokenActual.getTipoDeToken() == TipoDeToken.PALABRA_RESERVADA) {
                                 break;
                             }
 
-                            antecesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
+                            //Si existe el bloque def => estamos ante una definicion de funcion
                             if (enBloqueDef && lineaDeCodigoEnTokens.get(1).getLexema().equals("def") && antecesorTokenActual.getLexema().equals("def")) {
                                 //Cambiamos el nombre de la funcion de variable a funcion en la tabla de simbolos
 
                                 modificarTipoSimboloEnTablaSimbolos(tokenActual.getLexema(), "funcion", tokenActual.getNumeroLinea());
 
-                                System.out.println();
                                 System.out.println("837 En modificando tipo de simbolo a funcion  en bloque def " + enBloqueDef + " " + tokenActual.getLexema() + " " + i);
                                 System.out.println();
                             }
+
+                            //Si no existe def ==> podriamos estar ante un definicion de funcion
+                            System.out.println("787 En llamada de funcion o es una definicion de funcion sin def " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
+                            System.out.println();
+                            /*
                             if (!enBloqueDef && !enInstruccionReturn) {
                                 if (esFuncion(tokenActual.getLexema())) {
-                                    System.out.println();
-                                    System.out.println("347 En llamada de funcion " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
+
+                                    System.out.println("792 En llamada de funcion " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
                                     System.out.println();
                                     validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
                                 }
                             }
+                             */
+                            //El identificador es una posible definicion de funcion?
+                            int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
+                            if (indiceDosPuntos != -1) {
+                                if (esDefinicionDeFuncionSinDef(lineaDeCodigoEnTokens, indiceTokenActual)) {
 
-                            if (esFuncion(tokenActual.getLexema())) {
-                                boolean llamadaDeFuncion = esLlamadaAFuncion(lineaDeCodigoEnTokens, indiceTokenActual);
-                                if (llamadaDeFuncion) {
-                                    System.out.println();
-                                    System.out.println("502 El identificador es una llamda de funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
-                                } else {
-                                    System.out.println();
-                                    System.out.println("505 El identificador no es una llamda de funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                    System.out.println("795  El identificador es una definicion de funcion sin def: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
                                 }
-                            } else {
+                            }
+
+                            //El identificador ->(->) es una posible llamada de funcion?
+                            //El identificador ->( es una posible llamada de funcion?
+                            //El identificador ->) es una posible llamada de funcion?
+                            int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
+                            int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+                            if ((indiceParentesisIzquierdo != -1 || indiceParentesisDerecho != -1) && indiceDosPuntos == -1) {
+                                validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
+                            }
+
+                            System.out.println("815 El identificador " + tokenActual.getLexema() + " es funcion  " + esFuncion(tokenActual.getLexema()));
+                            //El identificador solo  es una posible llamada de funcion?
+                            if (esFuncion(tokenActual.getLexema())) {
+
+                                System.out.println("815 El identificador " + tokenActual.getLexema() + " es funcion  " + esFuncion(tokenActual.getLexema()));
                                 System.out.println();
-                                System.out.println("509 El identificador no es una funcion: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
                             }
 
                             break;
@@ -864,35 +828,6 @@ public class Parser {
                     }
 
                 }//fin for de lectura de tokens de una lineas de codigo
-                //Contando instrucciones de cada bloque def
-                System.out.println("196 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueDef es " + enBloqueDef + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueDef);
-                if (enBloqueDef && !tokenSiguiente.getLexema().equals("def")) {
-                    ++cantidadDeInstruccionesBloqueDef;
-                }
-                System.out.println("200 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueDef es " + enBloqueDef + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueDef);
-
-                //Contando instrucciones de cada bloque while
-                System.out.println("203 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueWhile es " + enBloqueWhile + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueWhile);
-                if (enBloqueWhile && !tokenSiguiente.getLexema().equals("while")) {
-                    ++cantidadDeInstruccionesBloqueWhile;
-                }
-                System.out.println("207 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueWhile es " + enBloqueWhile + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueWhile);
-
-                //Contando instrucciones de cada bloque try
-                System.out.println("210 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueTry es " + enBloqueTry + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueTry);
-                if (enBloqueTry && !tokenSiguiente.getLexema().equals("try")) {
-                    ++cantidadDeInstruccionesBloqueTry;
-                }
-                System.out.println("214 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueTry es " + enBloqueTry + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueTry);
-
-                //Contando instrucciones de cada bloque except
-                System.out.println("217 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueExcept es " + enBloqueExcept + " cantidad de instrucciones anteriores " + cantidadDeInstruccionesBloqueExcept);
-                if (enBloqueExcept && !tokenSiguiente.getLexema().equals("except")) {
-                    ++cantidadDeInstruccionesBloqueExcept;
-                }
-                System.out.println("221 La instruccion es " + tokenSiguiente.getLexema() + " enBloqueExcept es " + enBloqueExcept + " cantidad de instruccines actualizadas " + cantidadDeInstruccionesBloqueExcept);
-                System.out.println();
-
             }
         }//fin for lectura de lineas de codigo
         System.out.println();
@@ -915,36 +850,6 @@ public class Parser {
             System.out.println("909 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo);
             int k = 0;
             while (k < pilaIndentacion.size()) {
-                if (pilaIndentacion.peek().tipo.equals("except")) {
-                    // Bloque except sin instrucciones
-                    if (cantidadDeInstruccionesBloqueExcept == 0) {
-                        incluirErrorEncontrado(tokenActual.getNumeroLinea(), 863);
-
-                    }
-                    System.out.println("903 Saliendo de sintactico peek de la pila es " + pilaIndentacion.peek().tipo + "lineaTokenExcept " + lineaTokenExcept);
-                }
-                if (pilaIndentacion.peek().tipo.equals("while")) {
-                    // Bloque except sin instrucciones
-                    if (cantidadDeInstruccionesBloqueWhile == 0) {
-                        incluirErrorEncontrado(tokenActual.getNumeroLinea(), 629);
-
-                    }
-                }
-                if (pilaIndentacion.peek().tipo.equals("def")) {
-                    // Bloque def sin instrucciones
-                    if (cantidadDeInstruccionesBloqueDef == 0) {
-                        incluirErrorEncontrado(tokenActual.getNumeroLinea(), 664);
-
-                    }
-
-                }
-                if (pilaIndentacion.peek().tipo.equals("try")) {
-                    // Bloque except sin instrucciones
-                    if (cantidadDeInstruccionesBloqueTry == 0) {
-                        incluirErrorEncontrado(tokenActual.getNumeroLinea(), 757);
-
-                    }
-                }
                 pilaIndentacion.pop();
                 ++k;
             }
@@ -960,23 +865,6 @@ public class Parser {
         //imprimirListas(listaContenidoFinal);
         List<String> programaRevisado = generarProgramaEnPythonRevisado(listaContenidoFinal);
 
-        /*
-        imprimirListas(programaRevisado);
-        System.out.println();
-
-        System.out.println();
-        System.out.println("140");
-        System.out.println("PARSER: Contenido del mapa de errores encontrados " + erroresEncontradosMap.size());
-        for (Map.Entry<Integer, List<MiError>> entry : erroresEncontradosMap.entrySet()) {
-            Integer key = entry.getKey();
-            List<MiError> errorList = entry.getValue();
-            System.out.println("Linea: " + key);
-            for (MiError error : errorList) {
-                System.out.println(error.getKey() + "  " + error.getDescripcion());
-            }
-        }
-        
-         */
         System.out.println();
         System.out.println("914 PARSER TABLA DE SIMBOLOS ");
         imprimirTablaDeSimbolos();
@@ -1259,58 +1147,6 @@ public class Parser {
         return resultado;
     }
 
-    //no usada
-    public void verificarIndentacion(List<List<Token>> listaDeTokens) {
-        boolean enBloque = false;
-        String tipoBloque = null;
-        int indentacionBloque = 0;
-        int cantidadDeBloques = 0;
-
-        for (List<Token> tokens : listaDeTokens) {
-            if (tokens.isEmpty()) {
-                continue;
-            }
-
-            int indentacionActual = Integer.parseInt(tokens.get(0).getLiteral());
-            String primerToken = tokens.get(1).getLexema();
-
-            // Mostrar la línea actual
-            System.out.print("Línea: " + tokens);
-            if (indentacionActual == indentacionBloque) {
-                System.out.println();
-                System.out.println(" 1023 - Encontramos instruccion con indentacion igual al bloque. La indentacion actual es " + indentacionActual + " y la indentacion del bloque es " + indentacionBloque + " y el bloque es " + tipoBloque);
-                enBloque = false;
-
-            }
-
-            if (enBloque) {
-
-                if (indentacionActual != indentacionBloque + 4) {
-                    System.out.println();
-                    System.out.println(" 1031 - Error de indentación  La indentacion actual es " + indentacionActual + " y la indentacion del bloque es " + indentacionBloque + " y el bloque es " + tipoBloque);
-                } else {
-                    if (indentacionActual <= indentacionBloque) {
-                        enBloque = false;
-                        tipoBloque = null;
-                        System.out.println();
-                        System.out.println(" 1027 La indentacion actual es " + indentacionActual + " y la indentacion del bloque es " + indentacionBloque + " y el bloque es " + tipoBloque);
-                    }
-                }
-            }
-
-            if (primerToken.equals("def") || primerToken.equals("while") || primerToken.equals("try") || primerToken.equals("except") || primerToken.equals("for") || primerToken.equals("if")) {
-                enBloque = true;
-                tipoBloque = primerToken;
-
-                indentacionBloque = indentacionActual + 4; // Ajustar la indentación del bloque
-                ++cantidadDeBloques;
-                System.out.println();
-                System.out.println(" 1046 La indentacion actual es " + indentacionActual + " y la indentacion del bloque es " + indentacionBloque + " y el bloque es " + tipoBloque);
-            }
-        }
-
-    }
-
     //FUNCIONES RELACIONADOS CON LA VERIFICACION DE LA SINTAXIS DE INSTRUCCIONES
     public void validarSintaxisInput(List<Token> lineaDeTokens, int numeroDeLinea, int indiceInput) {
         int numeroError = 0;
@@ -1586,6 +1422,91 @@ public class Parser {
 
     }
 
+    //Devuelte false si no es una definicion de funcion correcta
+    public boolean esDefinicionDeFuncionSinDef(List<Token> lineaDeCodigoEnTokens, int indiceTokenActual) {
+
+        Token anteriorToken = new Token();
+        Token siguienteToken = new Token();
+        Token penultimoToken = new Token();
+        Token ultimoToken = lineaDeCodigoEnTokens.getLast();
+
+        boolean resultado = false;
+        int numeroDeLinea = lineaDeCodigoEnTokens.getFirst().getNumeroLinea();
+
+        int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
+        int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+        int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
+
+        if ((indiceTokenActual) + 1 < lineaDeCodigoEnTokens.size()) {
+            siguienteToken = lineaDeCodigoEnTokens.get(indiceTokenActual + 1);
+        }
+        if (lineaDeCodigoEnTokens.size() > 2) {
+            anteriorToken = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
+        }
+
+        if (lineaDeCodigoEnTokens.size() > 2) {
+            penultimoToken = lineaDeCodigoEnTokens.get(lineaDeCodigoEnTokens.size() - 2);
+        }
+
+        if ((indiceTokenActual) + 2 < lineaDeCodigoEnTokens.size()) {
+            ultimoToken = lineaDeCodigoEnTokens.get(lineaDeCodigoEnTokens.size() - 1);
+        }
+
+        //Validando sintaxis
+        //Caso: identificador -> :
+        if (siguienteToken.getTipoDeToken() != null && siguienteToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
+            resultado = true;
+            incluirErrorEncontrado(numeroDeLinea, 500);
+            incluirErrorEncontrado(numeroDeLinea, 501);
+            incluirErrorEncontrado(numeroDeLinea, 651);
+
+        }
+        //Caso: idenfiticador -> ( -> : 
+        if (siguienteToken.getTipoDeToken() != null && siguienteToken.getTipoDeToken().equals(TipoDeToken.PARENTESIS_IZQUIERDO) && (indiceParentesisDerecho == -1) && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
+            resultado = true;
+            boolean paren = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLinea);
+
+            if (!paren) {
+                incluirErrorEncontrado(numeroDeLinea, 510);
+            }
+        }
+        //Caso: identificador -> ( -> : 
+        if (siguienteToken.getTipoDeToken() != null && siguienteToken.getTipoDeToken().equals(TipoDeToken.PARENTESIS_IZQUIERDO) && (indiceParentesisDerecho == -1) && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
+            resultado = true;
+            boolean paren = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLinea);
+
+            if (!paren) {
+                incluirErrorEncontrado(numeroDeLinea, 501);
+            }
+
+        }
+
+        //Caso: identificador -> ) -> : 
+        if (siguienteToken.getTipoDeToken() != null && siguienteToken.getTipoDeToken().equals(TipoDeToken.PARENTESIS_DERECHO) && (indiceParentesisIzquierdo == -1) && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
+            resultado = true;
+            boolean paren = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLinea);
+
+            if (!paren) {
+                incluirErrorEncontrado(numeroDeLinea, 500);
+            }
+        }
+        //Caso: identificador -> ( -> )->: xxx
+        if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho != -1) && (indiceParentesisIzquierdo < indiceParentesisDerecho) && !ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS) && (indiceDosPuntos != -1)) {
+            resultado = true;
+            incluirErrorEncontrado(numeroDeLinea, 661);
+
+        }
+
+        //Caso: palabra reservada -> identificador -> ) -> ->: 
+        if (anteriorToken != null && !anteriorToken.getLexema().equals("def") && ultimoToken != null && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS) && (indiceDosPuntos != -1)) {
+            resultado = true;
+            incluirErrorEncontrado(numeroDeLinea, 655);
+
+        }
+
+        return resultado;
+    }
+
     public boolean esLlamadaAFuncion(List<Token> lineaDeCodigoEnTokens, int indiceTokenActual) {
 
         Token sucesor = new Token();
@@ -1599,6 +1520,7 @@ public class Parser {
         if (verificarExistenciaParentesis(lineaDeCodigoEnTokens)) {
             int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
             int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+            int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
             if (indiceParentesisIzquierdo != -1) {
                 if (lineaDeCodigoEnTokens.get(indiceParentesisIzquierdo).getTipoDeToken() == sucesor.getTipoDeToken()) {
                     resultado = true;
@@ -1622,6 +1544,8 @@ public class Parser {
         Token sucesor = new Token();
         Token ultimoToken = lineaDeCodigoEnTokens.getLast();
 
+        boolean posibleDefinicionDeFuncion = false;
+
         if (indiceIdentificador + 1 < lineaDeCodigoEnTokens.size()) {
             sucesor = lineaDeCodigoEnTokens.get(indiceIdentificador + 1);
         } else {
@@ -1632,13 +1556,16 @@ public class Parser {
             numeroError = 668;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
-        /*
-        if (sucesor.getTipoDeToken() != TipoDeToken.PARENTESIS_IZQUIERDO) {
-            numeroError = 500;
-            incluirErrorEncontrado(numeroDeLinea, numeroError);
-        }
-         */
+
         boolean p = verificarExistenciaParentesis(lineaDeCodigoEnTokens);
+
+        if (p && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
+            //Hay parentesis y dos puntos posible definicion de funcion sin def
+            if (antecesor.getTipoDeToken().equals(TipoDeToken.INDENTACION)) {
+                incluirErrorEncontrado(numeroDeLinea, 652);
+            }
+        }
+
         System.out.println();
         System.out.println("498 validarSintaxisDeLlamadaDeFuncion-> existen parentesis " + p);
         boolean b = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLinea);
@@ -2421,7 +2348,7 @@ public class Parser {
     }
 
     //Verifica que los parentesis este balanceados 
-    //Devuelve true si los parentesis estan balanceados, false en caso contrario
+    //Devuelve true si los parentesis estan balanceados, false si no estan balanceados
     public boolean verificarParentesisBalanceados(List<Token> lineaDeTokens, int numeroDeLinea) {
         Stack<String> pila = new Stack<>();
         boolean resultado = false;
@@ -2693,7 +2620,7 @@ public class Parser {
 
         HashMap<String, Integer> histograma = contarLaCantidadOperadoresComparacion();
 
-        ArrayList<String> operadores = new ArrayList<String>(histograma.keySet());
+        ArrayList<String> operadores = new ArrayList<>(histograma.keySet());
         programaEnPythonRevisado.add("=================================================");
         for (String operador : operadores) {
             programaEnPythonRevisado.add(histograma.get(operador) + " Token " + operador);

@@ -53,8 +53,8 @@ public class TiposDeError {
         errores.put(405, "La variable incluida en el argumento de la función no ha sido declarada anteriormente.");
 
         //Relacionados con operadores de agrupacion-> (, ), [, ]
-        errores.put(500, "Falta el parénteris izquierdo: \"(\".");
-        errores.put(501, "Falta el parénteris derecho: \")\".");
+        errores.put(500, "Error de sintaxis. Falta el parénteris izquierdo: '('.");
+        errores.put(501, "Error de sintaxis. Falta el parénteris derecho: ')'.");
         errores.put(502, "Falta el corchete izquierdo: \"[\".");
         errores.put(503, "Falta el corchete derecho: \"]\".");
         errores.put(504, "Falta el parénteris izquierdo: \"{\" y el parénteris derecho: \"}\".");
@@ -103,23 +103,23 @@ public class TiposDeError {
 
         //Errores relacionados con operador def
         errores.put(650, "No se esperaba cambio en la indentacion.");
-        errores.put(651, "Sintaxix incorrecta. Se esperaba def -> nombre_de_la_funcion -> ( -> parametros -> ) -> : ");
-        errores.put(652, "La definición de una función debe comenzar con la palabra def.");
+        errores.put(651, "Error de sintaxis. Se esperaba def -> nombre_de_la_funcion -> ( -> parametros -> ) -> : ");
+        errores.put(652, "Error de sintaxis. La definición de una función debe comenzar con la palabra def.");
         errores.put(653, "Falta el nombre de la funcion.");
         errores.put(654, "Bloque de código 'def' sin instrucciones.");
-        errores.put(655, "La definición de una nueva función debe comenzar solo con la palabra reservada def.");
+        errores.put(655, "Error de sintaxis. La definición de una nueva función debe comenzar solo con la palabra reservada def.");
         errores.put(656, "La instrucción def no se debe usar para terminar una linea de código");
         errores.put(657, "Sintaxis incorrecta. Se esperaba \":\" al final de la línea de código.");
         errores.put(658, "Sintaxis incorrecta. Uso incorrecto del operador aritmetico");
         errores.put(659, "Sintaxis incorrecta. Uso incorrecto del operador relacional");
         errores.put(660, "Sintaxis incorrecta. Falta nombre de la funcion, los paréntesis y los parámetros de la funcion (caso de existir).");
-        errores.put(661, " El operador \":\" debe ser el último token de la línea");
+        errores.put(661, "Error de sintaxis. El operador ':' debe ser el último token de la línea");
         errores.put(662, "Una palabra reservada no puede ser usada como nombre de la función.");
         errores.put(663, "El nombre de la función debe ser un identificador válido");
         errores.put(664, "Error de sintaxis. El bloque 'def' no contiene instrucciones.");
         errores.put(665, "Faltan los paréntesis y los parametros.");
         errores.put(666, "Sintaxis incorrecta. Se espera el nombre de la función, los paréntesis (), los parámetros de la función (si los hay) y los dos puntos : después de def.");
-        errores.put(667, "Sintaxis incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
+        errores.put(667, "Error de sintaxis. LLamada a función incorrecta. Se esperaba nombre_funcion -> ( -> parametros (si existen) -> )");
         errores.put(668, "La línea de código de una llamada de función comenzar con el nombre de la función.");
         errores.put(669, "La línea de código de una llamada de función debe terminar con un )");
         errores.put(670, "La línea de código de return debe comenzar con la palabra return");
@@ -141,7 +141,7 @@ public class TiposDeError {
         errores.put(752, "Sintaxis incorrecta. La línea de la instrucción try debe comenzar la palabra try");
         errores.put(753, "Sintaxis incorrecta. La línea de la instrucción try debe terminar con :");
         errores.put(754, "Expresión inválida. Falta operador de inicio de bloque debe ser \":\"");
-        errores.put(755, "Sintaxis incorrecta. No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
+        errores.put(755, "Error de sintaxis No se permiten expresiones despues de :, cualquier instrucción debe estar en la siguiente línea");
         errores.put(756, "En el bloque de instrucciones se esperaba una indentación mayor que la de la instrucción try");
         errores.put(757, "Error de sintaxis. El bloque 'try' no contiene instrucciones.");
         errores.put(758, "Error de sintaxis. Falta instruccion 'except' para cerrar el bloque 'try' abierto.");
