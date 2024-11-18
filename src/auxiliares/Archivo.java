@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  *
- * @author abmon
+ * @author amon
  */
 public class Archivo {
     //Lee el programa a analizar y convierte cada linea del programa en una entrada de una lista.
@@ -35,7 +35,7 @@ public class Archivo {
                 }
             }
         } catch (IOException e) {
-            System.out.println("El archivo " + nombreArchivo + " no existe en el directorio usado");
+          
             System.exit(0);
         }
         return lineas;
@@ -54,12 +54,12 @@ public class Archivo {
                     bw.newLine();
                 }
             }
-            System.out.println("Archivo escrito exitosamente en: " + rutaArchivo);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+   
     public void imprimirArchivo(String nombreArchivo) throws IOException {
         try {
             // Obtener el directorio actual del programa
