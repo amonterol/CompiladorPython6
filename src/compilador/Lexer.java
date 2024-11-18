@@ -854,25 +854,13 @@ public class Lexer {
         String nombre = token.getLexema();
         String tipo = "variable";
         String literal = token.getLiteral();
+        String argumento = "no aplica";
 
         int numeroLinea = token.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
 
-        Simbolo simbolo = new Simbolo(tipo, literal, numeroLinea);
+        Simbolo simbolo = new Simbolo(tipo, literal, numeroLinea, argumento);
         tablaDeSimbolos.agregarSimbolo(nombre, simbolo);
 
-    }
-
-    public void modificarTipoSimboloEnTablaSimbolos(String nombre, String nuevoTipo) {
-        System.out.println();
-        System.out.println("867 Token sucesor def " + nombre);
-        System.out.println();
-        Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
-        System.out.println();
-        System.out.println("871 sucesor def " + simbolo.getTipo());
-        System.out.println();
-        if (simbolo != null) {
-            simbolo.setTipo(nuevoTipo);
-        }
     }
 
     public void imprimirTablaDeSimbolos() {

@@ -108,6 +108,8 @@ public class Parser {
 
         int indentacionReturn = 0;
 
+        boolean enLlamadaDeFuncion = false;
+
         System.out.println();
 
         //Almacena la indentacion de los bloques
@@ -613,6 +615,7 @@ public class Parser {
                                     numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                                     int indiceTokenPrint = lineaDeCodigoEnTokens.indexOf(tokenActual);
                                     validarSintaxisPrint(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenPrint);
+                                    incluirPrintEnEnTablaDeSimbolos(tokenActual);
                                     break;
 
                                 case "def":
@@ -624,7 +627,7 @@ public class Parser {
                                     int indiceTokenDef = lineaDeCodigoEnTokens.indexOf(tokenActual);
 
                                     System.out.println();
-                                    System.out.println("683 Encontramos una instruccion  def " + " linea " + numeroDeLineaTokenActual + "  indice while " + indiceTokenDef);
+                                    System.out.println("683 Encontramos una instruccion  def " + " linea " + numeroDeLineaTokenActual + "  indice def " + indiceTokenDef);
                                     System.out.println();
                                     boolean existenErrores = validarSintaxisDeDef(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenDef); //false no hay errores
 
@@ -748,12 +751,15 @@ public class Parser {
 
                         case TipoDeToken.IDENTIFICADOR:
 
-                            System.out.println("337 En llamada de funcion " + enBloqueDef + " " + tokenActual.getLexema() + " " + i);
+                            System.out.println("751 El identificador " + tokenActual.getLexema() + " dentro del bloques def " + enBloqueDef);
+                            System.out.println("752 ES FUNCION O ES LLAMADA A FUNCION ?");
                             System.out.println();
                             int indiceTokenActual = lineaDeCodigoEnTokens.indexOf(tokenActual);
                             numeroDeLineaTokenActual = tokenActual.getNumeroLinea();
                             Token sucesorTokenActual = new Token();
                             Token antecesorTokenActual = new Token();
+                            boolean modificaStatusFuncion = false;
+                            int numeroLinea = -1;
 
                             if (lineaDeCodigoEnTokens.size() > 2) {
                                 antecesorTokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual - 1);
@@ -768,54 +774,84 @@ public class Parser {
                                 break;
                             }
 
+                            System.out.println("772 Estamos en bloque 'def' " + enBloqueDef + " el identificador " + tokenActual.getLexema() + " no se le a asignado status de  funcion " + verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()));
                             //Si existe el bloque def => estamos ante una definicion de funcion
-                            if (enBloqueDef && lineaDeCodigoEnTokens.get(1).getLexema().equals("def") && antecesorTokenActual.getLexema().equals("def")) {
+                            if (lineaDeCodigoEnTokens.get(1).getLexema().equals("def") && antecesorTokenActual.getLexema().equals("def")) {
                                 //Cambiamos el nombre de la funcion de variable a funcion en la tabla de simbolos
-
+                                System.out.println();
+                                System.out.println("775 En modificando tipo de simbolo de variable a funcion a la funcion " + tokenActual.getLexema() + " en bloque def " + enBloqueDef);
                                 modificarTipoSimboloEnTablaSimbolos(tokenActual.getLexema(), "funcion", tokenActual.getNumeroLinea());
 
-                                System.out.println("837 En modificando tipo de simbolo a funcion  en bloque def " + enBloqueDef + " " + tokenActual.getLexema() + " " + i);
-                                System.out.println();
+                                System.out.println("777 En extrayendo argumento de funcion " + tokenActual.getLexema() + " el argumento es " + existeArgumentoDeFuncion(lineaDeCodigoEnTokens, tokenActual.getNumeroLinea()));
+                                boolean argumento = existeArgumentoDeFuncion(lineaDeCodigoEnTokens, tokenActual.getNumeroLinea());
+
+                                if (argumento) {
+                                    modificarArgumentoDeFuncionEnTablaSimbolos(tokenActual.getLexema(), tokenActual.getNumeroLinea(), "existe");
+                                }
+                                numeroLinea = tokenActual.getNumeroLinea();
+                                modificaStatusFuncion = true;
+                                break;
                             }
 
                             //Si no existe def ==> podriamos estar ante un definicion de funcion
-                            System.out.println("787 En llamada de funcion o es una definicion de funcion sin def " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
+                            System.out.println("787 En llamada de funcion o es una definicion de funcion sin def ? " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
                             System.out.println();
-                            /*
-                            if (!enBloqueDef && !enInstruccionReturn) {
-                                if (esFuncion(tokenActual.getLexema())) {
 
-                                    System.out.println("792 En llamada de funcion " + tokenActual.getLexema() + " " + numeroDeLineaTokenActual + " " + i);
-                                    System.out.println();
-                                    validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
+                            if (!lineaDeCodigoEnTokens.get(1).getLexema().equals("def")) {
+                                //El identificador es una posible definicion de funcion?
+                                System.out.println("815  El identificador es una definicion de funcion sin def? " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
+                                System.out.println("817 Existen dos puntos " + (indiceDosPuntos != -1));
+
+                                if ((indiceDosPuntos != -1)) {
+                                    if (esDefinicionDeFuncionSinDef(lineaDeCodigoEnTokens, indiceTokenActual)) {
+
+                                        System.out.println("820  El identificador es una definicion de funcion sin def: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
+                                    }
+                                    if (verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()).equals("variable")) {
+                                        break;
+                                    }
+                                } else {
+                                    //El identificador ->(->) es una posible llamada de funcion?
+                                    //El identificador ->( ->es una posible llamada de funcion?
+                                    //El identificador ->)-> es una posible llamada de funcion?
+                                    System.out.println("814 El identificador " + tokenActual.getLexema() + " es una posible definicion de funcion sin def");
+                                    int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
+                                    int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+
+                                    System.out.println("814 El identificador " + tokenActual.getLexema() + " en llamada de funcion " + enLlamadaDeFuncion);
+                                    /*
+                                    if (enLlamadaDeFuncion) {
+                                        enLlamadaDeFuncion = false;
+                                        System.out.println("814 El identificador " + tokenActual.getLexema() + " en llamada de funcion " + enLlamadaDeFuncion);
+                                        break;
+                                    }
+                                     */
+                                    if (verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()).equals("variable")) {
+                                        break;
+                                    }
+
+                                    if ((indiceParentesisIzquierdo != -1 || indiceParentesisDerecho != -1) && indiceDosPuntos == -1) {
+                                        System.out.println("819 El identificador " + tokenActual.getLexema() + " es una funcion  " + verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()));
+                                        if (verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()).equals("variable")) {
+                                            break;
+                                        }
+                                        if (verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()).equals("noExiste")) {
+
+                                            System.out.println("822 El identificador " + tokenActual.getLexema() + " es una llamada de funcion " + verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenActual.getLexema()));
+                                            System.out.println();
+                                            incluirErrorEncontrado(tokenActual.getNumeroLinea(), 675);
+                                            System.out.println("825 El identificador " + tokenActual.getLexema() + " esta en la posicion " + indiceTokenActual);
+                                        } else {
+                                            System.out.println("827 El identificador " + tokenActual.getLexema() + " esta en la posicion " + indiceTokenActual);
+                                            validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
+                                            enLlamadaDeFuncion = true;
+                                        }
+
+                                    }
+
                                 }
-                            }
-                             */
-                            //El identificador es una posible definicion de funcion?
-                            int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
-                            if (indiceDosPuntos != -1) {
-                                if (esDefinicionDeFuncionSinDef(lineaDeCodigoEnTokens, indiceTokenActual)) {
 
-                                    System.out.println("795  El identificador es una definicion de funcion sin def: " + tokenActual.getLexema() + " en linea " + numeroDeLineaTokenActual);
-                                }
-                            }
-
-                            //El identificador ->(->) es una posible llamada de funcion?
-                            //El identificador ->( es una posible llamada de funcion?
-                            //El identificador ->) es una posible llamada de funcion?
-                            int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
-                            int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
-                            if ((indiceParentesisIzquierdo != -1 || indiceParentesisDerecho != -1) && indiceDosPuntos == -1) {
-                                validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
-                            }
-
-                            System.out.println("815 El identificador " + tokenActual.getLexema() + " es funcion  " + esFuncion(tokenActual.getLexema()));
-                            //El identificador solo  es una posible llamada de funcion?
-                            if (esFuncion(tokenActual.getLexema())) {
-
-                                System.out.println("815 El identificador " + tokenActual.getLexema() + " es funcion  " + esFuncion(tokenActual.getLexema()));
-                                System.out.println();
-                                validarSintaxisDeLlamadaDeFuncion(lineaDeCodigoEnTokens, numeroDeLineaTokenActual, indiceTokenActual);
                             }
 
                             break;
@@ -828,6 +864,7 @@ public class Parser {
                     }
 
                 }//fin for de lectura de tokens de una lineas de codigo
+
             }
         }//fin for lectura de lineas de codigo
         System.out.println();
@@ -882,6 +919,105 @@ public class Parser {
     } // fin metodo analisisSintactico
 
     //INICIO METODOS AUXILIARES
+    public boolean existeArgumentoDeFuncion(List<Token> lineaDeCodigoEnTokens, int indiceTokenActual) {
+        boolean argumento = false;
+
+        int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
+        int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+        int indiceDosPuntos = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.DOS_PUNTOS);
+        if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho != -1) && indiceParentesisIzquierdo == (indiceTokenActual + 2) && ((indiceParentesisDerecho - indiceParentesisIzquierdo) == 1)) {
+            argumento = false;
+        } else if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho != -1)
+                && indiceParentesisIzquierdo == (indiceTokenActual + 2)
+                && ((indiceParentesisDerecho - indiceParentesisIzquierdo) >= 2)) {
+            argumento = true;
+        } else if ((indiceParentesisIzquierdo == -1) && (indiceParentesisDerecho != -1) && ((indiceParentesisDerecho - (indiceTokenActual + 2)) >= 2)) {
+            argumento = true;
+            System.out.println("907 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho == -1) && (indiceDosPuntos != 1) && ((indiceDosPuntos - indiceParentesisIzquierdo) == 1)) {
+            argumento = false;
+            System.out.println("907 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo == -1) && (indiceParentesisDerecho == -1) && (indiceDosPuntos != 1) && ((indiceDosPuntos - (indiceTokenActual + 1)) >= 2)) {
+            argumento = true;
+            System.out.println("907 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo == -1) && (indiceParentesisDerecho == -1) && (indiceDosPuntos != 1) && ((indiceDosPuntos - (indiceTokenActual + 1)) == 1)) {
+            argumento = false;
+            System.out.println("907 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        }
+        return argumento;
+    }
+
+    public String existeArgumentoEnLlamadaDeFuncion(String nombre) {
+        Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
+        String resultado = " ";
+        if (simbolo != null) {
+            resultado = simbolo.getArgumento();
+        } else {
+            resultado = "noExiste";
+        }
+        System.out.println();
+        System.out.println("963 " + nombre + " es  " + resultado);
+        return resultado;
+
+    }
+
+    /*
+    public boolean existeArgumentoEnLlamadaDeFuncion(List<Token> lineaDeCodigoEnTokens, int indiceTokenActual) {
+        boolean argumento = false;
+
+        int indiceParentesisIzquierdo = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_IZQUIERDO);
+        int indiceParentesisDerecho = buscarPosicionDeTokenPorTipoDeToken(lineaDeCodigoEnTokens, TipoDeToken.PARENTESIS_DERECHO);
+        int indiceUltimoToken = lineaDeCodigoEnTokens.indexOf(lineaDeCodigoEnTokens.getLast());
+        Token tokenActual = lineaDeCodigoEnTokens.get(indiceTokenActual);
+
+        System.out.println("957 primer token " + tokenActual);
+        System.out.println("957 indice Token actual " + indiceTokenActual + " indiceParentesisIzquierdo " + indiceParentesisIzquierdo + " indiceParentesisDerecho " + indiceParentesisDerecho + " indiceUltimoToken " + indiceUltimoToken);
+        if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho != -1) && indiceParentesisIzquierdo == (indiceTokenActual + 1) && ((indiceParentesisDerecho - indiceParentesisIzquierdo) == 1)) {
+            argumento = false;
+            System.out.println("955 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho != -1)
+                && indiceParentesisIzquierdo == (indiceTokenActual + 1)
+                && ((indiceParentesisDerecho - indiceParentesisIzquierdo) >= 2)) {
+            argumento = true;
+            System.out.println("963 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo == -1) && (indiceParentesisDerecho != -1) && ((indiceParentesisDerecho - (indiceTokenActual)) >= 2)) {
+            argumento = true;
+            System.out.println("969 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        } else if ((indiceParentesisIzquierdo != -1) && (indiceParentesisDerecho == -1) && indiceParentesisIzquierdo == (indiceTokenActual + 1) && (indiceUltimoToken == (indiceParentesisIzquierdo + 1))) {
+            argumento = true;
+            System.out.println("975 En existeArgumentoDeFuncion: " + argumento
+                    + " indiceTokenActual " + indiceTokenActual
+                    + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                    + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        }
+        System.out.println("980 En existeArgumentoDeFuncion: " + argumento
+                + " indiceTokenActual " + indiceTokenActual
+                + " posicion izquierdo " + indiceParentesisIzquierdo + " posicion derecho " + indiceParentesisDerecho
+                + " la diferencia es " + (indiceParentesisDerecho - indiceParentesisIzquierdo));
+        return argumento;
+    }
+     */
     public boolean lineasDeCodigoNoEvaluadas(List<Token> lineaDeTokens) {
         boolean lineaNoEvaluada = false;
         int indice = 0;
@@ -1497,8 +1633,14 @@ public class Parser {
 
         }
 
+        //Caso:  identificador -> : 
+        if (anteriorToken != null && anteriorToken.getTipoDeToken().equals(TipoDeToken.INDENTACION)) {
+            resultado = true;
+            incluirErrorEncontrado(numeroDeLinea, 655);
+
+        }
         //Caso: palabra reservada -> identificador -> ) -> ->: 
-        if (anteriorToken != null && !anteriorToken.getLexema().equals("def") && ultimoToken != null && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS) && (indiceDosPuntos != -1)) {
+        if (anteriorToken != null && !anteriorToken.getTipoDeToken().equals(TipoDeToken.INDENTACION) && !anteriorToken.getLexema().equals("def") && ultimoToken != null && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS) && (indiceDosPuntos != -1)) {
             resultado = true;
             incluirErrorEncontrado(numeroDeLinea, 655);
 
@@ -1543,6 +1685,7 @@ public class Parser {
         Token antecesor = lineaDeCodigoEnTokens.get(indiceIdentificador - 1);
         Token sucesor = new Token();
         Token ultimoToken = lineaDeCodigoEnTokens.getLast();
+        Token tokenActual = lineaDeCodigoEnTokens.get(indiceIdentificador);
 
         boolean posibleDefinicionDeFuncion = false;
 
@@ -1552,20 +1695,20 @@ public class Parser {
             numeroError = 667;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
-        if (antecesor.getTipoDeToken() != TipoDeToken.INDENTACION) {
+        if (antecesor.getLexema() != null && antecesor.getTipoDeToken() != TipoDeToken.INDENTACION) {
             numeroError = 668;
             incluirErrorEncontrado(numeroDeLinea, numeroError);
         }
 
         boolean p = verificarExistenciaParentesis(lineaDeCodigoEnTokens);
-
+        /*
         if (p && ultimoToken.getTipoDeToken().equals(TipoDeToken.DOS_PUNTOS)) {
             //Hay parentesis y dos puntos posible definicion de funcion sin def
             if (antecesor.getTipoDeToken().equals(TipoDeToken.INDENTACION)) {
                 incluirErrorEncontrado(numeroDeLinea, 652);
             }
         }
-
+         */
         System.out.println();
         System.out.println("498 validarSintaxisDeLlamadaDeFuncion-> existen parentesis " + p);
         boolean b = verificarParentesisBalanceados(lineaDeCodigoEnTokens, numeroDeLinea);
@@ -1577,6 +1720,13 @@ public class Parser {
                 incluirErrorEncontrado(numeroDeLinea, numeroError);
 
             }
+        }
+
+        String argumento = existeArgumentoEnLlamadaDeFuncion(tokenActual.getLexema());
+        System.out.println("1656 falta argumento de la funcion " + argumento);
+        System.out.println("1657 En extrayendo argumento de funcion " + tokenActual.getLexema() + " el argumento es " + existeArgumentoEnLlamadaDeFuncion(tokenActual.getLexema()));
+        if (argumento.equals("noExiste")) {
+            incluirErrorEncontrado(numeroDeLinea, 677);
         }
 
     }
@@ -2083,7 +2233,7 @@ public class Parser {
                             break;
                         case TipoDeToken.IDENTIFICADOR:
                             if (esLlamadaAFuncion(lineaDeTokens, indiceTokenAsignacion)) {
-                                if (!esFuncion(tokenSucesorAlOperador.getLexema()) && !tokenSucesorAlOperador.getLexema().equals("int")) {
+                                if (verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(tokenSucesorAlOperador.getLexema()).equals("noExiste") && !tokenSucesorAlOperador.getLexema().equals("int")) {
                                     numeroError = 675;
                                     incluirErrorEncontrado(numeroDeLinea, numeroError);
                                     System.out.println();
@@ -2497,20 +2647,54 @@ public class Parser {
 
     }
 
-    //Permite verificar si un identificador en la tabla de simbolos es una funcion
-    //Devuelve false si nombre no es funcion, true si nombre es una funcion
-    public boolean esFuncion(String nombre) {
+    public void modificarArgumentoDeFuncionEnTablaSimbolos(String nombre, int numeroDeLinea, String argumento) {
+        System.out.println("2501 EN MODIFICAR ARGUMENTO DE FUNCION EN TABLA SIMBOLOS ");
+        imprimirTablaDeSimbolos();
+
         Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
+
+        System.out.println("2492 Modificanto nombre de la funcion " + nombre + " nuevo argumento " + argumento + " en la linea " + numeroDeLinea);
+
         if (simbolo != null) {
-            if (simbolo.getTipo().equals("funcion")) {
-                return true;
+            if (tablaDeSimbolos.contieneSimbolo(nombre) == false) {
+                incluirErrorEncontrado(numeroDeLinea, 675);
+            } else {
+                simbolo.setArgumento(argumento);
             }
-            System.out.println();
-            System.out.println("1666 Es funcion " + simbolo.getTipo() + " " + simbolo.getTipo().equals("funcion"));
 
         }
 
-        return false;
+        System.out.println("2503 EN MODIFICAR TIPO SIMBOLO EN TABLA SIMBOLOS ");
+        imprimirTablaDeSimbolos();
+
+    }
+
+    //Permite verificar si un identificador en la tabla de simbolos es una funcion
+    //Devuelve false si nombre no es funcion, true si nombre es una funcion
+    public String verificandoIdentificadorEnTablaDeSimbolosExisteComoFuncion(String nombre) {
+        Simbolo simbolo = tablaDeSimbolos.obtenerSimbolo(nombre);
+        String resultado = " ";
+        if (simbolo != null) {
+            resultado = simbolo.getTipo();
+        } else {
+            resultado = "noExiste";
+        }
+        System.out.println();
+        System.out.println("1666 " + nombre + " es  " + resultado + " por lo que es funcion es  " + simbolo.getTipo().equals("funcion"));
+        return resultado;
+    }
+
+    public void incluirPrintEnEnTablaDeSimbolos(Token token) {
+        String nombre = token.getLexema();
+        String tipo = "funcion";
+        String literal = token.getLiteral();
+        String argumento = "no aplica";
+
+        int numeroLinea = token.getNumeroLinea(); // Obtiene el número de línea donde se declaro por primera vez
+
+        Simbolo simbolo = new Simbolo(tipo, literal, numeroLinea, argumento);
+        tablaDeSimbolos.agregarSimbolo(nombre, simbolo);
+
     }
 
     public boolean funcionDefinidaAnteriormente(String nombre) {

@@ -129,6 +129,7 @@ public class TiposDeError {
         errores.put(674, "La línea de código de return termina caon caracter especial");
         errores.put(675, "La función no ha sido definida previamente");
         errores.put(676, "La función ya fue definida anteriormente.");
+        errores.put(677, "Error de sintaxis. Falta el argumento de la funcion.");
 
         //Errores relacionados con operador PRINT
         errores.put(700, "Error de sintaxis. La línea de código contiene caracteres no permitidos antes de la función print.");

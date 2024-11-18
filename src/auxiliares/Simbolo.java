@@ -13,13 +13,26 @@ public class Simbolo {
     private String tipo; //Almacena variables y funciones
     private String valor; //Nombre de la variable o de la función
     private int numeroLinea; //Número de línea donde se declaró por primera vez
+    private String argumento; //Nombre del argumento
 
-    public Simbolo(String tipo, String valor, int numeroLinea) {
+    
+    public Simbolo(String tipo, String valor, int numeroLinea, String argumento) {
         this.tipo = tipo;
         this.valor = valor;
         this.numeroLinea = numeroLinea;
+        this.argumento = argumento;
     }
 
+    
+    public String getArgumento() {
+        return argumento;
+    }
+
+    public void setArgumento(String argumento) {
+        this.argumento = argumento;
+    }
+
+    
     public String getTipo() {
         return tipo;
     }
